@@ -22,7 +22,7 @@ public class WorkshopApplication implements CommandLineRunner {
 		if (v != null && v == 1) {
 			System.out.println(" Connection works (SELECT 1 = " + v + ")");
 		} else {
-			System.err.println("✖ Connection does not work (Result: " + v + ")");
+			System.err.println("Connection does not work (Result: " + v + ")");
 		}
 	}
 }
