@@ -11,8 +11,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>Warehouse</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Workshop</name>
-	<description>Workshop</description>
+	<name>Warehouse</name>
+	<description>Warehouse</description>
 	<url/>
 	<licenses>
 		<license/>
