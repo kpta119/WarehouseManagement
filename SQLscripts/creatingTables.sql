@@ -1,3 +1,15 @@
+DROP TABLE IF EXISTS ProductInventory;
+DROP TABLE IF EXISTS Product;
+DROP TABLE IF EXISTS Category;
+DROP TABLE IF EXISTS Employee;
+DROP TABLE IF EXISTS Warehouse;
+DROP TABLE IF EXISTS Supplier;
+DROP TABLE IF EXISTS Client;
+DROP TABLE IF EXISTS Address;
+DROP TABLE IF EXISTS City;
+DROP TABLE IF EXISTS Country;
+DROP TABLE IF EXISTS Region;
+
 CREATE TABLE Region (
     RegionID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(50) NOT NULL
@@ -53,7 +65,8 @@ CREATE TABLE Employee (
     Email VARCHAR(100),
     PhoneNumber VARCHAR(20),
     AddressID INT,
-    FOREIGN KEY (AddressID) REFERENCES Address(AddressID)
+    FOREIGN KEY (AddressID) REFERENCES Address(AddressID),
+    FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
 );
 
 CREATE TABLE Warehouse (
