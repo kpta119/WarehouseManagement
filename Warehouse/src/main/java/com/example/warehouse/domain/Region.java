@@ -1,4 +1,4 @@
-package com.example.workshop.domain;
+package com.example.warehouse.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Region {
-    private Long id;
+    private Integer id;
     private String name;
 }

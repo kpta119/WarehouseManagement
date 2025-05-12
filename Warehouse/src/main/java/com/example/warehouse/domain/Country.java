@@ -1,4 +1,4 @@
-package com.example.workshop.domain;
+package com.example.warehouse.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Country {
-    private Long id;
+    private Integer id;
     private String name;
     private String countryCode;
-    private Long regionId;
+    private Integer regionId;
 }

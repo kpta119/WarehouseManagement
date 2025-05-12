@@ -1,7 +1,7 @@
-package com.example.workshop.dao.impl;
+package com.example.warehouse.dao.impl;
 
-import com.example.workshop.dao.RegionDao;
-import com.example.workshop.domain.Region;
+import com.example.warehouse.dao.RegionDao;
+import com.example.warehouse.domain.Region;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class RegionDaoImpl implements RegionDao {

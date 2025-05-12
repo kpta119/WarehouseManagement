@@ -1,10 +1,10 @@
-package com.example.workshop;
+package com.example.warehouse;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class WorkshopApplicationTests {
+class WarehouseApplicationTests {
 
 	@Test
 	void contextLoads() {
