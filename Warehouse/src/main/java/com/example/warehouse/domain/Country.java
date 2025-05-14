@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class Country {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "CountryID")
     private Integer id;
 
     private String name;
