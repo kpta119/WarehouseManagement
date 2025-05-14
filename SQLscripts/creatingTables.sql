@@ -57,6 +57,16 @@ CREATE TABLE Supplier (
     FOREIGN KEY (AddressID) REFERENCES Address(AddressID)
 );
 
+
+CREATE TABLE Warehouse (
+    WarehouseID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Capacity INT NOT NULL,
+    OccupiedCapacity INT NOT NULL,
+    AddressID INT,
+    FOREIGN KEY (AddressID) REFERENCES Address(AddressID)
+);
+
 CREATE TABLE Employee (
     EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
@@ -70,14 +80,6 @@ CREATE TABLE Employee (
     FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
 );
 
-CREATE TABLE Warehouse (
-    WarehouseID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    Capacity INT NOT NULL,
-    OccupiedCapacity INT NOT NULL,
-    AddressID INT,
-    FOREIGN KEY (AddressID) REFERENCES Address(AddressID)
-);
 
 CREATE TABLE Category (
     CategoryID INT AUTO_INCREMENT PRIMARY KEY,
