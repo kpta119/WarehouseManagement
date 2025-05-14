@@ -21,7 +21,6 @@ public class RegionRepositoryIntegrationTests {
     @Autowired
     private RegionRepository underTest;
 
-
     @Test
     public void testThatRegionCanBeCreatedAndRecalled(){
         Region region = TestDataUtil.createRegion1();

@@ -13,12 +13,13 @@ import lombok.NoArgsConstructor;
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "CityID")
     private Integer id;
 
     private String name;
     private String postalCode;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "CountryID")
     private Country country;
 }

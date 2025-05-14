@@ -14,6 +14,7 @@ public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ClientID")
     private Integer id;
 
     private String name;

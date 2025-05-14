@@ -13,15 +13,19 @@ import lombok.NoArgsConstructor;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "AddressID")
     private Integer id;
 
     private String street;
     private Integer streetNumber;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "CityID")
     private City city;
 
     @OneToOne(mappedBy = "address")
     private Client client;
+
+    @OneToOne(mappedBy = "address")
+    private Supplier supplier;
 }
