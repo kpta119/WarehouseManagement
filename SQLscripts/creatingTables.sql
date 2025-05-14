@@ -65,6 +65,7 @@ CREATE TABLE Employee (
     Email VARCHAR(100),
     PhoneNumber VARCHAR(20),
     AddressID INT,
+    WarehouseID INT,
     FOREIGN KEY (AddressID) REFERENCES Address(AddressID),
     FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
 );
