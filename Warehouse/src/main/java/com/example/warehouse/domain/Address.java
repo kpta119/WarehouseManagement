@@ -21,4 +21,7 @@ public class Address {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "CityID")
     private City city;
+
+    @OneToOne(mappedBy = "address")
+    private Client client;
 }

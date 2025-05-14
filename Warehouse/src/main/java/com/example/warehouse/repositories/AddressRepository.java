@@ -1,4 +1,7 @@
 package com.example.warehouse.repositories;
 
-public interface AddressRepository {
+import com.example.warehouse.domain.Address;
+import org.springframework.data.repository.CrudRepository;
+
+public interface AddressRepository extends CrudRepository<Address, Integer> {
 }
