@@ -1,16 +1,17 @@
 package com.example.warehouse;
 
+import com.example.warehouse.domain.Region;
+import com.example.warehouse.repositories.RegionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootApplication
 public class WarehouseApplication implements CommandLineRunner {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private RegionRepository regionRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(WarehouseApplication.class, args);
@@ -18,11 +19,9 @@ public class WarehouseApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		Integer v = jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-		if (v != null && v == 1) {
-			System.out.println(" Connection works (SELECT 1 = " + v + ")");
-		} else {
-			System.err.println("Connection does not work (Result: " + v + ")");
-		}
+		Region region = new Region();
+		region.setName("Europe");
+		Region savedReg = regionRepository.save(region);
+		System.out.println("Saved region is: Id= " + savedReg.getId() + "Name= " + savedReg.getName());
 	}
 }
