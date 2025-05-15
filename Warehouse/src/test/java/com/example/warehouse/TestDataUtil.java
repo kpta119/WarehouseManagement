@@ -32,4 +32,20 @@ public class TestDataUtil {
         country.setCountryCode("PL");
         return country;
     }
+
+    public static Country createCountry2(Region region){
+        Country country = new Country();
+        country.setName("China");
+        country.setRegion(region);
+        country.setCountryCode("CHN");
+        return country;
+    }
+
+    public static Country createCountry3(Region region){
+        Country country = new Country();
+        country.setName("Germany");
+        country.setRegion(region);
+        country.setCountryCode("GER");
+        return country;
+    }
 }

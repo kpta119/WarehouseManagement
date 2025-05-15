@@ -43,5 +43,26 @@ public class CountryRepositoryIntegrationTests {
         assertThat(resultRegion).isPresent();
         assertThat(resultRegion.get()).isEqualTo(region);
     }
+
+    @Test
+    @Transactional
+    public void testThatMultipleCountriesCanBeCreated(){
+        Region region1 = TestDataUtil.createRegion1();
+        regionRepository.save(region1);
+        Country country1 = TestDataUtil.createCountry1(region1);
+        underTest.save(country1);
+        Region region2 = TestDataUtil.createRegion2();
+        regionRepository.save(region2);
+        Country country2 = TestDataUtil.createCountry2(region2);
+        underTest.save(country2);
+        Region region3 = TestDataUtil.createRegion3();
+        regionRepository.save(region3);
+        Country country3 = TestDataUtil.createCountry3(region3);
+        underTest.save(country3);
+
+        Iterable<Country> result = underTest.findAll();
+        assertThat(result).hasSize(3).containsExactly(country1, country2, country3);
+
+    }
 }
 
