@@ -43,5 +43,28 @@ public class RegionRepositoryIntegrationTests {
         assertThat(result).hasSize(3).containsExactly(region, region2, region3);
     }
 
+    @Test
+    public void testThatRegionCanBeUpdated(){
+        Region region = TestDataUtil.createRegion1();
+        underTest.save(region);
+        region.setName("Updated");
+        underTest.save(region);
+        Optional<Region> result = underTest.findById(region.getId());
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(region);
+    }
+
+    @Test
+    public void testThatRegionCanBeDeleted(){
+        Region region = TestDataUtil.createRegion1();
+        underTest.save(region);
+        Optional<Region> result = underTest.findById(region.getId());
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(region);
+
+        underTest.deleteById(region.getId());
+        Optional<Region> resultAfterDeleting = underTest.findById(region.getId());
+        assertThat(resultAfterDeleting).isEmpty();
+    }
 }
 
