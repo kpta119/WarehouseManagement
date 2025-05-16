@@ -1,49 +1,30 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as authAPI from "./authAPI";
+import { createSlice } from "@reduxjs/toolkit";
 
-export const loginUser = createAsyncThunk(
-  "auth/login",
-  async (credentials, thunkAPI) => {
-    const response = await authAPI.login(credentials);
-    localStorage.setItem("token", response.data.token);
-    return response.data.user;
-  }
-);
-
-export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  await authAPI.logout();
-  localStorage.removeItem("token");
-});
-
-export const checkAuth = createAsyncThunk("auth/verify", async () => {
-  const response = await authAPI.verifyToken();
-  return response.data.user;
-});
+const persisted = localStorage.getItem("loggedIn") === "true";
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { user: null, status: "idle", error: null },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(loginUser.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.user = action.payload;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.user = null;
-      })
-      .addCase(checkAuth.fulfilled, (state, action) => {
-        state.user = action.payload;
-      });
+  initialState: { loggedIn: persisted, error: null },
+  reducers: {
+    login: (state, action) => {
+      const { username, password } = action.payload;
+      if (username === "admin" && password === "admin") {
+        state.loggedIn = true;
+        state.error = null;
+        localStorage.setItem("loggedIn", "true");
+      } else {
+        state.loggedIn = false;
+        state.error = "Nieprawidłowa nazwa lub hasło";
+        localStorage.removeItem("loggedIn");
+      }
+    },
+    logout: (state) => {
+      state.loggedIn = false;
+      state.error = null;
+      localStorage.removeItem("loggedIn");
+    },
   },
 });
 
+export const { login, logout } = authSlice.actions;
 export default authSlice.reducer;

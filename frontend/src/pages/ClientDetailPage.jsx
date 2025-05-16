@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
 
-const SupplierDetailPage = () => {
+const ClientDetailPage = () => {
   const { id } = useParams();
   return (
     <div>
-      <h1>Supplier Detail Page</h1>
+      <h1>Client Detail Page</h1>
       <p>Params: {JSON.stringify({ id })}</p>
     </div>
   );
 };
 
-export default SupplierDetailPage;
+export default ClientDetailPage;
