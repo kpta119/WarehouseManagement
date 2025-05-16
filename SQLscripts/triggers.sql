@@ -109,7 +109,7 @@ BEGIN
     IF NOT (
         (NEW.TransactionType = 'WAREHOUSE_TO_WAREHOUSE' AND NEW.FromWarehouseID IS NOT NULL AND NEW.ToWarehouseID IS NOT NULL)
         OR
-        (NEW.TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND NEW.SupplierID IS NOT NULL AND NEW.FromWarehouseID IS NOT NULL)
+        (NEW.TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND NEW.SupplierID IS NOT NULL AND NEW.ToWarehouseID IS NOT NULL)
         OR
         (NEW.TransactionType = 'WAREHOUSE_TO_CUSTOMER' AND NEW.FromWarehouseID IS NOT NULL AND NEW.ClientID IS NOT NULL)
     ) THEN

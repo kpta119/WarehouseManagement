@@ -138,7 +138,7 @@ ALTER TABLE Transaction
     ADD CONSTRAINT transaction_type_check
     CHECK ((TransactionType = 'WAREHOUSE_TO_WAREHOUSE' AND FromWarehouseID IS NOT NULL AND ToWarehouseID IS NOT NULL)
         OR
-        (TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND SupplierID IS NOT NULL AND FromWarehouseID IS NOT NULL)
+        (TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND SupplierID IS NOT NULL AND ToWarehouseID IS NOT NULL)
         OR
         (TransactionType = 'WAREHOUSE_TO_CUSTOMER' AND FromWarehouseID IS NOT NULL AND ClientID IS NOT NULL)
         );
