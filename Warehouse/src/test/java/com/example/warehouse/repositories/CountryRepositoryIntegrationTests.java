@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -27,7 +26,6 @@ public class CountryRepositoryIntegrationTests {
     private RegionRepository regionRepository;
 
     @Test
-    @Transactional
     public void testThatCountryCanBeCreatedAndRecalled() {
         Region region = TestDataUtil.createRegion2();
         regionRepository.save(region);
@@ -45,7 +43,6 @@ public class CountryRepositoryIntegrationTests {
     }
 
     @Test
-    @Transactional
     public void testThatMultipleCountriesCanBeCreated(){
         Region region1 = TestDataUtil.createRegion1();
         regionRepository.save(region1);
@@ -62,7 +59,23 @@ public class CountryRepositoryIntegrationTests {
 
         Iterable<Country> result = underTest.findAll();
         assertThat(result).hasSize(3).containsExactly(country1, country2, country3);
+    }
 
+    @Test
+    public void testThatCountriesCanBeFoundFromGivenRegion(){
+        Region region = TestDataUtil.createRegion1();
+        regionRepository.save(region);
+        Country country1 = TestDataUtil.createCountry1(region);
+        underTest.save(country1);
+        Region anotherRegion = TestDataUtil.createRegion2();
+        regionRepository.save(anotherRegion);
+        Country country2 = TestDataUtil.createCountry2(anotherRegion);
+        underTest.save(country2);
+        Country country3 = TestDataUtil.createCountry3(region);
+        underTest.save(country3);
+
+        Iterable<Country> foundCountries = underTest.findByRegionId(region.getId());
+        assertThat(foundCountries).hasSize(2).containsExactly(country1, country3);
     }
 }
 
