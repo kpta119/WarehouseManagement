@@ -22,7 +22,6 @@ export default function Sidebar() {
           <img src={Logo} alt="Logo" className="h-10 w-10 rounded-full mr-2" />
           <span className="text-xl font-bold">BD2 gr. 03</span>
         </div>
-
         <SidebarLink to="/" end icon={AiOutlineHome} label="Dashboard" />
         <SidebarLink to="/products" icon={FaBoxOpen} label="Products" />
         <SidebarLink to="/categories" icon={FaTags} label="Categories" />
@@ -36,7 +35,6 @@ export default function Sidebar() {
         <SidebarLink to="/suppliers" icon={FaUserTie} label="Suppliers" />
         <SidebarLink to="/employees" icon={FaUserFriends} label="Employees" />
         <SidebarLink to="/geography" icon={FaGlobe} label="Geography" />
-
         <div className="mt-4 border-t pt-4">
           <p className="text-xs uppercase text-gray-500 px-2">Inventory</p>
           <SidebarLink to="/inventory/receive" icon={FaTruck} label="Receive" />

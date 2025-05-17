@@ -1,7 +1,12 @@
 import apiClient from "../utils/apiClient";
+import { dummyTransactions, dummyTransactionById } from "../utils/dummyData";
 
 export const listTransactions = (params) =>
-  apiClient.get("/api/transactions", { params });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyTransactions })
+    : apiClient.get("/api/transactions", { params });
 
 export const getTransactionById = (transactionId) =>
-  apiClient.get(`/api/transactions/${transactionId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyTransactionById })
+    : apiClient.get(`/api/transactions/${transactionId}`);

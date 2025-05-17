@@ -11,6 +11,7 @@ import clientsReducer from "../features/clients/clientsSlice";
 import suppliersReducer from "../features/suppliers/suppliersSlice";
 import employeesReducer from "../features/employees/employeesSlice";
 import summaryReducer from "../features/dashboard/summarySlice";
+import selectedWarehouseReducer from "../features/selectedWarehouse/selectedWarehouseSlice";
 
 export default combineReducers({
   auth: authReducer,
@@ -27,4 +28,5 @@ export default combineReducers({
   suppliers: suppliersReducer,
   employees: employeesReducer,
   dashboard: summaryReducer,
+  selectedWarehouse: selectedWarehouseReducer,
 });

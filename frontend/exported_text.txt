@@ -31,8 +31,12 @@ createRoot(document.getElementById("root")).render(
 // \api\categories.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyCategories } from "../utils/dummyData";
 
-export const listCategories = () => apiClient.get("/api/categories");
+export const listCategories = () =>
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyCategories })
+    : apiClient.get("/api/categories");
 
 export const createCategory = (data) => apiClient.post("/api/categories", data);
 
@@ -46,11 +50,17 @@ export const deleteCategory = (categoryId) =>
 // \api\clients.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyClients, dummyClientById } from "../utils/dummyData";
 
-export const listClients = () => apiClient.get("/api/clients");
+export const listClients = () =>
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyClients })
+    : apiClient.get("/api/clients");
 
 export const getClientById = (clientId) =>
-  apiClient.get(`/api/clients/${clientId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyClientById })
+    : apiClient.get(`/api/clients/${clientId}`);
 
 export const createClient = (data) => apiClient.post("/api/clients", data);
 
@@ -58,20 +68,28 @@ export const createClient = (data) => apiClient.post("/api/clients", data);
 // \api\dashboard.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyDashboardSummary } from "../utils/dummyData";
 
 export const getDashboardSummary = (warehouseId) =>
-  apiClient.get("/api/dashboard/summary", { params: { warehouseId } });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyDashboardSummary })
+    : apiClient.get("/api/dashboard/summary", { params: { warehouseId } });
 
 
 // \api\employees.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyEmployees, dummyEmployeeById } from "../utils/dummyData";
 
 export const listEmployees = (params) =>
-  apiClient.get("/api/employees", { params });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyEmployees })
+    : apiClient.get("/api/employees", { params });
 
 export const getEmployeeById = (employeeId) =>
-  apiClient.get(`/api/employees/${employeeId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyEmployeeById })
+    : apiClient.get(`/api/employees/${employeeId}`);
 
 export const createEmployee = (data) => apiClient.post("/api/employees", data);
 
@@ -79,11 +97,17 @@ export const createEmployee = (data) => apiClient.post("/api/employees", data);
 // \api\geography.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyRegions, dummyCountries } from "../utils/dummyData";
 
-export const listRegions = () => apiClient.get("/api/regions");
+export const listRegions = () =>
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyRegions })
+    : apiClient.get("/api/regions");
 
 export const listCountries = (regionId) =>
-  apiClient.get("/api/countries", { params: { regionId } });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyCountries })
+    : apiClient.get("/api/countries", { params: { regionId } });
 
 export const createAddress = (data) => apiClient.post("/api/addresses", data);
 
@@ -105,20 +129,34 @@ export const deliverToClient = (data) =>
 // \api\products.jsx
 
 import apiClient from "../utils/apiClient";
+import {
+  dummyProducts,
+  dummyProductById,
+  dummyLowStock,
+  dummyBestSelling,
+} from "../utils/dummyData";
 
 export const searchProducts = (params) =>
-  apiClient.get("/api/products/search", { params });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyProducts })
+    : apiClient.get("/api/products/search", { params });
 
 export const getProductById = (productId) =>
-  apiClient.get(`/api/products/${productId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyProductById })
+    : apiClient.get(`/api/products/${productId}`);
 
 export const getLowStockProducts = (warehouseId) =>
-  apiClient.get("/api/products/low-stock", { params: { warehouseId } });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyLowStock })
+    : apiClient.get("/api/products/low-stock", { params: { warehouseId } });
 
 export const getBestSelling = ({ warehouseId, period }) =>
-  apiClient.get("/api/products/best-selling", {
-    params: { warehouseId, period },
-  });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyBestSelling })
+    : apiClient.get("/api/products/best-selling", {
+        params: { warehouseId, period },
+      });
 
 export const createProduct = (data) => apiClient.post("/api/products", data);
 
@@ -132,11 +170,17 @@ export const deleteProduct = (productId) =>
 // \api\suppliers.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummySupplierById, dummySuppliers } from "../utils/dummyData";
 
-export const listSuppliers = () => apiClient.get("/api/suppliers");
+export const listSuppliers = () =>
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummySuppliers })
+    : apiClient.get("/api/suppliers");
 
 export const getSupplierById = (supplierId) =>
-  apiClient.get(`/api/suppliers/${supplierId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummySupplierById })
+    : apiClient.get(`/api/suppliers/${supplierId}`);
 
 export const createSupplier = (data) => apiClient.post("/api/suppliers", data);
 
@@ -144,22 +188,33 @@ export const createSupplier = (data) => apiClient.post("/api/suppliers", data);
 // \api\transactions.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyTransactions, dummyTransactionById } from "../utils/dummyData";
 
 export const listTransactions = (params) =>
-  apiClient.get("/api/transactions", { params });
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyTransactions })
+    : apiClient.get("/api/transactions", { params });
 
 export const getTransactionById = (transactionId) =>
-  apiClient.get(`/api/transactions/${transactionId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyTransactionById })
+    : apiClient.get(`/api/transactions/${transactionId}`);
 
 
 // \api\warehouses.jsx
 
 import apiClient from "../utils/apiClient";
+import { dummyWarehouses, dummyWarehouseById } from "../utils/dummyData";
 
-export const listWarehouses = () => apiClient.get("/api/warehouses");
+export const listWarehouses = () =>
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyWarehouses })
+    : apiClient.get("/api/warehouses");
 
 export const getWarehouseById = (warehouseId) =>
-  apiClient.get(`/api/warehouses/${warehouseId}`);
+  import.meta.env.DEV
+    ? Promise.resolve({ data: dummyWarehouseById })
+    : apiClient.get(`/api/warehouses/${warehouseId}`);
 
 export const createWarehouse = (data) =>
   apiClient.post("/api/warehouses", data);
@@ -186,6 +241,7 @@ import clientsReducer from "../features/clients/clientsSlice";
 import suppliersReducer from "../features/suppliers/suppliersSlice";
 import employeesReducer from "../features/employees/employeesSlice";
 import summaryReducer from "../features/dashboard/summarySlice";
+import selectedWarehouseReducer from "../features/selectedWarehouse/selectedWarehouseSlice";
 
 export default combineReducers({
   auth: authReducer,
@@ -202,6 +258,7 @@ export default combineReducers({
   suppliers: suppliersReducer,
   employees: employeesReducer,
   dashboard: summaryReducer,
+  selectedWarehouse: selectedWarehouseReducer,
 });
 
 
@@ -223,10 +280,182 @@ export default store;
 
 // \components\Dashboard\Charts.jsx
 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+
+export default function Charts({ summary }) {
+  const barData = [
+    {
+      name: "Monthly",
+      Receipts: summary.monthlyReceipts,
+      Deliveries: summary.monthlyDeliveries,
+    },
+  ];
+  const inStock = summary.productsCount - summary.lowStockCount;
+  const pieData = [
+    { name: "Low stock", value: summary.lowStockCount },
+    { name: "In stock", value: inStock },
+  ];
+  const COLORS = ["#EF4444", "#10B981"];
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Monthly movements</h2>
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={barData}>
+            <XAxis dataKey="name" tick={{ fill: "#6B7280" }} />
+            <YAxis tick={{ fill: "#6B7280" }} />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Receipts" fill="#3B82F6" />
+            <Bar dataKey="Deliveries" fill="#8B5CF6" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Stock status</h2>
+        <ResponsiveContainer width="100%" height={260}>
+          <PieChart>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={50}
+              outerRadius={80}
+              label
+            >
+              {pieData.map((_, idx) => (
+                <Cell key={idx} fill={COLORS[idx]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend verticalAlign="bottom" height={36} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
 
 
 // \components\Dashboard\SummaryTiles.jsx
 
+import {
+  FaBox,
+  FaTags,
+  FaTruckLoading,
+  FaTruckPickup,
+  FaExclamationTriangle,
+  FaStar,
+  FaDollarSign,
+  FaSyncAlt,
+  FaCalendarCheck,
+  FaCalendarDay,
+} from "react-icons/fa";
+
+const SummaryTiles = ({ summary }) => {
+  console.log(summary);
+  const {
+    productsCount,
+    categoriesCount,
+    monthlyReceipts,
+    monthlyDeliveries,
+    lowStockCount,
+    topProduct,
+    inventoryValue,
+    turnoverLastWeek,
+    lastReceiptDate,
+    lastDeliveryDate,
+  } = summary;
+  const tiles = [
+    {
+      icon: <FaBox className="text-indigo-500 w-6 h-6" />,
+      label: "Products",
+      value: productsCount,
+    },
+    {
+      icon: <FaTags className="text-green-500 w-6 h-6" />,
+      label: "Categories",
+      value: categoriesCount,
+    },
+    {
+      icon: <FaTruckLoading className="text-blue-500 w-6 h-6" />,
+      label: "Receipts (M)",
+      value: monthlyReceipts,
+    },
+    {
+      icon: <FaTruckPickup className="text-pink-500 w-6 h-6" />,
+      label: "Deliveries (M)",
+      value: monthlyDeliveries,
+    },
+    {
+      icon: <FaExclamationTriangle className="text-red-500 w-6 h-6" />,
+      label: "Low stock",
+      value: lowStockCount,
+    },
+    {
+      icon: <FaStar className="text-yellow-500 w-6 h-6" />,
+      label: "Top product",
+      value: topProduct,
+    },
+    {
+      icon: <FaDollarSign className="text-emerald-500 w-6 h-6" />,
+      label: "Inventory $",
+      value: inventoryValue?.toLocaleString(undefined, {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      }),
+    },
+    {
+      icon: <FaSyncAlt className="text-teal-500 w-6 h-6" />,
+      label: "Turnover LW",
+      value: turnoverLastWeek?.toLocaleString(undefined, {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      }),
+    },
+    {
+      icon: <FaCalendarCheck className="text-purple-500 w-6 h-6" />,
+      label: "Last receipt",
+      value: new Date(lastReceiptDate).toLocaleDateString(),
+    },
+    {
+      icon: <FaCalendarDay className="text-indigo-700 w-6 h-6" />,
+      label: "Last delivery",
+      value: new Date(lastDeliveryDate).toLocaleDateString(),
+    },
+  ];
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      {tiles.map(({ icon, label, value }) => (
+        <div
+          key={label}
+          className="bg-white rounded-lg shadow p-4 flex flex-col items-start"
+        >
+          <div className="flex items-center mb-2">
+            {icon}
+            <p className="ml-2 text-sm text-gray-500">{label}</p>
+          </div>
+          <p className="text-2xl font-semibold text-gray-800">{value}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default SummaryTiles;
 
 
 // \components\Forms\CategoryForm.jsx
@@ -310,11 +539,96 @@ export default Layout;
 
 // \components\Layout\Navbar.jsx
 
-const Navbar = () => {
-  return <div>Navbar</div>;
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../../features/auth/authSlice";
+import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
+import { setSelectedWarehouse } from "../../features/selectedWarehouse/selectedWarehouseSlice";
+import { FaChevronDown, FaSignOutAlt } from "react-icons/fa";
+import { useEffect } from "react";
+
+const titles = {
+  "/": "Dashboard",
+  "/products": "Products",
+  "/categories": "Categories",
+  "/warehouses": "Warehouses",
+  "/inventory/receive": "Receive Inventory",
+  "/inventory/transfer": "Transfer Inventory",
+  "/inventory/delivery": "Delivery",
+  "/transactions": "Transactions",
+  "/clients": "Clients",
+  "/suppliers": "Suppliers",
+  "/employees": "Employees",
+  "/geography": "Geography",
 };
 
-export default Navbar;
+export default function Navbar() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { list: warehouses } = useSelector((s) => s.warehouses);
+  const selectedWarehouse = useSelector((s) => s.selectedWarehouse);
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+  }, [dispatch]);
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
+  const title =
+    titles[pathname] ||
+    pathname
+      .split("/")
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  return (
+    <header className="flex items-center justify-between bg-white shadow p-4">
+      <div className="flex items-center">
+        <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
+      </div>
+      <div className="relative mx-4">
+        <select
+          className="
+            block
+            appearance-none
+            w-80
+            bg-white
+            border border-gray-300
+            text-gray-700
+            py-2 px-3 pr-8
+            rounded-md
+            leading-tight
+            focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500
+            transition-colors duration-300
+          "
+          value={selectedWarehouse ?? ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            dispatch(setSelectedWarehouse(val === "" ? null : Number(val)));
+          }}
+        >
+          <option value="">All Warehouses</option>
+          {warehouses.map((w) => (
+            <option key={w.warehouseId} value={w.warehouseId}>
+              {w.name}
+            </option>
+          ))}
+        </select>
+        <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+      </div>
+      <div className="flex items-center">
+        <button
+          className="flex items-center text-gray-600 hover:text-pink-800 transition-colors duration-300 cursor-pointer"
+          onClick={handleLogout}
+        >
+          <FaSignOutAlt className="mr-2" />
+          Logout
+        </button>
+      </div>
+    </header>
+  );
+}
 
 
 // \components\Layout\ProtectedRoute.jsx
@@ -356,7 +670,6 @@ export default function Sidebar() {
           <img src={Logo} alt="Logo" className="h-10 w-10 rounded-full mr-2" />
           <span className="text-xl font-bold">BD2 gr. 03</span>
         </div>
-
         <SidebarLink to="/" end icon={AiOutlineHome} label="Dashboard" />
         <SidebarLink to="/products" icon={FaBoxOpen} label="Products" />
         <SidebarLink to="/categories" icon={FaTags} label="Categories" />
@@ -370,7 +683,6 @@ export default function Sidebar() {
         <SidebarLink to="/suppliers" icon={FaUserTie} label="Suppliers" />
         <SidebarLink to="/employees" icon={FaUserFriends} label="Employees" />
         <SidebarLink to="/geography" icon={FaGlobe} label="Geography" />
-
         <div className="mt-4 border-t pt-4">
           <p className="text-xs uppercase text-gray-500 px-2">Inventory</p>
           <SidebarLink to="/inventory/receive" icon={FaTruck} label="Receive" />
@@ -854,6 +1166,22 @@ const productsSlice = createSlice({
 export default productsSlice.reducer;
 
 
+// \features\selectedWarehouse\selectedWarehouseSlice.jsx
+
+import { createSlice } from "@reduxjs/toolkit";
+
+const selectedWarehouseSlice = createSlice({
+  name: "selectedWarehouse",
+  initialState: null,
+  reducers: {
+    setSelectedWarehouse: (_, action) => action.payload,
+  },
+});
+
+export const { setSelectedWarehouse } = selectedWarehouseSlice.actions;
+export default selectedWarehouseSlice.reducer;
+
+
 // \features\suppliers\suppliersSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
@@ -1076,11 +1404,28 @@ export default ClientsPage;
 
 // \pages\DashboardPage.jsx
 
-const DashboardPage = () => (
-  <div>
-    <h1>Dashboard Page</h1>
-  </div>
-);
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDashboardSummary } from "../features/dashboard/summarySlice";
+import SummaryTiles from "../components/Dashboard/SummaryTiles";
+import Charts from "../components/Dashboard/Charts";
+
+const DashboardPage = () => {
+  const dispatch = useDispatch();
+  const selectedWarehouse = useSelector((s) => s.selectedWarehouse);
+  const { data: summary, status, error } = useSelector((s) => s.dashboard);
+  useEffect(() => {
+    dispatch(fetchDashboardSummary(selectedWarehouse));
+  }, [dispatch, selectedWarehouse]);
+  if (status === "loading") return <p>Loading...</p>;
+  if (status === "failed") return <p className="text-red-500">{error}</p>;
+  return (
+    <div className="space-y-6">
+      <SummaryTiles summary={summary} />
+      <Charts summary={summary} />
+    </div>
+  );
+};
 
 export default DashboardPage;
 
@@ -1454,7 +1799,7 @@ export default AppRouter;
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000",
 });
 
 export default apiClient;
@@ -1462,6 +1807,196 @@ export default apiClient;
 
 // \utils\authHeader.jsx
 
+
+
+// \utils\dummyData.jsx
+
+export const dummyDashboardSummary = {
+  productsCount: 528,
+  categoriesCount: 12,
+  monthlyReceipts: 45,
+  monthlyDeliveries: 38,
+  lowStockCount: 7,
+  topProduct: "SuperWidget",
+  inventoryValue: 120000.0,
+  turnoverLastWeek: 15000.0,
+  lastReceiptDate: "2025-05-10T12:34:56Z",
+  lastDeliveryDate: "2025-05-09T15:20:00Z",
+};
+
+export const dummyCategories = [
+  { categoryId: 1, name: "Electronics", description: "Gadgets" },
+  { categoryId: 2, name: "Furniture", description: "Home & Office" },
+];
+
+export const dummyClients = [
+  {
+    clientId: 1,
+    name: "Acme Corp",
+    email: "contact@acme.com",
+    phoneNumber: "123-456",
+    address: "123 Elm St",
+    transactionsCount: 5,
+  },
+];
+
+export const dummyClientById = {
+  clientId: 1,
+  name: "Acme Corp",
+  email: "contact@acme.com",
+  phoneNumber: "123-456",
+  address: {
+    street: "Elm St",
+    streetNumber: "123",
+    postalCode: "00-001",
+    city: "Metropolis",
+    country: "USA",
+    region: "North",
+  },
+  history: [],
+};
+
+export const dummyEmployees = [
+  {
+    employeeId: 1,
+    name: "John",
+    surname: "Doe",
+    email: "john@doe.com",
+    phoneNumber: "555-1234",
+    position: "Manager",
+    warehouseName: "Main",
+    transactionsCount: 20,
+  },
+];
+
+export const dummyEmployeeById = {
+  employeeId: 1,
+  name: "John",
+  surname: "Doe",
+  email: "john@doe.com",
+  phoneNumber: "555-1234",
+  position: "Manager",
+  warehouseId: 1,
+  warehouseName: "Main",
+  transactionsCount: 20,
+  history: [],
+};
+
+export const dummyRegions = [
+  { regionId: 1, name: "North" },
+  { regionId: 2, name: "South" },
+];
+
+export const dummyCountries = [
+  { countryId: 1, name: "USA", regionId: 1 },
+  { countryId: 2, name: "Canada", regionId: 1 },
+];
+
+export const dummyWarehouses = [
+  {
+    warehouseId: 1,
+    name: "Main",
+    capacity: 1000,
+    occupiedCapacity: 450,
+    address: "123 Elm St",
+    employeesCount: 5,
+    productsCount: 100,
+    transactionsCount: 20,
+  },
+];
+
+export const dummyWarehouseById = {
+  warehouseId: 1,
+  name: "Main",
+  capacity: 1000,
+  occupiedCapacity: 450,
+  address: "123 Elm St",
+  employees: [],
+  products: [],
+  transactions: [],
+  occupancyHistory: [],
+};
+
+export const dummyProducts = [
+  {
+    productId: 1,
+    name: "Widget",
+    description: "A useful widget",
+    unitPrice: 9.99,
+    unitSize: 1.0,
+    categoryName: "Gadgets",
+    inventoryCount: 100,
+    transactionsCount: 20,
+  },
+];
+
+export const dummyProductById = {
+  productId: 1,
+  name: "Widget",
+  description: "A useful widget",
+  unitPrice: 9.99,
+  unitSize: 1.0,
+  categoryName: "Gadgets",
+  inventory: { 1: 50 },
+  transactions: [],
+};
+
+export const dummyLowStock = [1, 2, 3];
+export const dummyBestSelling = [1, 2, 3];
+
+export const dummySuppliers = [
+  {
+    supplierId: 1,
+    name: "SupplyCo",
+    email: "trade@supplyco.com",
+    phoneNumber: "555-6789",
+    address: "456 Oak St",
+    transactionsCount: 8,
+  },
+];
+
+export const dummySupplierById = {
+  supplierId: 1,
+  name: "SupplyCo",
+  email: "trade@supplyco.com",
+  phoneNumber: "555-6789",
+  address: {
+    street: "Oak St",
+    streetNumber: "456",
+    postalCode: "00-002",
+    city: "Gotham",
+    country: "USA",
+    region: "East",
+  },
+  history: [],
+};
+
+export const dummyTransactions = [
+  {
+    transactionId: 1,
+    date: "2025-05-01",
+    description: "Order 1",
+    type: "WAREHOUSE_TO_CLIENT",
+    employeeId: 1,
+    fromWarehouseId: 1,
+    toWarehouseId: 1,
+    clientId: 1,
+    supplierId: 1,
+    totalPrice: 1500.0,
+  },
+];
+
+export const dummyTransactionById = {
+  transactionId: 1,
+  date: "2025-05-01",
+  description: "Order 1",
+  type: "WAREHOUSE_TO_CLIENT",
+  employeeId: 1,
+  fromWarehouseId: 1,
+  toWarehouseId: 1,
+  clientId: 1,
+  products: [],
+};
 
 
 // \utils\helpers.jsx
