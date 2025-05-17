@@ -19,12 +19,20 @@ BEGIN
     DECLARE v_ProductCount INT;
     DECLARE v_ProductID INT;
     DECLARE v_Quantity INT;
-    DECLARE v_UnitPrice DECIMAL(6,2);
+    DECLARE v_UnitPrice DECIMAL(10,2);
+    DECLARE v_UnitSize INT;
+    DECLARE v_ChangeInCapacity INT;
+    DECLARE v_SourceCapacityAfter INT DEFAULT NULL;
+    DECLARE v_TargetCapacityAfter INT DEFAULT NULL;
+    DECLARE v_FromWarehouseOccupied INT;
+    DECLARE v_ToWarehouseOccupied INT;
 
     INSERT INTO `Transaction` 
-      (TransactionType, Date, Description, EmployeeID, FromWarehouseID, ToWarehouseID, ClientID, SupplierID)
+      (TransactionType, Date, Description, EmployeeID, FromWarehouseID, ToWarehouseID, ClientID, SupplierID,
+       SourceWarehouseCapacityAfterTransaction, TargetWarehouseCapacityAfterTransaction)
     VALUES 
-      (p_TransactionType, p_Date, p_Description, p_EmployeeID, p_FromWarehouseID, p_ToWarehouseID, p_ClientID, p_SupplierID);
+      (p_TransactionType, p_Date, p_Description, p_EmployeeID, p_FromWarehouseID, p_ToWarehouseID, p_ClientID, p_SupplierID,
+       NULL, NULL);
 
     SET v_TransactionID = LAST_INSERT_ID();
 
@@ -34,9 +42,11 @@ BEGIN
         SET v_ProductID = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].ProductID')));
         SET v_Quantity = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].Quantity')));
 
-        SELECT UnitPrice INTO v_UnitPrice
+        SELECT UnitPrice, UnitSize INTO v_UnitPrice, v_UnitSize
         FROM Product
         WHERE ProductID = v_ProductID;
+
+        SET v_ChangeInCapacity = v_UnitSize * v_Quantity;
 
         INSERT INTO TransactionProduct(TransactionID, ProductID, Quantity, TransactionPrice)
         VALUES (v_TransactionID, v_ProductID, v_Quantity, v_Quantity * v_UnitPrice);
@@ -46,10 +56,18 @@ BEGIN
             VALUES (v_ProductID, p_ToWarehouseID, v_Quantity, v_UnitPrice)
             ON DUPLICATE KEY UPDATE Quantity = Quantity + v_Quantity;
 
+            UPDATE Warehouse
+            SET OccupiedCapacity = OccupiedCapacity + v_ChangeInCapacity
+            WHERE WarehouseID = p_ToWarehouseID;
+
         ELSEIF p_TransactionType = 'WAREHOUSE_TO_CUSTOMER' THEN
             UPDATE ProductInventory
             SET Quantity = Quantity - v_Quantity
             WHERE ProductID = v_ProductID AND WarehouseID = p_FromWarehouseID;
+
+            UPDATE Warehouse
+            SET OccupiedCapacity = OccupiedCapacity - v_ChangeInCapacity
+            WHERE WarehouseID = p_FromWarehouseID;
 
         ELSEIF p_TransactionType = 'WAREHOUSE_TO_WAREHOUSE' THEN
             UPDATE ProductInventory
@@ -59,92 +77,34 @@ BEGIN
             INSERT INTO ProductInventory (ProductID, WarehouseID, Quantity, Price)
             VALUES (v_ProductID, p_ToWarehouseID, v_Quantity, v_UnitPrice)
             ON DUPLICATE KEY UPDATE Quantity = Quantity + v_Quantity;
-        END IF;
 
-        SET v_i = v_i + 1;
-    END WHILE;
-END$$
+            UPDATE Warehouse
+            SET OccupiedCapacity = OccupiedCapacity - v_ChangeInCapacity
+            WHERE WarehouseID = p_FromWarehouseID;
 
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS receive_delivery;
-
-DELIMITER $$
-
-CREATE PROCEDURE receive_delivery(
-    IN p_Date DATE,
-    IN p_Description VARCHAR(200),
-    IN p_EmployeeID INT,
-    IN p_SupplierID INT,
-    IN p_ToWarehouseID INT,
-    IN p_ProductsJSON TEXT
-)
-BEGIN
-    CALL add_transaction(
-        'SUPPLIER_TO_WAREHOUSE',
-        p_Date,
-        p_Description,
-        p_EmployeeID,
-        NULL,
-        p_ToWarehouseID,
-        NULL,
-        p_SupplierID,
-        p_ProductsJSON
-    );
-END$$
-
-DELIMITER ;
-
-
-DROP PROCEDURE IF EXISTS sell_to_client;
-
-DELIMITER $$
-
-CREATE PROCEDURE sell_to_client(
-    IN p_Date DATE,
-    IN p_Description VARCHAR(200),
-    IN p_EmployeeID INT,
-    IN p_ClientID INT,
-    IN p_FromWarehouseID INT,
-    IN p_ProductsJSON TEXT
-)
-BEGIN
-    DECLARE v_i INT DEFAULT 0;
-    DECLARE v_ProductCount INT;
-    DECLARE v_ProductID INT;
-    DECLARE v_Quantity INT;
-    DECLARE v_Available INT;
-    DECLARE v_ErrorMessage VARCHAR(255);
-
-    SET v_ProductCount = JSON_LENGTH(p_ProductsJSON);
-
-    WHILE v_i < v_ProductCount DO
-        SET v_ProductID = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].ProductID')));
-        SET v_Quantity = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].Quantity')));
-
-        SELECT Quantity INTO v_Available
-        FROM ProductInventory
-        WHERE ProductID = v_ProductID AND WarehouseID = p_FromWarehouseID;
-
-        IF v_Available IS NULL OR v_Available < v_Quantity THEN
-            SET v_ErrorMessage = CONCAT('Not enough product in stock, ID: ', CAST(v_ProductID AS CHAR));
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_ErrorMessage;
+            UPDATE Warehouse
+            SET OccupiedCapacity = OccupiedCapacity + v_ChangeInCapacity
+            WHERE WarehouseID = p_ToWarehouseID;
         END IF;
 
         SET v_i = v_i + 1;
     END WHILE;
 
-    CALL add_transaction(
-        'WAREHOUSE_TO_CUSTOMER',
-        p_Date,
-        p_Description,
-        p_EmployeeID,
-        p_FromWarehouseID,
-        NULL,
-        p_ClientID,
-        NULL,
-        p_ProductsJSON
-    );
+    IF p_FromWarehouseID IS NOT NULL THEN
+        SELECT OccupiedCapacity INTO v_FromWarehouseOccupied FROM Warehouse WHERE WarehouseID = p_FromWarehouseID;
+        SET v_SourceCapacityAfter = v_FromWarehouseOccupied;
+    END IF;
+
+    IF p_ToWarehouseID IS NOT NULL THEN
+        SELECT OccupiedCapacity INTO v_ToWarehouseOccupied FROM Warehouse WHERE WarehouseID = p_ToWarehouseID;
+        SET v_TargetCapacityAfter = v_ToWarehouseOccupied;
+    END IF;
+
+    UPDATE `Transaction`
+    SET SourceWarehouseCapacityAfterTransaction = v_SourceCapacityAfter,
+        TargetWarehouseCapacityAfterTransaction = v_TargetCapacityAfter
+    WHERE TransactionID = v_TransactionID;
+
 END$$
 
 DELIMITER ;

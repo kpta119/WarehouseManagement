@@ -105,7 +105,7 @@ CREATE TABLE Product
     Name        VARCHAR(50)   NOT NULL,
     Description VARCHAR(200),
     UnitPrice   DECIMAL(6, 2) NOT NULL,
-    UnitSize    DECIMAL(4, 2) NOT NULL,
+    UnitSize    INT NOT NULL,
     CategoryID  INT,
     FOREIGN KEY (CategoryID) REFERENCES Category (CategoryID)
 );
