@@ -95,6 +95,7 @@ END$$
 
 DELIMITER ;
 
+
 DROP PROCEDURE IF EXISTS sell_to_client;
 
 DELIMITER $$
@@ -113,20 +114,21 @@ BEGIN
     DECLARE v_ProductID INT;
     DECLARE v_Quantity INT;
     DECLARE v_Available INT;
+    DECLARE v_ErrorMessage VARCHAR(255);
 
     SET v_ProductCount = JSON_LENGTH(p_ProductsJSON);
 
     WHILE v_i < v_ProductCount DO
-        SET v_ProductID = JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].ProductID'));
-        SET v_Quantity = JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].Quantity'));
+        SET v_ProductID = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].ProductID')));
+        SET v_Quantity = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].Quantity')));
 
         SELECT Quantity INTO v_Available
         FROM ProductInventory
         WHERE ProductID = v_ProductID AND WarehouseID = p_FromWarehouseID;
 
         IF v_Available IS NULL OR v_Available < v_Quantity THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = CONCAT('Not enough product in stock, ID: ', v_ProductID);
+            SET v_ErrorMessage = CONCAT('Not enough product in stock, ID: ', CAST(v_ProductID AS CHAR));
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_ErrorMessage;
         END IF;
 
         SET v_i = v_i + 1;
