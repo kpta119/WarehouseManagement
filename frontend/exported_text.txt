@@ -1,4 +1,4 @@
-// \src\App.jsx
+// \App.jsx
 
 import { Provider } from "react-redux";
 import store from "./app/store";
@@ -14,7 +14,7 @@ const App = () => (
 export default App;
 
 
-// \src\index.jsx
+// \index.jsx
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
@@ -28,7 +28,7 @@ createRoot(document.getElementById("root")).render(
 );
 
 
-// \src\api\categories.jsx
+// \api\categories.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -43,7 +43,7 @@ export const deleteCategory = (categoryId) =>
   apiClient.delete(`/api/categories/${categoryId}`);
 
 
-// \src\api\clients.jsx
+// \api\clients.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -55,7 +55,7 @@ export const getClientById = (clientId) =>
 export const createClient = (data) => apiClient.post("/api/clients", data);
 
 
-// \src\api\dashboard.jsx
+// \api\dashboard.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -63,7 +63,7 @@ export const getDashboardSummary = (warehouseId) =>
   apiClient.get("/api/dashboard/summary", { params: { warehouseId } });
 
 
-// \src\api\employees.jsx
+// \api\employees.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -76,7 +76,7 @@ export const getEmployeeById = (employeeId) =>
 export const createEmployee = (data) => apiClient.post("/api/employees", data);
 
 
-// \src\api\geography.jsx
+// \api\geography.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -88,7 +88,7 @@ export const listCountries = (regionId) =>
 export const createAddress = (data) => apiClient.post("/api/addresses", data);
 
 
-// \src\api\inventory.jsx
+// \api\inventory.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -102,7 +102,7 @@ export const deliverToClient = (data) =>
   apiClient.post("/api/inventory/delivery", data);
 
 
-// \src\api\products.jsx
+// \api\products.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -129,7 +129,7 @@ export const deleteProduct = (productId) =>
   apiClient.delete(`/api/products/${productId}`);
 
 
-// \src\api\suppliers.jsx
+// \api\suppliers.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -141,7 +141,7 @@ export const getSupplierById = (supplierId) =>
 export const createSupplier = (data) => apiClient.post("/api/suppliers", data);
 
 
-// \src\api\transactions.jsx
+// \api\transactions.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -152,7 +152,7 @@ export const getTransactionById = (transactionId) =>
   apiClient.get(`/api/transactions/${transactionId}`);
 
 
-// \src\api\warehouses.jsx
+// \api\warehouses.jsx
 
 import apiClient from "../utils/apiClient";
 
@@ -171,7 +171,7 @@ export const deleteWarehouse = (warehouseId) =>
   apiClient.delete(`/api/warehouses/${warehouseId}`);
 
 
-// \src\app\rootReducer.jsx
+// \app\rootReducer.jsx
 
 import { combineReducers } from "redux";
 import authReducer from "../features/auth/authSlice";
@@ -205,7 +205,7 @@ export default combineReducers({
 });
 
 
-// \src\app\store.jsx
+// \app\store.jsx
 
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "./rootReducer";
@@ -221,59 +221,59 @@ const store = configureStore({
 export default store;
 
 
-// \src\components\Dashboard\Charts.jsx
+// \components\Dashboard\Charts.jsx
 
 
 
-// \src\components\Dashboard\SummaryTiles.jsx
+// \components\Dashboard\SummaryTiles.jsx
 
 
 
-// \src\components\Forms\CategoryForm.jsx
+// \components\Forms\CategoryForm.jsx
 
 
 
-// \src\components\Forms\ClientForm.jsx
+// \components\Forms\ClientForm.jsx
 
 
 
-// \src\components\Forms\EmployeeForm.jsx
+// \components\Forms\EmployeeForm.jsx
 
 
 
-// \src\components\Forms\InventoryForm.jsx
+// \components\Forms\InventoryForm.jsx
 
 
 
-// \src\components\Forms\ProductForm.jsx
+// \components\Forms\ProductForm.jsx
 
 
 
-// \src\components\Forms\SupplierForm.jsx
+// \components\Forms\SupplierForm.jsx
 
 
 
-// \src\components\Forms\TransactionFilter.jsx
+// \components\Forms\TransactionFilter.jsx
 
 
 
-// \src\components\Forms\WarehouseForm.jsx
+// \components\Forms\WarehouseForm.jsx
 
 
 
-// \src\components\Geography\AddressForm.jsx
+// \components\Geography\AddressForm.jsx
 
 
 
-// \src\components\Geography\CountriesList.jsx
+// \components\Geography\CountriesList.jsx
 
 
 
-// \src\components\Geography\RegionsList.jsx
+// \components\Geography\RegionsList.jsx
 
 
 
-// \src\components\Layout\DefaultRedirect.jsx
+// \components\Layout\DefaultRedirect.jsx
 
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
@@ -290,11 +290,34 @@ const DefaultRedirect = () => {
 export default DefaultRedirect;
 
 
-// \src\components\Layout\Navbar.jsx
+// \components\Layout\Layout.jsx
+
+import Sidebar from "./Sidebar";
+import Navbar from "./Navbar";
+
+const Layout = ({ children }) => (
+  <div className="flex">
+    <Sidebar />
+    <div className="flex-1 ml-64">
+      <Navbar />
+      <main className="p-6">{children}</main>
+    </div>
+  </div>
+);
+
+export default Layout;
 
 
+// \components\Layout\Navbar.jsx
 
-// \src\components\Layout\ProtectedRoute.jsx
+const Navbar = () => {
+  return <div>Navbar</div>;
+};
+
+export default Navbar;
+
+
+// \components\Layout\ProtectedRoute.jsx
 
 import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -307,39 +330,127 @@ const ProtectedRoute = ({ children }) => {
 export default ProtectedRoute;
 
 
-// \src\components\Layout\Sidebar.jsx
+// \components\Layout\Sidebar.jsx
+
+import Logo from "../../assets/images/logo.png";
+import SidebarLink from "./SidebarLink";
+import { AiOutlineHome } from "react-icons/ai";
+import {
+  FaBoxOpen,
+  FaTags,
+  FaWarehouse,
+  FaTruck,
+  FaExchangeAlt,
+  FaClipboardList,
+  FaUsers,
+  FaUserTie,
+  FaUserFriends,
+  FaGlobe,
+} from "react-icons/fa";
+
+export default function Sidebar() {
+  return (
+    <aside className="w-64 h-screen bg-white shadow-lg p-4 fixed">
+      <nav className="flex flex-col space-y-2">
+        <div className="flex items-center mb-4">
+          <img src={Logo} alt="Logo" className="h-10 w-10 rounded-full mr-2" />
+          <span className="text-xl font-bold">BD2 gr. 03</span>
+        </div>
+
+        <SidebarLink to="/" end icon={AiOutlineHome} label="Dashboard" />
+        <SidebarLink to="/products" icon={FaBoxOpen} label="Products" />
+        <SidebarLink to="/categories" icon={FaTags} label="Categories" />
+        <SidebarLink to="/warehouses" icon={FaWarehouse} label="Warehouses" />
+        <SidebarLink
+          to="/transactions"
+          icon={FaClipboardList}
+          label="Transactions"
+        />
+        <SidebarLink to="/clients" icon={FaUsers} label="Clients" />
+        <SidebarLink to="/suppliers" icon={FaUserTie} label="Suppliers" />
+        <SidebarLink to="/employees" icon={FaUserFriends} label="Employees" />
+        <SidebarLink to="/geography" icon={FaGlobe} label="Geography" />
+
+        <div className="mt-4 border-t pt-4">
+          <p className="text-xs uppercase text-gray-500 px-2">Inventory</p>
+          <SidebarLink to="/inventory/receive" icon={FaTruck} label="Receive" />
+          <SidebarLink
+            to="/inventory/transfer"
+            icon={FaExchangeAlt}
+            label="Transfer"
+          />
+          <SidebarLink
+            to="/inventory/delivery"
+            icon={FaTruck}
+            label="Delivery"
+          />
+        </div>
+      </nav>
+    </aside>
+  );
+}
+
+
+// \components\Layout\SidebarLink.jsx
+
+import { NavLink } from "react-router-dom";
+
+const SidebarLink = ({ to, icon: Icon, label }) => {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) => `
+        flex items-center p-2
+        border-2 rounded-lg
+        transition-colors duration-300 ${
+          isActive
+            ? "bg-pink-100 text-pink-800 border-pink-300"
+            : "text-gray-600 border-transparent hover:bg-pink-100 hover:text-pink-800 hover:border-pink-300"
+        }`}
+    >
+      <Icon className="mr-4 text-xl" />
+      {label}
+    </NavLink>
+  );
+};
+
+export default SidebarLink;
+
+
+// \components\Tables\DataTable.jsx
 
 
 
-// \src\components\Tables\DataTable.jsx
+// \components\Tables\Pagination.jsx
 
 
 
-// \src\components\Tables\Pagination.jsx
-
-
-
-// \src\features\auth\authSlice.jsx
+// \features\auth\authSlice.jsx
 
 import { createSlice } from "@reduxjs/toolkit";
 
+const persisted = localStorage.getItem("loggedIn") === "true";
+
 const authSlice = createSlice({
   name: "auth",
-  initialState: { loggedIn: false, error: null },
+  initialState: { loggedIn: persisted, error: null },
   reducers: {
     login: (state, action) => {
       const { username, password } = action.payload;
       if (username === "admin" && password === "admin") {
         state.loggedIn = true;
         state.error = null;
+        localStorage.setItem("loggedIn", "true");
       } else {
         state.loggedIn = false;
         state.error = "Nieprawidłowa nazwa lub hasło";
+        localStorage.removeItem("loggedIn");
       }
     },
     logout: (state) => {
       state.loggedIn = false;
       state.error = null;
+      localStorage.removeItem("loggedIn");
     },
   },
 });
@@ -348,7 +459,7 @@ export const { login, logout } = authSlice.actions;
 export default authSlice.reducer;
 
 
-// \src\features\categories\categoriesSlice.jsx
+// \features\categories\categoriesSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as categoriesAPI from "../../api/categories";
@@ -417,7 +528,7 @@ const categoriesSlice = createSlice({
 export default categoriesSlice.reducer;
 
 
-// \src\features\clients\clientsSlice.jsx
+// \features\clients\clientsSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as clientsAPI from "../../api/clients";
@@ -467,7 +578,7 @@ const clientsSlice = createSlice({
 export default clientsSlice.reducer;
 
 
-// \src\features\dashboard\summarySlice.jsx
+// \features\dashboard\summarySlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getDashboardSummary } from "../../api/dashboard";
@@ -503,7 +614,7 @@ const summarySlice = createSlice({
 export default summarySlice.reducer;
 
 
-// \src\features\employees\employeesSlice.jsx
+// \features\employees\employeesSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as employeesAPI from "../../api/employees";
@@ -559,7 +670,7 @@ const employeesSlice = createSlice({
 export default employeesSlice.reducer;
 
 
-// \src\features\inventory\deliverySlice.jsx
+// \features\inventory\deliverySlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { deliverToClient } from "../../api/inventory";
@@ -595,7 +706,7 @@ const deliverySlice = createSlice({
 export default deliverySlice.reducer;
 
 
-// \src\features\inventory\receiveSlice.jsx
+// \features\inventory\receiveSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { receiveFromSupplier } from "../../api/inventory";
@@ -631,7 +742,7 @@ const receiveSlice = createSlice({
 export default receiveSlice.reducer;
 
 
-// \src\features\inventory\transferSlice.jsx
+// \features\inventory\transferSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { transferBetweenWarehouses } from "../../api/inventory";
@@ -667,7 +778,7 @@ const transferSlice = createSlice({
 export default transferSlice.reducer;
 
 
-// \src\features\products\productsSlice.jsx
+// \features\products\productsSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as productsAPI from "../../api/products";
@@ -743,7 +854,7 @@ const productsSlice = createSlice({
 export default productsSlice.reducer;
 
 
-// \src\features\suppliers\suppliersSlice.jsx
+// \features\suppliers\suppliersSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as suppliersAPI from "../../api/suppliers";
@@ -799,7 +910,7 @@ const suppliersSlice = createSlice({
 export default suppliersSlice.reducer;
 
 
-// \src\features\transactions\transactionsSlice.jsx
+// \features\transactions\transactionsSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as transactionsAPI from "../../api/transactions";
@@ -845,7 +956,7 @@ const transactionsSlice = createSlice({
 export default transactionsSlice.reducer;
 
 
-// \src\features\warehouses\warehousesSlice.jsx
+// \features\warehouses\warehousesSlice.jsx
 
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as warehousesAPI from "../../api/warehouses";
@@ -924,7 +1035,7 @@ const warehousesSlice = createSlice({
 export default warehousesSlice.reducer;
 
 
-// \src\pages\CategoriesPage.jsx
+// \pages\CategoriesPage.jsx
 
 const CategoriesPage = () => (
   <div>
@@ -935,7 +1046,7 @@ const CategoriesPage = () => (
 export default CategoriesPage;
 
 
-// \src\pages\ClientDetailPage.jsx
+// \pages\ClientDetailPage.jsx
 
 import { useParams } from "react-router-dom";
 
@@ -952,7 +1063,7 @@ const ClientDetailPage = () => {
 export default ClientDetailPage;
 
 
-// \src\pages\ClientsPage.jsx
+// \pages\ClientsPage.jsx
 
 const ClientsPage = () => (
   <div>
@@ -963,7 +1074,7 @@ const ClientsPage = () => (
 export default ClientsPage;
 
 
-// \src\pages\DashboardPage.jsx
+// \pages\DashboardPage.jsx
 
 const DashboardPage = () => (
   <div>
@@ -974,7 +1085,7 @@ const DashboardPage = () => (
 export default DashboardPage;
 
 
-// \src\pages\EmployeeDetailPage.jsx
+// \pages\EmployeeDetailPage.jsx
 
 import { useParams } from "react-router-dom";
 
@@ -991,7 +1102,7 @@ const EmployeeDetailPage = () => {
 export default EmployeeDetailPage;
 
 
-// \src\pages\EmployeesPage.jsx
+// \pages\EmployeesPage.jsx
 
 const EmployeesPage = () => (
   <div>
@@ -1002,7 +1113,7 @@ const EmployeesPage = () => (
 export default EmployeesPage;
 
 
-// \src\pages\GeographyPage.jsx
+// \pages\GeographyPage.jsx
 
 import { useLocation } from "react-router-dom";
 
@@ -1019,7 +1130,7 @@ const GeographyPage = () => {
 export default GeographyPage;
 
 
-// \src\pages\InventoryDeliveryPage.jsx
+// \pages\InventoryDeliveryPage.jsx
 
 const InventoryDeliveryPage = () => (
   <div>
@@ -1030,7 +1141,7 @@ const InventoryDeliveryPage = () => (
 export default InventoryDeliveryPage;
 
 
-// \src\pages\InventoryReceivePage.jsx
+// \pages\InventoryReceivePage.jsx
 
 const InventoryReceivePage = () => (
   <div>
@@ -1041,7 +1152,7 @@ const InventoryReceivePage = () => (
 export default InventoryReceivePage;
 
 
-// \src\pages\InventoryTransferPage.jsx
+// \pages\InventoryTransferPage.jsx
 
 const InventoryTransferPage = () => (
   <div>
@@ -1052,7 +1163,7 @@ const InventoryTransferPage = () => (
 export default InventoryTransferPage;
 
 
-// \src\pages\LoginPage.jsx
+// \pages\LoginPage.jsx
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -1136,7 +1247,7 @@ const LoginPage = () => {
 export default LoginPage;
 
 
-// \src\pages\ProductDetailPage.jsx
+// \pages\ProductDetailPage.jsx
 
 import { useParams, useLocation } from "react-router-dom";
 
@@ -1155,7 +1266,7 @@ const ProductDetailPage = () => {
 export default ProductDetailPage;
 
 
-// \src\pages\ProductsPage.jsx
+// \pages\ProductsPage.jsx
 
 const ProductsPage = () => (
   <div>
@@ -1166,7 +1277,7 @@ const ProductsPage = () => (
 export default ProductsPage;
 
 
-// \src\pages\SupplierDetailPage.jsx
+// \pages\SupplierDetailPage.jsx
 
 import { useParams } from "react-router-dom";
 
@@ -1183,7 +1294,7 @@ const SupplierDetailPage = () => {
 export default SupplierDetailPage;
 
 
-// \src\pages\SuppliersPage.jsx
+// \pages\SuppliersPage.jsx
 
 const SuppliersPage = () => (
   <div>
@@ -1194,7 +1305,7 @@ const SuppliersPage = () => (
 export default SuppliersPage;
 
 
-// \src\pages\TransactionDetailPage.jsx
+// \pages\TransactionDetailPage.jsx
 
 import { useParams } from "react-router-dom";
 
@@ -1211,7 +1322,7 @@ const TransactionDetailPage = () => {
 export default TransactionDetailPage;
 
 
-// \src\pages\TransactionsPage.jsx
+// \pages\TransactionsPage.jsx
 
 import { useLocation } from "react-router-dom";
 
@@ -1228,7 +1339,7 @@ const TransactionsPage = () => {
 export default TransactionsPage;
 
 
-// \src\pages\WarehouseDetailPage.jsx
+// \pages\WarehouseDetailPage.jsx
 
 import { useParams } from "react-router-dom";
 
@@ -1245,7 +1356,7 @@ const WarehouseDetailPage = () => {
 export default WarehouseDetailPage;
 
 
-// \src\pages\WarehousesPage.jsx
+// \pages\WarehousesPage.jsx
 
 const WarehousesPage = () => (
   <div>
@@ -1256,7 +1367,7 @@ const WarehousesPage = () => (
 export default WarehousesPage;
 
 
-// \src\routes\AppRouter.jsx
+// \routes\AppRouter.jsx
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
@@ -1279,6 +1390,7 @@ import EmployeesPage from "../pages/EmployeesPage";
 import EmployeeDetailPage from "../pages/EmployeeDetailPage";
 import GeographyPage from "../pages/GeographyPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
+import Layout from "../components/Layout/Layout";
 import DefaultRedirect from "../components/Layout/DefaultRedirect";
 
 const AppRouter = () => (
@@ -1286,150 +1398,50 @@ const AppRouter = () => (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/"
+        path="/*"
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <Layout>
+              <Routes>
+                <Route index element={<DashboardPage />} />
+                <Route path="products" element={<ProductsPage />} />
+                <Route path="products/:id" element={<ProductDetailPage />} />
+                <Route path="categories" element={<CategoriesPage />} />
+                <Route path="warehouses" element={<WarehousesPage />} />
+                <Route
+                  path="warehouses/:id"
+                  element={<WarehouseDetailPage />}
+                />
+                <Route
+                  path="inventory/receive"
+                  element={<InventoryReceivePage />}
+                />
+                <Route
+                  path="inventory/transfer"
+                  element={<InventoryTransferPage />}
+                />
+                <Route
+                  path="inventory/delivery"
+                  element={<InventoryDeliveryPage />}
+                />
+                <Route path="transactions" element={<TransactionsPage />} />
+                <Route
+                  path="transactions/:id"
+                  element={<TransactionDetailPage />}
+                />
+                <Route path="clients" element={<ClientsPage />} />
+                <Route path="clients/:id" element={<ClientDetailPage />} />
+                <Route path="suppliers" element={<SuppliersPage />} />
+                <Route path="suppliers/:id" element={<SupplierDetailPage />} />
+                <Route path="employees" element={<EmployeesPage />} />
+                <Route path="employees/:id" element={<EmployeeDetailPage />} />
+                <Route path="geography" element={<GeographyPage />} />
+                <Route path="*" element={<DefaultRedirect />} />
+              </Routes>
+            </Layout>
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute>
-            <ProductsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/products/:id"
-        element={
-          <ProtectedRoute>
-            <ProductDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/categories"
-        element={
-          <ProtectedRoute>
-            <CategoriesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/warehouses"
-        element={
-          <ProtectedRoute>
-            <WarehousesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/warehouses/:id"
-        element={
-          <ProtectedRoute>
-            <WarehouseDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory/receive"
-        element={
-          <ProtectedRoute>
-            <InventoryReceivePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory/transfer"
-        element={
-          <ProtectedRoute>
-            <InventoryTransferPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory/delivery"
-        element={
-          <ProtectedRoute>
-            <InventoryDeliveryPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/transactions"
-        element={
-          <ProtectedRoute>
-            <TransactionsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/transactions/:id"
-        element={
-          <ProtectedRoute>
-            <TransactionDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/clients"
-        element={
-          <ProtectedRoute>
-            <ClientsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/clients/:id"
-        element={
-          <ProtectedRoute>
-            <ClientDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/suppliers"
-        element={
-          <ProtectedRoute>
-            <SuppliersPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/suppliers/:id"
-        element={
-          <ProtectedRoute>
-            <SupplierDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employees"
-        element={
-          <ProtectedRoute>
-            <EmployeesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employees/:id"
-        element={
-          <ProtectedRoute>
-            <EmployeeDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/geography"
-        element={
-          <ProtectedRoute>
-            <GeographyPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<DefaultRedirect />} />
     </Routes>
   </Router>
 );
@@ -1437,7 +1449,7 @@ const AppRouter = () => (
 export default AppRouter;
 
 
-// \src\utils\apiClient.jsx
+// \utils\apiClient.jsx
 
 import axios from "axios";
 
@@ -1448,11 +1460,11 @@ const apiClient = axios.create({
 export default apiClient;
 
 
-// \src\utils\authHeader.jsx
+// \utils\authHeader.jsx
 
 
 
-// \src\utils\helpers.jsx
+// \utils\helpers.jsx
 
 
 

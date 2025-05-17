@@ -19,6 +19,7 @@ import EmployeesPage from "../pages/EmployeesPage";
 import EmployeeDetailPage from "../pages/EmployeeDetailPage";
 import GeographyPage from "../pages/GeographyPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
+import Layout from "../components/Layout/Layout";
 import DefaultRedirect from "../components/Layout/DefaultRedirect";
 
 const AppRouter = () => (
@@ -26,150 +27,50 @@ const AppRouter = () => (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/"
+        path="/*"
         element={
           <ProtectedRoute>
-            <DashboardPage />
+            <Layout>
+              <Routes>
+                <Route index element={<DashboardPage />} />
+                <Route path="products" element={<ProductsPage />} />
+                <Route path="products/:id" element={<ProductDetailPage />} />
+                <Route path="categories" element={<CategoriesPage />} />
+                <Route path="warehouses" element={<WarehousesPage />} />
+                <Route
+                  path="warehouses/:id"
+                  element={<WarehouseDetailPage />}
+                />
+                <Route
+                  path="inventory/receive"
+                  element={<InventoryReceivePage />}
+                />
+                <Route
+                  path="inventory/transfer"
+                  element={<InventoryTransferPage />}
+                />
+                <Route
+                  path="inventory/delivery"
+                  element={<InventoryDeliveryPage />}
+                />
+                <Route path="transactions" element={<TransactionsPage />} />
+                <Route
+                  path="transactions/:id"
+                  element={<TransactionDetailPage />}
+                />
+                <Route path="clients" element={<ClientsPage />} />
+                <Route path="clients/:id" element={<ClientDetailPage />} />
+                <Route path="suppliers" element={<SuppliersPage />} />
+                <Route path="suppliers/:id" element={<SupplierDetailPage />} />
+                <Route path="employees" element={<EmployeesPage />} />
+                <Route path="employees/:id" element={<EmployeeDetailPage />} />
+                <Route path="geography" element={<GeographyPage />} />
+                <Route path="*" element={<DefaultRedirect />} />
+              </Routes>
+            </Layout>
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute>
-            <ProductsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/products/:id"
-        element={
-          <ProtectedRoute>
-            <ProductDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/categories"
-        element={
-          <ProtectedRoute>
-            <CategoriesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/warehouses"
-        element={
-          <ProtectedRoute>
-            <WarehousesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/warehouses/:id"
-        element={
-          <ProtectedRoute>
-            <WarehouseDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory/receive"
-        element={
-          <ProtectedRoute>
-            <InventoryReceivePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory/transfer"
-        element={
-          <ProtectedRoute>
-            <InventoryTransferPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inventory/delivery"
-        element={
-          <ProtectedRoute>
-            <InventoryDeliveryPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/transactions"
-        element={
-          <ProtectedRoute>
-            <TransactionsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/transactions/:id"
-        element={
-          <ProtectedRoute>
-            <TransactionDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/clients"
-        element={
-          <ProtectedRoute>
-            <ClientsPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/clients/:id"
-        element={
-          <ProtectedRoute>
-            <ClientDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/suppliers"
-        element={
-          <ProtectedRoute>
-            <SuppliersPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/suppliers/:id"
-        element={
-          <ProtectedRoute>
-            <SupplierDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employees"
-        element={
-          <ProtectedRoute>
-            <EmployeesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employees/:id"
-        element={
-          <ProtectedRoute>
-            <EmployeeDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/geography"
-        element={
-          <ProtectedRoute>
-            <GeographyPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<DefaultRedirect />} />
     </Routes>
   </Router>
 );
