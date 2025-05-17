@@ -16,7 +16,11 @@ public class ProductInventory {
     @Column(name = "ProductInventoryID")
     private Integer id;
 
+    @Column(name = "Quantity")
     private Integer quantity;
+
+    @Column(name = "Price")
+    private Double price;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "ProductID")

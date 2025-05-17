@@ -48,4 +48,10 @@ public class Transaction {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "SupplierID")
     private Supplier supplier;
+
+    @Column(name = "SourceWarehouseCapacityAfterTransaction")
+    private Integer sourceWarehouseCapacityAfterTransaction;
+
+    @Column(name = "TargetWarehouseCapacityAfterTransaction")
+    private Integer targetWarehouseCapacityAfterTransaction;
 }

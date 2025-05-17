@@ -24,5 +24,9 @@ public class TransactionProduct {
     @JoinColumn(name = "ProductID")
     private Product product;
 
+    @Column(name = "Quantity")
     private Integer quantity;
+
+    @Column(name = "TransactionPrice")
+    private Double transactionPrice;
 }
