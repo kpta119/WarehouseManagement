@@ -1,22 +1,19 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.ProductInfoDto;
-import com.example.warehouse.domain.dto.TransactionDto;
+import com.example.warehouse.domain.dto.TransactionSummaryDto;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
-public class TransactionMapperImpl {
+public class TransactionSummaryMapper {
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-
-    public TransactionDto mapToDto(Transaction transaction) {
-        TransactionDto dto = new TransactionDto();
+    public TransactionSummaryDto mapToDto(Transaction transaction) {
+        TransactionSummaryDto dto = new TransactionSummaryDto();
 
         dto.setTransactionId(transaction.getId());
         dto.setType(transaction.getTransactionType().name());
@@ -43,20 +40,14 @@ public class TransactionMapperImpl {
             dto.setSupplierId(transaction.getSupplier().getId());
         }
 
-        List<ProductInfoDto> productDtos = transaction.getProducts().stream()
-                .map(tp -> {
-                    ProductInfoDto pDto = new ProductInfoDto();
-                    pDto.setProductId(tp.getProduct().getId());
-                    pDto.setName(tp.getProduct().getName());
-                    pDto.setQuantity(tp.getQuantity());
-                    pDto.setUnitPrice(tp.getTransactionPrice()); // albo tp.getProduct().getUnitPrice()
-                    pDto.setCategoryName(tp.getProduct().getCategory().getName());
-                    return pDto;
-                })
-                .collect(Collectors.toList());
+        Double totalPrice = transaction.getProducts().stream()
+                .map(tp -> BigDecimal.valueOf(tp.getTransactionPrice()).multiply(BigDecimal.valueOf(tp.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .doubleValue();
 
-        dto.setProducts(productDtos);
+        dto.setTotalPrice(totalPrice);
 
         return dto;
+
     }
 }
