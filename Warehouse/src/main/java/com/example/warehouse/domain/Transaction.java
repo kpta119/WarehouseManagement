@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
+
 
 
 @Data
@@ -14,7 +16,7 @@ import java.util.Date;
 @Entity
 @Table(name = "Transaction")
 public class Transaction {
-    enum TransactionType {
+    public enum TransactionType {
         WAREHOUSE_TO_WAREHOUSE,
         SUPPLIER_TO_WAREHOUSE,
         WAREHOUSE_TO_CUSTOMER
@@ -25,6 +27,7 @@ public class Transaction {
     @Column(name = "TransactionID")
     private Integer id;
 
+    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
     private Date date;
     private String description;
@@ -54,4 +57,7 @@ public class Transaction {
 
     @Column(name = "TargetWarehouseCapacityAfterTransaction")
     private Integer targetWarehouseCapacityAfterTransaction;
+
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TransactionProduct> products;
 }

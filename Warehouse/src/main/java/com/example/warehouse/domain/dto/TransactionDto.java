@@ -1,30 +1,24 @@
 package com.example.warehouse.domain.dto;
 
-import com.example.warehouse.domain.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransactionDto {
-    enum TransactionType {
-        WAREHOUSE_TO_WAREHOUSE,
-        SUPPLIER_TO_WAREHOUSE,
-        WAREHOUSE_TO_CUSTOMER
-    }
-
-    private int id;
-
-    private TransactionDto.TransactionType transactionType;
+    private Integer transactionId;
+    private String type;
     private Date date;
     private String description;
-    private Employee employee;
-    private Warehouse fromWarehouse;
-    private Warehouse toWarehouse;
-    private Client client;
-    private Supplier supplier;
+    private Integer employeeId;
+    private Integer fromWarehouseId;
+    private Integer toWarehouseId;
+    private Integer clientId;
+    private Integer supplierId;
+    private List<ProductInfoDto> products;
 }
