@@ -5,18 +5,22 @@ import com.example.warehouse.domain.dto.ProductInfoDto;
 import com.example.warehouse.domain.dto.TransactionDto;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class TransactionMapperImpl {
 
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+
     public TransactionDto mapToDto(Transaction transaction) {
         TransactionDto dto = new TransactionDto();
 
         dto.setTransactionId(transaction.getId());
         dto.setType(transaction.getTransactionType().name());
-        dto.setDate(transaction.getDate());
+        dto.setDate(simpleDateFormat.format(transaction.getDate()));
         dto.setDescription(transaction.getDescription());
 
         if (transaction.getEmployee() != null) {

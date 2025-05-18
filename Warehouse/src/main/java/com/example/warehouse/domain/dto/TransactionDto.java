@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -13,7 +12,7 @@ import java.util.List;
 public class TransactionDto {
     private Integer transactionId;
     private String type;
-    private Date date;
+    private String date;
     private String description;
     private Integer employeeId;
     private Integer fromWarehouseId;
