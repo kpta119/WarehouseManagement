@@ -21,6 +21,7 @@ import GeographyPage from "../pages/GeographyPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
 import Layout from "../components/Layout/Layout";
 import DefaultRedirect from "../components/Layout/DefaultRedirect";
+import ProductFormPage from "../pages/ProductFormPage";
 
 const AppRouter = () => (
   <Router>
@@ -34,6 +35,8 @@ const AppRouter = () => (
               <Routes>
                 <Route index element={<DashboardPage />} />
                 <Route path="products" element={<ProductsPage />} />
+                <Route path="products/new" element={<ProductFormPage />} />
+                <Route path="products/:id/edit" element={<ProductFormPage />} />
                 <Route path="products/:id" element={<ProductDetailPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
                 <Route path="warehouses" element={<WarehousesPage />} />

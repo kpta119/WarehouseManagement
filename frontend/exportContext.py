@@ -12,7 +12,7 @@ def export_files_in_directory(directory_path):
             file_path = os.path.join(root, file)
             if file.endswith('.jsx'):
                 try:
-                    base_path = r"C:\Users\Adrian Garbowski\Desktop\Studia\Semestr 4\BD2\frontend\src"
+                    base_path = r"C:\Users\Adrian Garbowski\Desktop\Programs\College\BD2\frontend\src"
                     result += f"// {file_path.replace(base_path, '')}\n\n"
                     file_text = export_text(file_path)
                     result += f"{file_text}\n\n"

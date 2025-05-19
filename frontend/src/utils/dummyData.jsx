@@ -9,6 +9,9 @@ export const dummyDashboardSummary = {
   turnoverLastWeek: 15000.0,
   lastReceiptDate: "2025-05-10T12:34:56Z",
   lastDeliveryDate: "2025-05-09T15:20:00Z",
+  lastReceiptId: 1,
+  lastDeliveryId: 1,
+  topProductId: 1,
 };
 
 export const dummyCategories = [
@@ -105,6 +108,26 @@ export const dummyWarehouseById = {
 };
 
 export const dummyProducts = [
+  {
+    productId: 1,
+    name: "Widget",
+    description: "A useful widget",
+    unitPrice: 9.99,
+    unitSize: 1.0,
+    categoryName: "Gadgets",
+    inventoryCount: 100,
+    transactionsCount: 20,
+  },
+  {
+    productId: 1,
+    name: "Widget",
+    description: "A useful widget",
+    unitPrice: 9.99,
+    unitSize: 1.0,
+    categoryName: "Gadgets",
+    inventoryCount: 100,
+    transactionsCount: 20,
+  },
   {
     productId: 1,
     name: "Widget",
