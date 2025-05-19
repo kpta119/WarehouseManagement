@@ -3,11 +3,8 @@ package com.example.warehouse.repositories;
 import com.example.warehouse.TestDataUtil;
 import com.example.warehouse.domain.Region;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -15,8 +12,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 public class RegionRepositoryIntegrationTests {
 
@@ -24,7 +19,7 @@ public class RegionRepositoryIntegrationTests {
     private RegionRepository underTest;
 
     @Test
-    public void testThatRegionCanBeCreatedAndRecalled(){
+    public void testThatRegionCanBeCreatedAndRecalled() {
         Region region = TestDataUtil.createRegion1();
         underTest.save(region);
         Optional<Region> result = underTest.findById(region.getId());
@@ -46,7 +41,7 @@ public class RegionRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatRegionCanBeUpdated(){
+    public void testThatRegionCanBeUpdated() {
         Region region = TestDataUtil.createRegion1();
         underTest.save(region);
         region.setName("Updated");
@@ -57,7 +52,7 @@ public class RegionRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatRegionCanBeDeleted(){
+    public void testThatRegionCanBeDeleted() {
         Region region = TestDataUtil.createRegion1();
         underTest.save(region);
         Optional<Region> result = underTest.findById(region.getId());

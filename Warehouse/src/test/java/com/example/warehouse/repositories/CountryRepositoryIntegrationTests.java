@@ -5,19 +5,14 @@ import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @Transactional
 public class CountryRepositoryIntegrationTests {
 
@@ -45,7 +40,7 @@ public class CountryRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatMultipleCountriesCanBeCreated(){
+    public void testThatMultipleCountriesCanBeCreated() {
         Region region1 = TestDataUtil.createRegion1();
         regionRepository.save(region1);
         Country country1 = TestDataUtil.createCountry1(region1);
@@ -64,7 +59,7 @@ public class CountryRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatCountriesCanBeFoundFromGivenRegion(){
+    public void testThatCountriesCanBeFoundFromGivenRegion() {
         Region region = TestDataUtil.createRegion1();
         regionRepository.save(region);
         Country country1 = TestDataUtil.createCountry1(region);
