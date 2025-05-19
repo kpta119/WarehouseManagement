@@ -56,7 +56,8 @@ public class ClientServiceImpl implements ClientService {
         address = addressRepository.save(address);
 
         Client client = new Client();
-        client.setName(request.getName());
+        String name = request.getName();
+        client.setName(name != null && !name.trim().isEmpty() ? name : null);
         client.setEmail(request.getEmail());
         client.setPhoneNumber(request.getPhoneNumber());
         client.setAddress(address);
