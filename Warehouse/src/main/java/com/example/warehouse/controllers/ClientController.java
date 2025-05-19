@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.NoSuchElementException;
+
 @RestController
 @RequestMapping("/api/clients")
 public class ClientController {
@@ -24,10 +26,16 @@ public class ClientController {
     }
 
     @PostMapping()
-    public ResponseEntity<ClientDto> createClient(@RequestBody ClientDto request) {
-        Client savedClient = clientService.createClient(request);
-        ClientDto responseDto = clientMapper.mapToDto(savedClient);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    public ResponseEntity<?> createClient(@RequestBody ClientDto request) {
+        try {
+            Client savedClient = clientService.createClient(request);
+            ClientDto responseDto = clientMapper.mapToDto(savedClient);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
     }
 
 
