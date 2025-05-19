@@ -1,7 +1,7 @@
 import os
 
 def export_text(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         content = file.read()
     return content
     
@@ -23,6 +23,6 @@ def export_files_in_directory(directory_path):
 if __name__ == "__main__":
     directory_path = os.path.join(os.getcwd(), 'src')
     total_text = export_files_in_directory(directory_path)
-    with open('exported_text.txt', 'w') as output_file:
+    with open('exported_text.txt', 'w', encoding="utf-8") as output_file:
         output_file.write(total_text)
     print(f"Exported text from all files to exported_text.txt")

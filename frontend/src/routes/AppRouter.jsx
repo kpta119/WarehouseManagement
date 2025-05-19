@@ -22,6 +22,11 @@ import ProtectedRoute from "../components/Layout/ProtectedRoute";
 import Layout from "../components/Layout/Layout";
 import DefaultRedirect from "../components/Layout/DefaultRedirect";
 import ProductFormPage from "../pages/ProductFormPage";
+import CategoryFormPage from "../pages/CategoryFormPage";
+import WarehousesFormPage from "../pages/WarehousesFormPage";
+import ClientFormPage from "../pages/ClientFormPage";
+import EmployeeFormPage from "../pages/EmployeeFormPage";
+import SupplierFormPage from "../pages/SupplierFormPage";
 
 const AppRouter = () => (
   <Router>
@@ -39,7 +44,17 @@ const AppRouter = () => (
                 <Route path="products/:id/edit" element={<ProductFormPage />} />
                 <Route path="products/:id" element={<ProductDetailPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
+                <Route path="categories/new" element={<CategoryFormPage />} />
+                <Route
+                  path="categories/:id/edit"
+                  element={<CategoryFormPage />}
+                />
                 <Route path="warehouses" element={<WarehousesPage />} />
+                <Route path="warehouses/new" element={<WarehousesFormPage />} />
+                <Route
+                  path="warehouses/:id/edit"
+                  element={<WarehousesFormPage />}
+                />
                 <Route
                   path="warehouses/:id"
                   element={<WarehouseDetailPage />}
@@ -62,10 +77,13 @@ const AppRouter = () => (
                   element={<TransactionDetailPage />}
                 />
                 <Route path="clients" element={<ClientsPage />} />
+                <Route path="clients/new" element={<ClientFormPage />} />
                 <Route path="clients/:id" element={<ClientDetailPage />} />
                 <Route path="suppliers" element={<SuppliersPage />} />
+                <Route path="suppliers/new" element={<SupplierFormPage />} />
                 <Route path="suppliers/:id" element={<SupplierDetailPage />} />
                 <Route path="employees" element={<EmployeesPage />} />
+                <Route path="employees/new" element={<EmployeeFormPage />} />
                 <Route path="employees/:id" element={<EmployeeDetailPage />} />
                 <Route path="geography" element={<GeographyPage />} />
                 <Route path="*" element={<DefaultRedirect />} />

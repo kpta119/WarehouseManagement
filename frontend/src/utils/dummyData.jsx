@@ -43,7 +43,24 @@ export const dummyClientById = {
     country: "USA",
     region: "North",
   },
-  history: [],
+  history: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "Order 1",
+      type: "WAREHOUSE_TO_CLIENT",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+    {
+      transactionId: 2,
+      date: "2025-05-02",
+      description: "Order 2",
+      type: "WAREHOUSE_TO_CLIENT",
+      employeeId: 1,
+      totalPrice: 2000.0,
+    },
+  ],
 };
 
 export const dummyEmployees = [
@@ -69,7 +86,24 @@ export const dummyEmployeeById = {
   warehouseId: 1,
   warehouseName: "Main",
   transactionsCount: 20,
-  history: [],
+  history: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "Order 1",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+    {
+      transactionId: 2,
+      date: "2025-05-02",
+      description: "Order 2",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 2000.0,
+    },
+  ],
 };
 
 export const dummyRegions = [
@@ -101,33 +135,38 @@ export const dummyWarehouseById = {
   capacity: 1000,
   occupiedCapacity: 450,
   address: "123 Elm St",
-  employees: [],
-  products: [],
-  transactions: [],
-  occupancyHistory: [],
+  employees: [
+    {
+      employeeId: 1,
+      name: "string",
+      surname: "string",
+      email: "string",
+      phoneNumber: "string",
+      position: "string",
+    },
+  ],
+  products: [
+    {
+      productId: 1,
+      name: "string",
+      quantity: 100,
+      unitPrice: 0.0,
+    },
+  ],
+  transactions: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "string",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+  ],
+  occupancyHistory: [{ date: "2025-04-01", occupiedCapacity: 400 }],
 };
 
 export const dummyProducts = [
-  {
-    productId: 1,
-    name: "Widget",
-    description: "A useful widget",
-    unitPrice: 9.99,
-    unitSize: 1.0,
-    categoryName: "Gadgets",
-    inventoryCount: 100,
-    transactionsCount: 20,
-  },
-  {
-    productId: 1,
-    name: "Widget",
-    description: "A useful widget",
-    unitPrice: 9.99,
-    unitSize: 1.0,
-    categoryName: "Gadgets",
-    inventoryCount: 100,
-    transactionsCount: 20,
-  },
   {
     productId: 1,
     name: "Widget",
@@ -147,8 +186,19 @@ export const dummyProductById = {
   unitPrice: 9.99,
   unitSize: 1.0,
   categoryName: "Gadgets",
-  inventory: { 1: 50 },
-  transactions: [],
+  inventory: {
+    warehouseId1: 10,
+    warehouseId2: 5,
+  },
+  transactions: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      price: 1500.0,
+      quantity: 10,
+    },
+  ],
 };
 
 export const dummyLowStock = [1, 2, 3];
@@ -178,7 +228,24 @@ export const dummySupplierById = {
     country: "USA",
     region: "East",
   },
-  history: [],
+  history: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "Order 1",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+    {
+      transactionId: 2,
+      date: "2025-05-02",
+      description: "Order 2",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 2000.0,
+    },
+  ],
 };
 
 export const dummyTransactions = [
@@ -203,7 +270,21 @@ export const dummyTransactionById = {
   type: "WAREHOUSE_TO_CLIENT",
   employeeId: 1,
   fromWarehouseId: 1,
-  toWarehouseId: 1,
   clientId: 1,
-  products: [],
+  products: [
+    {
+      productId: 1,
+      name: "Widget",
+      categoryName: "Gadgets",
+      quantity: 10,
+      unitPrice: 9.99,
+    },
+    {
+      productId: 2,
+      name: "Gadget",
+      categoryName: "Gadgets",
+      quantity: 5,
+      unitPrice: 19.99,
+    },
+  ],
 };

@@ -350,8 +350,6 @@ export default function Charts({ summary }) {
 
 // \components\Dashboard\SummaryTiles.jsx
 
-// \components\Dashboard\SummaryTiles.jsx
-
 import { Link } from "react-router-dom";
 import {
   FaBox,
@@ -479,50 +477,6 @@ const SummaryTiles = ({ summary }) => {
 };
 
 export default SummaryTiles;
-
-
-// \components\Forms\CategoryForm.jsx
-
-
-
-// \components\Forms\ClientForm.jsx
-
-
-
-// \components\Forms\EmployeeForm.jsx
-
-
-
-// \components\Forms\InventoryForm.jsx
-
-
-
-// \components\Forms\ProductForm.jsx
-
-
-
-// \components\Forms\SupplierForm.jsx
-
-
-
-// \components\Forms\TransactionFilter.jsx
-
-
-
-// \components\Forms\WarehouseForm.jsx
-
-
-
-// \components\Geography\AddressForm.jsx
-
-
-
-// \components\Geography\CountriesList.jsx
-
-
-
-// \components\Geography\RegionsList.jsx
-
 
 
 // \components\Layout\DefaultRedirect.jsx
@@ -750,14 +704,6 @@ const SidebarLink = ({ to, icon: Icon, label }) => {
 };
 
 export default SidebarLink;
-
-
-// \components\Tables\DataTable.jsx
-
-
-
-// \components\Tables\Pagination.jsx
-
 
 
 // \features\auth\authSlice.jsx
@@ -1388,25 +1334,273 @@ export default warehousesSlice.reducer;
 
 // \pages\CategoriesPage.jsx
 
-const CategoriesPage = () => (
-  <div>
-    <h1>Categories Page</h1>
-  </div>
-);
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import {
+  fetchCategories,
+  deleteCategory,
+} from "../features/categories/categoriesSlice";
+import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+
+const CategoriesPage = () => {
+  const dispatch = useDispatch();
+  const {
+    list: categories,
+    status,
+    error,
+  } = useSelector((state) => state.categories);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  const filtered = categories.filter((cat) =>
+    cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleDelete = (id) => {
+    if (window.confirm("Czy na pewno chcesz usunąć tę kategorię?")) {
+      dispatch(deleteCategory(id));
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Kategorie</h1>
+        <Link
+          to="/categories/new"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaPlus className="mr-2" /> Nowa Kategoria
+        </Link>
+      </div>
+
+      <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/2">
+        <input
+          type="text"
+          placeholder="Szukaj kategorii..."
+          className="w-full focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {status === "loading" ? (
+        <p>Ładowanie...</p>
+      ) : status === "failed" ? (
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="hidden sm:grid grid-cols-3 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div>Nazwa</div>
+            <div>Opis</div>
+            <div className="text-center">Akcje</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {filtered.map((cat) => (
+              <div
+                key={cat.categoryId}
+                className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+              >
+                <div className="font-medium text-pink-600">
+                  <Link to={`/categories/${cat.categoryId}`}>{cat.name}</Link>
+                </div>
+                <div className="text-sm text-gray-700">{cat.description}</div>
+                <div className="flex justify-center space-x-4 text-gray-600">
+                  <Link to={`/categories/${cat.categoryId}/edit`}>
+                    <FaEdit />
+                  </Link>
+                  <button onClick={() => handleDelete(cat.categoryId)}>
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default CategoriesPage;
 
 
+// \pages\CategoryFormPage.jsx
+
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  fetchCategories,
+  createCategory,
+  updateCategory,
+} from "../features/categories/categoriesSlice";
+
+const CategoryFormPage = () => {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {
+    list: categories,
+    status,
+    error,
+  } = useSelector((state) => state.categories);
+  const [form, setForm] = useState({ name: "", description: "" });
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, status]);
+  useEffect(() => {
+    if (isEdit && status === "succeeded") {
+      const cat = categories.find((c) => String(c.categoryId) === String(id));
+      if (cat) {
+        setForm({ name: cat.name, description: cat.description });
+      }
+    }
+  }, [isEdit, status, categories, id]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const payload = { name: form.name, description: form.description };
+    if (isEdit) {
+      await dispatch(updateCategory({ id: Number(id), data: payload }));
+    } else {
+      await dispatch(createCategory(payload));
+    }
+    navigate("/categories");
+  };
+  if (isEdit && status === "loading") {
+    return <p>Ładowanie danych kategorii...</p>;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  return (
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <h1 className="text-2xl font-semibold mb-4">
+        {isEdit ? "Edytuj Kategorię" : "Nowa Kategoria"}
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium">
+            Nazwa
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium">
+            Opis
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+        >
+          {isEdit ? "Zapisz" : "Utwórz"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default CategoryFormPage;
+
+
 // \pages\ClientDetailPage.jsx
 
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { fetchClientById } from "../features/clients/clientsSlice";
+import { format } from "date-fns";
+import { FaChevronLeft, FaEye } from "react-icons/fa";
 
 const ClientDetailPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { current: client } = useSelector((s) => s.clients);
+  useEffect(() => {
+    dispatch(fetchClientById(id));
+  }, [dispatch, id]);
+  if (!client) {
+    return <p>Ładowanie danych klienta...</p>;
+  }
+  const { name, email, phoneNumber, address, history = [] } = client;
+  const addr = address.street
+    ? `${address.street} ${address.streetNumber}, ${address.postalCode} ${address.city}, ${address.country}`
+    : address;
   return (
-    <div>
-      <h1>Client Detail Page</h1>
-      <p>Params: {JSON.stringify({ id })}</p>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <Link to="/clients" className="text-gray-600 hover:text-pink-500">
+        <FaChevronLeft className="inline-block mr-2" /> Wróć do Klientów
+      </Link>
+      <div className="bg-white p-6 rounded-lg shadow space-y-4">
+        <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
+        <p>
+          <strong>Email:</strong> {email}
+        </p>
+        <p>
+          <strong>Telefon:</strong> {phoneNumber}
+        </p>
+        <p>
+          <strong>Adres:</strong> {addr}
+        </p>
+      </div>
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Historia transakcji</h2>
+        {history.length === 0 ? (
+          <p>Brak historii transakcji.</p>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+              <div>Data</div>
+              <div>Typ</div>
+              <div>Opis</div>
+              <div className="text-center">Szczegóły</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {history.map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
+                >
+                  <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                  <div>{tx.type.replace(/_/g, " ")}</div>
+                  <div>{tx.description}</div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link to={`/transactions/${tx.transactionId}`}>
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 };
@@ -1414,13 +1608,206 @@ const ClientDetailPage = () => {
 export default ClientDetailPage;
 
 
+// \pages\ClientFormPage.jsx
+
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { createClient } from "../features/clients/clientsSlice";
+import { FaChevronLeft } from "react-icons/fa";
+import { Link } from "react-router-dom";
+
+const ClientFormPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.clients);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+  });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(createClient(form)).unwrap();
+      navigate("/clients");
+    } catch {}
+  };
+  return (
+    <div className="max-w-xl mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">
+      <Link
+        to="/clients"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+      >
+        <FaChevronLeft className="inline mr-2" /> Back to Clients
+      </Link>
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">New Client</h1>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Phone Number
+          </label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            value={form.phoneNumber}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="address"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Address
+          </label>
+          <textarea
+            id="address"
+            name="address"
+            rows={3}
+            value={form.address}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        {error && <p className="text-red-500 text-sm">Error: {error}</p>}
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition disabled:opacity-50"
+        >
+          {status === "loading" ? "Saving..." : "Create Client"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default ClientFormPage;
+
+
 // \pages\ClientsPage.jsx
 
-const ClientsPage = () => (
-  <div>
-    <h1>Clients Page</h1>
-  </div>
-);
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { fetchClients } from "../features/clients/clientsSlice";
+import { FaSearch, FaEye, FaPlus } from "react-icons/fa";
+
+const ClientsPage = () => {
+  const dispatch = useDispatch();
+  const { list: clients, status, error } = useSelector((s) => s.clients);
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    dispatch(fetchClients());
+  }, [dispatch]);
+  const filtered = clients.filter((c) =>
+    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Klienci</h1>
+        <Link
+          to="/clients/new"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaPlus className="mr-2" /> Nowy Klient
+        </Link>
+      </div>
+
+      <form className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/2">
+        <FaSearch className="text-gray-500 mr-2" />
+        <input
+          type="text"
+          placeholder="Szukaj klientów..."
+          className="w-full focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </form>
+      {status === "loading" ? (
+        <p>Ładowanie...</p>
+      ) : status === "failed" ? (
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="hidden sm:grid grid-cols-5 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div>Nazwa</div>
+            <div>Email</div>
+            <div>Telefon</div>
+            <div>Adres</div>
+            <div className="text-center">Akcje</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {filtered.map((c) => (
+              <div
+                key={c.clientId}
+                className="grid grid-cols-1 sm:grid-cols-5 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+              >
+                <div className="font-medium text-pink-600">
+                  <Link to={`/clients/${c.clientId}`}>{c.name}</Link>
+                </div>
+                <div className="text-sm text-gray-700">{c.email}</div>
+                <div className="text-sm text-gray-700">{c.phoneNumber}</div>
+                <div className="text-sm text-gray-700">{c.address}</div>
+                <div className="flex justify-center text-gray-600">
+                  <Link to={`/clients/${c.clientId}`}>
+                    <FaEye />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default ClientsPage;
 
@@ -1455,14 +1842,93 @@ export default DashboardPage;
 
 // \pages\EmployeeDetailPage.jsx
 
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { fetchEmployeeById } from "../features/employees/employeesSlice";
+import { format } from "date-fns";
+import { FaChevronLeft, FaEye } from "react-icons/fa";
 
 const EmployeeDetailPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { current: employee } = useSelector((state) => state.employees);
+  useEffect(() => {
+    dispatch(fetchEmployeeById(id));
+  }, [dispatch, id]);
+  if (!employee) {
+    return <p>Ładowanie danych pracownika...</p>;
+  }
+  const {
+    name,
+    surname,
+    email,
+    phoneNumber,
+    position,
+    warehouseId,
+    warehouseName,
+    history = [],
+  } = employee;
   return (
-    <div>
-      <h1>Employee Detail Page</h1>
-      <p>Params: {JSON.stringify({ id })}</p>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <Link to="/employees" className="text-gray-600 hover:text-pink-500">
+        <FaChevronLeft className="inline-block mr-2" /> Wróć do Pracowników
+      </Link>
+      <div className="bg-white p-6 rounded-lg shadow space-y-2">
+        <h1 className="text-3xl font-semibold text-gray-800">
+          {name} {surname}
+        </h1>
+        <p>
+          <strong>Stanowisko:</strong> {position}
+        </p>
+        <p>
+          <strong>Email:</strong> {email}
+        </p>
+        <p>
+          <strong>Telefon:</strong> {phoneNumber}
+        </p>
+        <p>
+          <strong>Magazyn:</strong>{" "}
+          <Link
+            to={`/warehouses/${warehouseId}`}
+            className="text-pink-600 hover:underline"
+          >
+            {warehouseName}
+          </Link>
+        </p>
+      </div>
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Historia Transakcji</h2>
+        {history.length === 0 ? (
+          <p>Brak historii transakcji.</p>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+              <div>Data</div>
+              <div>Typ</div>
+              <div>Opis</div>
+              <div className="text-center">Szczegóły</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {history.map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
+                >
+                  <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                  <div>{tx.type.replace(/_/g, " ")}</div>
+                  <div>{tx.description}</div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link to={`/transactions/${tx.transactionId}`}>
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 };
@@ -1470,27 +1936,345 @@ const EmployeeDetailPage = () => {
 export default EmployeeDetailPage;
 
 
+// \pages\EmployeeFormPage.jsx
+
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { FaChevronLeft } from "react-icons/fa";
+import { createEmployee } from "../features/employees/employeesSlice";
+import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
+
+const EmployeeFormPage = () => {
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { list: warehouses } = useSelector((state) => state.warehouses);
+  const [form, setForm] = useState({
+    name: "",
+    surname: "",
+    email: "",
+    phoneNumber: "",
+    position: "",
+    warehouseId: "",
+  });
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+  }, [dispatch, id]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      name: form.name,
+      surname: form.surname,
+      email: form.email,
+      phoneNumber: form.phoneNumber,
+      position: form.position,
+      warehouseId: parseInt(form.warehouseId, 10),
+    };
+    dispatch(createEmployee(payload)).then(() => navigate("/employees"));
+  };
+  return (
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
+      <Link
+        to="/employees"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+      >
+        <FaChevronLeft className="mr-2" /> Wróć do Pracowników
+      </Link>
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">
+        Nowy Pracownik
+      </h1>
+      {empError && <p className="text-red-500 mb-4">Błąd: {empError}</p>}
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Imię
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="surname"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Nazwisko
+          </label>
+          <input
+            id="surname"
+            name="surname"
+            value={form.surname}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Telefon
+          </label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            value={form.phoneNumber}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="position"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Stanowisko
+          </label>
+          <input
+            id="position"
+            name="position"
+            value={form.position}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="warehouseId"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Magazyn
+          </label>
+          <select
+            id="warehouseId"
+            name="warehouseId"
+            value={form.warehouseId}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          >
+            <option value="">Wybierz magazyn</option>
+            {warehouses.map((wh) => (
+              <option key={wh.warehouseId} value={wh.warehouseId}>
+                {wh.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition"
+        >
+          Utwórz Pracownika
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default EmployeeFormPage;
+
+
 // \pages\EmployeesPage.jsx
 
-const EmployeesPage = () => (
-  <div>
-    <h1>Employees Page</h1>
-  </div>
-);
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { FaSearch, FaPlus, FaEye } from "react-icons/fa";
+import { fetchEmployees } from "../features/employees/employeesSlice";
+
+const EmployeesPage = () => {
+  const dispatch = useDispatch();
+  const {
+    list: employees,
+    status,
+    error,
+  } = useSelector((state) => state.employees);
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    dispatch(fetchEmployees());
+  }, [dispatch]);
+  const filtered = employees.filter((emp) =>
+    `${emp.name} ${emp.surname}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Employees</h1>
+        <Link
+          to="/employees/new"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaPlus className="mr-2" /> New Employee
+        </Link>
+      </div>
+      <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/2">
+        <FaSearch className="text-gray-500 mr-2" />
+        <input
+          type="text"
+          placeholder="Search employees..."
+          className="w-full focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      {status === "loading" ? (
+        <p>Loading...</p>
+      ) : status === "failed" ? (
+        <p className="text-red-500">Error: {error}</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div>Name</div>
+            <div>Email</div>
+            <div>Phone</div>
+            <div>Position</div>
+            <div>Warehouse</div>
+            <div className="text-center">Actions</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {filtered.map((emp) => (
+              <div
+                key={emp.employeeId}
+                className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+              >
+                <div className="font-medium text-pink-600">
+                  <Link to={`/employees/${emp.employeeId}`}>
+                    {emp.name} {emp.surname}
+                  </Link>
+                </div>
+                <div className="text-sm text-gray-700">{emp.email}</div>
+                <div className="text-sm text-gray-700">{emp.phoneNumber}</div>
+                <div className="text-sm text-gray-700">{emp.position}</div>
+                <div className="text-sm text-gray-700">{emp.warehouseName}</div>
+                <div className="flex justify-center text-gray-600">
+                  <Link to={`/employees/${emp.employeeId}`}>
+                    <FaEye />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default EmployeesPage;
 
 
 // \pages\GeographyPage.jsx
 
-import { useLocation } from "react-router-dom";
-
+import { useState, useEffect } from "react";
+import { listRegions, listCountries } from "../api/geography";
+import { FaGlobe } from "react-icons/fa";
 const GeographyPage = () => {
-  const { search } = useLocation();
+  const [regions, setRegions] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  useEffect(() => {
+    listRegions().then((res) => setRegions(res.data));
+  }, []);
+  useEffect(() => {
+    if (selectedRegion) {
+      listCountries(selectedRegion).then((res) => setCountries(res.data));
+    } else {
+      setCountries([]);
+    }
+  }, [selectedRegion]);
   return (
-    <div>
-      <h1>Geography Page</h1>
-      <p>Query: {search}</p>
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <FaGlobe className="text-pink-500 w-6 h-6" />
+        <h1 className="text-3xl font-semibold">Geography</h1>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">Regions</h2>
+          <ul className="space-y-2">
+            {regions.map((r) => (
+              <li key={r.regionId}>
+                <button
+                  onClick={() => setSelectedRegion(r.regionId)}
+                  className={`
+                    w-full text-left px-4 py-2 rounded-lg transition 
+                    ${
+                      selectedRegion === r.regionId
+                        ? "bg-pink-100 text-pink-800"
+                        : "hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  {r.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-xl font-semibold mb-4">
+            Countries{" "}
+            {selectedRegion &&
+              `in ${regions.find((r) => r.regionId === selectedRegion)?.name}`}
+          </h2>
+
+          {!selectedRegion ? (
+            <p className="text-gray-500">
+              Select a region to view its countries.
+            </p>
+          ) : countries.length > 0 ? (
+            <ul className="space-y-2">
+              {countries.map((c) => (
+                <li
+                  key={c.countryId}
+                  className="px-4 py-2 border border-gray-200 rounded-lg"
+                >
+                  {c.name}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">No countries found for this region.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
@@ -1500,33 +2284,540 @@ export default GeographyPage;
 
 // \pages\InventoryDeliveryPage.jsx
 
-const InventoryDeliveryPage = () => (
-  <div>
-    <h1>Inventory Delivery Page</h1>
-  </div>
-);
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
+import { deliverInventory } from "../features/inventory/deliverySlice";
+import { searchProducts } from "../api/products";
+import { fetchClients } from "../features/clients/clientsSlice";
+import { FaPlus, FaTrash } from "react-icons/fa";
+
+const InventoryDeliveryPage = () => {
+  const dispatch = useDispatch();
+  const { list: warehouses } = useSelector((s) => s.warehouses);
+  const { list: clients } = useSelector((s) => s.clients);
+  const { status, error, transaction } = useSelector(
+    (s) => s.inventory.delivery
+  );
+  const [form, setForm] = useState({
+    warehouseId: "",
+    clientId: "",
+    items: [{ productId: "", quantity: "" }],
+  });
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+    dispatch(fetchClients());
+    searchProducts({}).then((res) => setProducts(res.data));
+  }, [dispatch]);
+  const handleAddRow = () =>
+    setForm((f) => ({
+      ...f,
+      items: [...f.items, { productId: "", quantity: "" }],
+    }));
+  const handleRemoveRow = (idx) =>
+    setForm((f) => ({
+      ...f,
+      items: f.items.filter((_, i) => i !== idx),
+    }));
+  const handleItemChange = (idx, field, value) => {
+    const items = [...form.items];
+    items[idx][field] = value;
+    setForm((f) => ({ ...f, items }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const itemsPayload = {};
+    form.items.forEach(({ productId, quantity }) => {
+      if (productId && quantity) {
+        itemsPayload[productId] = Number(quantity);
+      }
+    });
+    dispatch(
+      deliverInventory({
+        warehouseId: Number(form.warehouseId),
+        clientId: Number(form.clientId),
+        items: itemsPayload,
+      })
+    );
+  };
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <h1 className="text-3xl font-semibold">Delivery Inventory</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-lg shadow space-y-4"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Warehouse</label>
+            <select
+              required
+              value={form.warehouseId}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, warehouseId: e.target.value }))
+              }
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+            >
+              <option value="">Select warehouse</option>
+              {warehouses.map((w) => (
+                <option key={w.warehouseId} value={w.warehouseId}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Client</label>
+            <select
+              required
+              value={form.clientId}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, clientId: e.target.value }))
+              }
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+            >
+              <option value="">Select client</option>
+              {clients.map((c) => (
+                <option key={c.clientId} value={c.clientId}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Products & Quantities</label>
+          {form.items.map((item, idx) => (
+            <div key={idx} className="grid grid-cols-5 gap-2 items-end">
+              <div className="col-span-3">
+                <select
+                  required
+                  value={item.productId}
+                  onChange={(e) =>
+                    handleItemChange(idx, "productId", e.target.value)
+                  }
+                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                >
+                  <option value="">Select product</option>
+                  {products.map((p) => (
+                    <option key={p.productId} value={p.productId}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  placeholder="Qty"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    handleItemChange(idx, "quantity", e.target.value)
+                  }
+                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveRow(idx)}
+                className="flex justify-center items-center text-red-500 hover:text-red-700"
+              >
+                <FaTrash />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddRow}
+            className="flex items-center text-pink-600 hover:text-pink-800"
+          >
+            <FaPlus className="mr-1" /> Add another product
+          </button>
+        </div>
+        <div className="pt-4 border-t">
+          {error && <p className="text-red-500 mb-2">Error: {error}</p>}
+          {status === "succeeded" && (
+            <p className="text-green-600 mb-2">
+              Delivered successfully! Transaction ID:{" "}
+              {transaction?.transactionId}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+          >
+            {status === "loading" ? "Processing..." : "Deliver Inventory"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 export default InventoryDeliveryPage;
 
 
 // \pages\InventoryReceivePage.jsx
 
-const InventoryReceivePage = () => (
-  <div>
-    <h1>Inventory Receive Page</h1>
-  </div>
-);
+// /pages/InventoryReceivePage.jsx
+
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
+import { fetchSuppliers } from "../features/suppliers/suppliersSlice";
+import { receiveInventory } from "../features/inventory/receiveSlice";
+import { searchProducts } from "../api/products";
+import { FaPlus, FaTrash } from "react-icons/fa";
+
+const InventoryReceivePage = () => {
+  const dispatch = useDispatch();
+  const { list: warehouses } = useSelector((s) => s.warehouses);
+  const { list: suppliers } = useSelector((s) => s.suppliers);
+  const { status, error, transaction } = useSelector(
+    (s) => s.inventory.receive
+  );
+  const [form, setForm] = useState({
+    warehouseId: "",
+    supplierId: "",
+    items: [{ productId: "", quantity: "" }],
+  });
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+    dispatch(fetchSuppliers());
+    searchProducts({}).then((res) => setProducts(res.data));
+  }, [dispatch]);
+  const handleAddRow = () =>
+    setForm((f) => ({
+      ...f,
+      items: [...f.items, { productId: "", quantity: "" }],
+    }));
+  const handleRemoveRow = (idx) =>
+    setForm((f) => ({
+      ...f,
+      items: f.items.filter((_, i) => i !== idx),
+    }));
+  const handleItemChange = (idx, field, value) => {
+    const items = [...form.items];
+    items[idx][field] = value;
+    setForm((f) => ({ ...f, items }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const itemsPayload = {};
+    form.items.forEach(({ productId, quantity }) => {
+      if (productId && quantity) {
+        itemsPayload[productId] = Number(quantity);
+      }
+    });
+    dispatch(
+      receiveInventory({
+        warehouseId: Number(form.warehouseId),
+        supplierId: Number(form.supplierId),
+        items: itemsPayload,
+      })
+    );
+  };
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <h1 className="text-3xl font-semibold">Receive Inventory</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-lg shadow space-y-4"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Warehouse</label>
+            <select
+              required
+              value={form.warehouseId}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, warehouseId: e.target.value }))
+              }
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+            >
+              <option value="">Select warehouse</option>
+              {warehouses.map((w) => (
+                <option key={w.warehouseId} value={w.warehouseId}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Supplier</label>
+            <select
+              required
+              value={form.supplierId}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, supplierId: e.target.value }))
+              }
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+            >
+              <option value="">Select supplier</option>
+              {suppliers.map((s) => (
+                <option key={s.supplierId} value={s.supplierId}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Products & Quantities</label>
+          {form.items.map((item, idx) => (
+            <div key={idx} className="grid grid-cols-5 gap-2 items-end">
+              <div className="col-span-3">
+                <select
+                  required
+                  value={item.productId}
+                  onChange={(e) =>
+                    handleItemChange(idx, "productId", e.target.value)
+                  }
+                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                >
+                  <option value="">Select product</option>
+                  {products.map((p) => (
+                    <option key={p.productId} value={p.productId}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  placeholder="Qty"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    handleItemChange(idx, "quantity", e.target.value)
+                  }
+                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveRow(idx)}
+                className="flex justify-center align-center text-red-500 hover:text-red-700"
+              >
+                <FaTrash />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddRow}
+            className="flex items-center text-pink-600 hover:text-pink-800"
+          >
+            <FaPlus className="mr-1" /> Add another product
+          </button>
+        </div>
+        <div className="pt-4 border-t">
+          {error && <p className="text-red-500 mb-2">Error: {error}</p>}
+          {status === "succeeded" && (
+            <p className="text-green-600 mb-2">
+              Received successfully! Transaction ID:{" "}
+              {transaction?.transactionId}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+          >
+            {status === "loading" ? "Processing..." : "Receive Inventory"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 export default InventoryReceivePage;
 
 
 // \pages\InventoryTransferPage.jsx
 
-const InventoryTransferPage = () => (
-  <div>
-    <h1>Inventory Transfer Page</h1>
-  </div>
-);
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
+import { transferInventory } from "../features/inventory/transferSlice";
+import { searchProducts } from "../api/products";
+import { FaPlus, FaTrash } from "react-icons/fa";
+
+const InventoryTransferPage = () => {
+  const dispatch = useDispatch();
+  const { list: warehouses } = useSelector((s) => s.warehouses);
+  const { status, error, transaction } = useSelector(
+    (s) => s.inventory.transfer
+  );
+  const [form, setForm] = useState({
+    fromWarehouseId: "",
+    toWarehouseId: "",
+    items: [{ productId: "", quantity: "" }],
+  });
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+    searchProducts({}).then((res) => setProducts(res.data));
+  }, [dispatch]);
+  const handleAddRow = () =>
+    setForm((f) => ({
+      ...f,
+      items: [...f.items, { productId: "", quantity: "" }],
+    }));
+  const handleRemoveRow = (idx) =>
+    setForm((f) => ({
+      ...f,
+      items: f.items.filter((_, i) => i !== idx),
+    }));
+  const handleItemChange = (idx, field, value) => {
+    const items = [...form.items];
+    items[idx][field] = value;
+    setForm((f) => ({ ...f, items }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const itemsPayload = {};
+    form.items.forEach(({ productId, quantity }) => {
+      if (productId && quantity) {
+        itemsPayload[productId] = Number(quantity);
+      }
+    });
+    dispatch(
+      transferInventory({
+        fromWarehouseId: Number(form.fromWarehouseId),
+        toWarehouseId: Number(form.toWarehouseId),
+        items: itemsPayload,
+      })
+    );
+  };
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      <h1 className="text-3xl font-semibold">Transfer Inventory</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-lg shadow space-y-4"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              From Warehouse
+            </label>
+            <select
+              required
+              value={form.fromWarehouseId}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, fromWarehouseId: e.target.value }))
+              }
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+            >
+              <option value="">Select source</option>
+              {warehouses.map((w) => (
+                <option key={w.warehouseId} value={w.warehouseId}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              To Warehouse
+            </label>
+            <select
+              required
+              value={form.toWarehouseId}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, toWarehouseId: e.target.value }))
+              }
+              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+            >
+              <option value="">Select destination</option>
+              {warehouses.map((w) => (
+                <option key={w.warehouseId} value={w.warehouseId}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Products & Quantities</label>
+          {form.items.map((item, idx) => (
+            <div key={idx} className="grid grid-cols-5 gap-2 items-end">
+              <div className="col-span-3">
+                <select
+                  required
+                  value={item.productId}
+                  onChange={(e) =>
+                    handleItemChange(idx, "productId", e.target.value)
+                  }
+                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                >
+                  <option value="">Select product</option>
+                  {products.map((p) => (
+                    <option key={p.productId} value={p.productId}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <input
+                  type="number"
+                  min="1"
+                  required
+                  placeholder="Qty"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    handleItemChange(idx, "quantity", e.target.value)
+                  }
+                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveRow(idx)}
+                className="flex justify-center align-center text-red-500 hover:text-red-700"
+              >
+                <FaTrash />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={handleAddRow}
+            className="flex items-center text-pink-600 hover:text-pink-800"
+          >
+            <FaPlus className="mr-1" /> Add another product
+          </button>
+        </div>
+        <div className="pt-4 border-t">
+          {error && <p className="text-red-500 mb-2">Error: {error}</p>}
+          {status === "succeeded" && (
+            <p className="text-green-600 mb-2">
+              Transferred successfully! Transaction ID:{" "}
+              {transaction?.transactionId}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+          >
+            {status === "loading" ? "Processing..." : "Transfer Inventory"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 export default InventoryTransferPage;
 
@@ -1617,21 +2908,281 @@ export default LoginPage;
 
 // \pages\ProductDetailPage.jsx
 
-import { useParams, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { fetchProductById } from "../features/products/productsSlice";
+import { format } from "date-fns";
+import { FaEdit, FaChevronLeft } from "react-icons/fa";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
-  const { search } = useLocation();
+  const dispatch = useDispatch();
+  const { current: product, error } = useSelector((state) => state.products);
+  useEffect(() => {
+    dispatch(fetchProductById(id));
+  }, [dispatch, id]);
+  if (!product) {
+    return <p>Loading product details...</p>;
+  }
+  const {
+    name,
+    description,
+    unitPrice,
+    unitSize,
+    categoryName,
+    inventory,
+    transactions,
+  } = product;
   return (
-    <div>
-      <h1>Product Detail Page</h1>
-      <p>Params: {JSON.stringify({ id })}</p>
-      <p>Query: {search}</p>
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
+      <div className="flex items-center justify-between">
+        <Link to="/products" className="text-gray-600 hover:text-pink-500">
+          <FaChevronLeft className="inline mr-2" /> Back to Products
+        </Link>
+        <Link
+          to={`/products/${id}/edit`}
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaEdit className="mr-2" /> Edit Product
+        </Link>
+      </div>
+      <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
+      <p className="text-sm text-gray-500">Category: {categoryName}</p>
+      <p className="text-lg font-medium">${unitPrice.toFixed(2)}</p>
+      <p className="text-sm text-gray-600">Size: {unitSize}</p>
+      {description && (
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Description</h2>
+          <p className="text-gray-700 whitespace-pre-line">{description}</p>
+        </div>
+      )}
+      {inventory && Object.keys(inventory).length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Inventory by Warehouse</h2>
+          {/* Header */}
+          <div className="grid grid-cols-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
+            <div>Warehouse ID</div>
+            <div className="text-right">Quantity</div>
+          </div>
+          {/* Rows */}
+          <div className="divide-y divide-gray-200">
+            {Object.entries(inventory).map(([warehouseId, qty]) => (
+              <div
+                key={warehouseId}
+                className="grid grid-cols-2 p-2 text-sm text-gray-700"
+              >
+                <div>{warehouseId}</div>
+                <div className="text-right">{qty}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {transactions && transactions.length > 0 && (
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Recent Transactions</h2>
+          <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
+            <div>Date</div>
+            <div>Type</div>
+            <div className="text-right">Quantity</div>
+            <div className="text-right">Price</div>
+            <div className="text-center">Details</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {transactions.map((tx) => (
+              <div
+                key={tx.transactionId}
+                className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
+              >
+                <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                <div>{tx.type.replace(/_/g, " ")}</div>
+                <div className="text-right">{tx.quantity}</div>
+                <div className="text-right">${tx.price.toFixed(2)}</div>
+                <div className="text-center">
+                  <Link
+                    to={`/transactions/${tx.transactionId}`}
+                    className="text-pink-600 hover:underline"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default ProductDetailPage;
+
+
+// \pages\ProductFormPage.jsx
+
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  fetchProductById,
+  createProduct,
+  updateProduct,
+} from "../features/products/productsSlice";
+import { fetchCategories } from "../features/categories/categoriesSlice";
+
+const ProductFormPage = () => {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {
+    current: product,
+    status: prodStatus,
+    error: prodError,
+  } = useSelector((state) => state.products);
+  const { list: categories } = useSelector((state) => state.categories);
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    unitPrice: "",
+    unitSize: "",
+    categoryId: "",
+  });
+  useEffect(() => {
+    dispatch(fetchCategories());
+    if (isEdit) dispatch(fetchProductById(id));
+  }, [dispatch, id, isEdit]);
+  useEffect(() => {
+    if (isEdit && product) {
+      setForm({
+        name: product.name || "",
+        description: product.description || "",
+        unitPrice: product.unitPrice?.toString() || "",
+        unitSize: product.unitSize?.toString() || "",
+        categoryId: product.categoryId?.toString() || "",
+      });
+    }
+  }, [product, isEdit]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      ...form,
+      unitPrice: parseFloat(form.unitPrice),
+      unitSize: parseFloat(form.unitSize),
+      categoryId: parseInt(form.categoryId, 10),
+    };
+    if (isEdit) {
+      dispatch(updateProduct({ id: parseInt(id, 10), data: payload })).then(
+        () => navigate("/products")
+      );
+    } else {
+      dispatch(createProduct(payload)).then(() => navigate("/products"));
+    }
+  };
+  if ((isEdit && prodStatus === "loading") || prodStatus === "idle") {
+    return <p>Loading...</p>;
+  }
+  return (
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <h1 className="text-2xl font-semibold mb-4">
+        {isEdit ? "Edit Product" : "New Product"}
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium">
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="unitPrice" className="block text-sm font-medium">
+              Unit Price
+            </label>
+            <input
+              id="unitPrice"
+              name="unitPrice"
+              type="number"
+              step="0.01"
+              value={form.unitPrice}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="unitSize" className="block text-sm font-medium">
+              Unit Size
+            </label>
+            <input
+              id="unitSize"
+              name="unitSize"
+              type="number"
+              step="0.01"
+              value={form.unitSize}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+              required
+            />
+          </div>
+        </div>
+        <div>
+          <label htmlFor="categoryId" className="block text-sm font-medium">
+            Category
+          </label>
+          <select
+            id="categoryId"
+            name="categoryId"
+            value={form.categoryId}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+            required
+          >
+            <option value="">Select category</option>
+            {categories.map((cat) => (
+              <option key={cat.categoryId} value={cat.categoryId}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {prodError && <p className="text-red-500">{prodError}</p>}
+        <button
+          type="submit"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+        >
+          {isEdit ? "Update Product" : "Create Product"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default ProductFormPage;
 
 
 // \pages\ProductsPage.jsx
@@ -1655,14 +3206,11 @@ const ProductsPage = () => {
   } = useSelector((state) => state.products);
   const { list: categories } = useSelector((state) => state.categories);
   const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
-
   useEffect(() => {
     dispatch(
       fetchProducts({
@@ -1672,17 +3220,14 @@ const ProductsPage = () => {
       })
     );
   }, [dispatch, searchTerm, categoryFilter, selectedWarehouse]);
-
   const handleSearch = (e) => {
     e.preventDefault();
   };
-
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       dispatch(deleteProduct(id));
     }
   };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -1694,12 +3239,11 @@ const ProductsPage = () => {
           <FaPlus className="mr-2" /> New Product
         </Link>
       </div>
-
       <form
         onSubmit={handleSearch}
         className="flex flex-wrap gap-4 items-center"
       >
-        <div className="flex items-center border rounded-lg px-3 py-2">
+        <div className="flex border-gray-300 items-center border rounded-lg px-3 py-2">
           <FaSearch className="text-gray-500 mr-2" />
           <input
             type="text"
@@ -1709,9 +3253,8 @@ const ProductsPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
         <select
-          className="border rounded-lg px-3 py-2"
+          className="border border-gray-300 rounded-lg px-3 py-2"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
@@ -1723,14 +3266,12 @@ const ProductsPage = () => {
           ))}
         </select>
       </form>
-
       {status === "loading" || status === "idle" ? (
         <p>Loading...</p>
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-auto">
-          {/* Header */}
           <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
             <div>Name</div>
             <div>Category</div>
@@ -1739,7 +3280,6 @@ const ProductsPage = () => {
             <div className="text-right">Transactions</div>
             <div className="text-center">Actions</div>
           </div>
-          {/* Rows */}
           <div className="divide-y divide-gray-200">
             {products.map((product) => (
               <div
@@ -1791,14 +3331,76 @@ export default ProductsPage;
 
 // \pages\SupplierDetailPage.jsx
 
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { fetchSupplierById } from "../features/suppliers/suppliersSlice";
+import { format } from "date-fns";
+import { FaChevronLeft, FaEye } from "react-icons/fa";
 
 const SupplierDetailPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { current: supplier } = useSelector((state) => state.suppliers);
+  useEffect(() => {
+    dispatch(fetchSupplierById(id));
+  }, [dispatch, id]);
+  if (!supplier) {
+    return <p>Ładowanie danych dostawcy...</p>;
+  }
+  const { name, email, phoneNumber, address, history = [] } = supplier;
+  const addr = address.street
+    ? `${address.street} ${address.streetNumber}, ${address.postalCode} ${address.city}, ${address.country}`
+    : address;
   return (
-    <div>
-      <h1>Supplier Detail Page</h1>
-      <p>Params: {JSON.stringify({ id })}</p>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <Link to="/suppliers" className="text-gray-600 hover:text-pink-500">
+        <FaChevronLeft className="inline-block mr-2" /> Wróć do Dostawców
+      </Link>
+      <div className="bg-white p-6 rounded-lg shadow space-y-4">
+        <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
+        <p>
+          <strong>Email:</strong> {email}
+        </p>
+        <p>
+          <strong>Telefon:</strong> {phoneNumber}
+        </p>
+        <p>
+          <strong>Adres:</strong> {addr}
+        </p>
+      </div>
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Historia transakcji</h2>
+        {history.length === 0 ? (
+          <p>Brak historii transakcji.</p>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+              <div>Data</div>
+              <div>Typ</div>
+              <div>Opis</div>
+              <div className="text-center">Szczegóły</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {history.map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
+                >
+                  <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                  <div>{tx.type.replace(/_/g, " ")}</div>
+                  <div>{tx.description}</div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link to={`/transactions/${tx.transactionId}`}>
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 };
@@ -1806,27 +3408,475 @@ const SupplierDetailPage = () => {
 export default SupplierDetailPage;
 
 
+// \pages\SupplierFormPage.jsx
+
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import { FaChevronLeft } from "react-icons/fa";
+import { createSupplier } from "../features/suppliers/suppliersSlice";
+import { listRegions, listCountries } from "../api/geography";
+
+const SupplierFormPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [regions, setRegions] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phoneNumber: "",
+    regionId: "",
+    countryId: "",
+    city: "",
+    postalCode: "",
+    street: "",
+    streetNumber: "",
+  });
+  useEffect(() => {
+    listRegions().then((res) => setRegions(res.data));
+  }, []);
+  useEffect(() => {
+    if (form.regionId) {
+      listCountries(Number(form.regionId)).then((res) =>
+        setCountries(res.data)
+      );
+    } else {
+      setCountries([]);
+    }
+  }, [form.regionId]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      name: form.name,
+      email: form.email,
+      phoneNumber: form.phoneNumber,
+      address: {
+        street: form.street,
+        streetNumber: form.streetNumber,
+        postalCode: form.postalCode,
+        city: form.city,
+        countryId: Number(form.countryId),
+        regionId: Number(form.regionId),
+      },
+    };
+    dispatch(createSupplier(payload)).then(() => navigate("/suppliers"));
+  };
+  return (
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
+      <Link
+        to="/suppliers"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+      >
+        <FaChevronLeft className="inline mr-2" /> Back to Suppliers
+      </Link>
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">
+        New Supplier
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            name="phoneNumber"
+            value={form.phoneNumber}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="regionId"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Region
+          </label>
+          <select
+            id="regionId"
+            name="regionId"
+            value={form.regionId}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          >
+            <option value="">Select region</option>
+            {regions.map((r) => (
+              <option key={r.regionId} value={r.regionId}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="countryId"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Country
+          </label>
+          <select
+            id="countryId"
+            name="countryId"
+            value={form.countryId}
+            onChange={handleChange}
+            required
+            disabled={!form.regionId}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          >
+            <option value="">Select country</option>
+            {countries.map((c) => (
+              <option key={c.countryId} value={c.countryId}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="city"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            City
+          </label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="postalCode"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Postal Code
+          </label>
+          <input
+            type="text"
+            id="postalCode"
+            name="postalCode"
+            value={form.postalCode}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="street"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Street
+          </label>
+          <input
+            type="text"
+            id="street"
+            name="street"
+            value={form.street}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="streetNumber"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Street Number
+          </label>
+          <input
+            type="text"
+            id="streetNumber"
+            name="streetNumber"
+            value={form.streetNumber}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition"
+        >
+          Create Supplier
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default SupplierFormPage;
+
+
 // \pages\SuppliersPage.jsx
 
-const SuppliersPage = () => (
-  <div>
-    <h1>Suppliers Page</h1>
-  </div>
-);
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { fetchSuppliers } from "../features/suppliers/suppliersSlice";
+import { FaSearch, FaPlus, FaEye } from "react-icons/fa";
+
+const SuppliersPage = () => {
+  const dispatch = useDispatch();
+  const {
+    list: suppliers,
+    status,
+    error,
+  } = useSelector((state) => state.suppliers);
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    dispatch(fetchSuppliers());
+  }, [dispatch]);
+  const filtered = suppliers.filter((s) =>
+    s.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Suppliers</h1>
+        <Link
+          to="/suppliers/new"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaPlus className="mr-2" /> New Supplier
+        </Link>
+      </div>
+      <form className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/2">
+        <FaSearch className="text-gray-500 mr-2" />
+        <input
+          type="text"
+          placeholder="Search suppliers..."
+          className="w-full focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </form>
+      {status === "loading" ? (
+        <p>Loading...</p>
+      ) : status === "failed" ? (
+        <p className="text-red-500">Error: {error}</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="hidden sm:grid grid-cols-5 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div>Name</div>
+            <div>Email</div>
+            <div>Phone</div>
+            <div>Address</div>
+            <div className="text-center">Actions</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {filtered.map((sup) => (
+              <div
+                key={sup.supplierId}
+                className="grid grid-cols-1 sm:grid-cols-5 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+              >
+                <div className="font-medium text-pink-600">
+                  <Link to={`/suppliers/${sup.supplierId}`}>{sup.name}</Link>
+                </div>
+                <div className="text-sm text-gray-700">{sup.email}</div>
+                <div className="text-sm text-gray-700">{sup.phoneNumber}</div>
+                <div className="text-sm text-gray-700">
+                  {typeof sup.address === "string"
+                    ? sup.address
+                    : `${sup.address.street} ${sup.address.streetNumber}, ${sup.address.postalCode} ${sup.address.city}, ${sup.address.country}`}
+                </div>
+                <div className="flex justify-center text-gray-600">
+                  <Link to={`/suppliers/${sup.supplierId}`}>
+                    <FaEye />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default SuppliersPage;
 
 
 // \pages\TransactionDetailPage.jsx
 
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { fetchTransactionById } from "../features/transactions/transactionsSlice";
+import { FaChevronLeft } from "react-icons/fa";
+import { format } from "date-fns";
 
 const TransactionDetailPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { current: tx } = useSelector((state) => state.transactions);
+  useEffect(() => {
+    dispatch(fetchTransactionById(id));
+  }, [dispatch, id]);
+  if (!tx) return <p>Loading...</p>;
+  const {
+    transactionId,
+    date,
+    description,
+    type,
+    employeeId,
+    fromWarehouseId,
+    toWarehouseId,
+    clientId,
+    supplierId,
+    products,
+  } = tx;
   return (
-    <div>
-      <h1>Transaction Detail Page</h1>
-      <p>Params: {JSON.stringify({ id })}</p>
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
+      <Link to="/transactions" className="text-gray-600 hover:text-pink-500">
+        <FaChevronLeft className="inline-block mr-2" /> Back to Transactions
+      </Link>
+      <h1 className="text-3xl font-semibold mt-2">
+        Transaction #{transactionId}
+      </h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <strong>Date:</strong> {format(new Date(date), "yyyy-MM-dd")}
+        </div>
+        <div>
+          <strong>Type:</strong> {type.replace(/_/g, " ")}
+        </div>
+        <div>
+          <strong>Description:</strong> {description}
+        </div>
+        <div>
+          <strong>Handled by:</strong>{" "}
+          <Link to={`/employees/${employeeId}`} className="text-pink-600">
+            Employee {employeeId}
+          </Link>
+        </div>
+        {supplierId && (
+          <div>
+            <strong>Supplier:</strong>{" "}
+            <Link to={`/suppliers/${supplierId}`} className="text-pink-600">
+              Supplier {supplierId}
+            </Link>
+          </div>
+        )}
+        {clientId && (
+          <div>
+            <strong>Client:</strong>{" "}
+            <Link to={`/clients/${clientId}`} className="text-pink-600">
+              Client {clientId}
+            </Link>
+          </div>
+        )}
+        {fromWarehouseId && (
+          <div>
+            <strong>From Warehouse:</strong>{" "}
+            <Link
+              to={`/warehouses/${fromWarehouseId}`}
+              className="text-pink-600"
+            >
+              Warehouse {fromWarehouseId}
+            </Link>
+          </div>
+        )}
+        {toWarehouseId && (
+          <div>
+            <strong>To Warehouse:</strong>{" "}
+            <Link to={`/warehouses/${toWarehouseId}`} className="text-pink-600">
+              Warehouse {toWarehouseId}
+            </Link>
+          </div>
+        )}
+      </div>
+      {products && products.length > 0 && (
+        <section>
+          <h2 className="text-xl font-semibold mb-4">Products</h2>
+          <div className="bg-gray-50 grid grid-cols-5 p-2 text-xs uppercase font-medium text-gray-500 rounded-t-lg">
+            <div>Product</div>
+            <div className="text-right">Quantity</div>
+            <div className="text-right">Unit Price</div>
+            <div className="text-right">Category</div>
+            <div className="text-right">Total</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {products.map((p) => (
+              <div
+                key={p.productId}
+                className="grid grid-cols-5 p-2 text-sm text-gray-700 items-center"
+              >
+                <div>
+                  <Link
+                    to={`/products/${p.productId}`}
+                    className="text-pink-600 hover:underline"
+                  >
+                    {p.name}
+                  </Link>
+                </div>
+                <div className="text-right">{p.quantity}</div>
+                <div className="text-right">${p.unitPrice.toFixed(2)}</div>
+                <div className="text-right">{p.categoryName}</div>
+                <div className="text-right">
+                  ${(p.quantity * p.unitPrice).toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-right p-2">
+            $
+            {products
+              .reduce((acc, p) => acc + p.quantity * p.unitPrice, 0)
+              .toFixed(2)}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
@@ -1836,14 +3886,135 @@ export default TransactionDetailPage;
 
 // \pages\TransactionsPage.jsx
 
-import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { fetchTransactions } from "../features/transactions/transactionsSlice";
+import { FaSearch, FaEye } from "react-icons/fa";
+import { format } from "date-fns";
 
 const TransactionsPage = () => {
-  const { search } = useLocation();
+  const dispatch = useDispatch();
+  const {
+    list: transactions,
+    status,
+    error,
+  } = useSelector((state) => state.transactions);
+  const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
+  const [filters, setFilters] = useState({
+    fromDate: "",
+    toDate: "",
+    type: "",
+  });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((f) => ({ ...f, [name]: value }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    dispatch(
+      fetchTransactions({
+        fromDate: filters.fromDate || undefined,
+        toDate: filters.toDate || undefined,
+        type: filters.type || undefined,
+        warehouseId: selectedWarehouse || undefined,
+      })
+    );
+  };
+  useEffect(() => {
+    dispatch(
+      fetchTransactions({ warehouseId: selectedWarehouse || undefined })
+    );
+  }, [dispatch, selectedWarehouse]);
   return (
-    <div>
-      <h1>Transactions Page</h1>
-      <p>Query: {search}</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Transactions</h1>
+      </div>
+      <form onSubmit={handleSubmit} className="flex flex-wrap gap-4 items-end">
+        <div>
+          <label className="block text-sm font-medium">From</label>
+          <input
+            type="date"
+            name="fromDate"
+            value={filters.fromDate}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">To</label>
+          <input
+            type="date"
+            name="toDate"
+            value={filters.toDate}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Type</label>
+          <select
+            name="type"
+            value={filters.type}
+            onChange={handleChange}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+          >
+            <option value="">All</option>
+            <option value="SUPPLIER_TO_WAREHOUSE">Supplier to Warehouse</option>
+            <option value="WAREHOUSE_TO_CUSTOMER">Warehouse to Customer</option>
+            <option value="WAREHOUSE_TO_WAREHOUSE">
+              Warehouse to Warehouse
+            </option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaSearch className="mr-2" /> Filter
+        </button>
+      </form>
+      {status === "loading" || status === "idle" ? (
+        <p>Loading...</p>
+      ) : status === "failed" ? (
+        <p className="text-red-500">Error: {error}</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div>Date</div>
+            <div>Type</div>
+            <div>From</div>
+            <div>To</div>
+            <div className="text-right">Total</div>
+            <div className="text-center">Actions</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {transactions.map((tx) => (
+              <div
+                key={tx.transactionId}
+                className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+              >
+                <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                <div>{tx.type.replace(/_/g, " ")}</div>
+                <div>{tx.fromWarehouseId ?? "-"}</div>
+                <div>
+                  {tx.toWarehouseId ?? tx.clientId ?? tx.supplierId ?? "-"}
+                </div>
+                <div className="text-right">${tx.totalPrice.toFixed(2)}</div>
+                <div className="text-gray-600">
+                  <Link
+                    to={`/transactions/${tx.transactionId}`}
+                    className="flex justify-center"
+                  >
+                    <FaEye />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1853,14 +4024,194 @@ export default TransactionsPage;
 
 // \pages\WarehouseDetailPage.jsx
 
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, Link } from "react-router-dom";
+import { fetchWarehouseById } from "../features/warehouses/warehousesSlice";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+import { FaChevronLeft, FaEdit } from "react-icons/fa";
 
 const WarehouseDetailPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { current: warehouse } = useSelector((state) => state.warehouses);
+  useEffect(() => {
+    dispatch(fetchWarehouseById(id));
+  }, [dispatch, id]);
+  if (!warehouse) return <p>Loading warehouse details...</p>;
+  const {
+    name,
+    capacity,
+    occupiedCapacity,
+    address,
+    employees,
+    products,
+    transactions,
+    occupancyHistory,
+  } = warehouse;
   return (
-    <div>
-      <h1>Warehouse Detail Page</h1>
-      <p>Params: {JSON.stringify({ id })}</p>
+    <div className="space-y-6 max-w-6xl mx-auto">
+      <div className="flex items-center justify-between">
+        <Link to="/warehouses" className="text-gray-600 hover:text-pink-500">
+          <FaChevronLeft className="inline mr-2" /> Back to Warehouses
+        </Link>
+        <Link
+          to={`/warehouses/${id}/edit`}
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaEdit className="mr-2" /> Edit Warehouse
+        </Link>
+      </div>
+      <div className="bg-white rounded-lg shadow p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Name</h2>
+          <p className="text-gray-800">{name}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Capacity</h2>
+          <p className="text-gray-800">{capacity}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Occupied</h2>
+          <p className="text-gray-800">{occupiedCapacity}</p>
+        </div>
+        <div className="md:col-span-3">
+          <h2 className="text-lg font-semibold mb-2">Address</h2>
+          <p className="text-gray-800">{address}</p>
+        </div>
+      </div>
+      <section>
+        <h3 className="text-2xl font-semibold mb-4">Occupancy History</h3>
+        <div className="bg-white rounded-lg shadow p-6">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={occupancyHistory}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="occupiedCapacity"
+                stroke="#3B82F6"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <h3 className="text-2xl font-semibold mb-4">Employees</h3>
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
+              <div>Name</div>
+              <div className="text-right">Email</div>
+              <div className="text-right">Phone</div>
+              <div className="text-right">Position</div>
+              <div className="text-right">Details</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {employees.map((emp) => (
+                <div
+                  key={emp.employeeId}
+                  className="grid grid-cols-5 p-2 text-sm text-gray-700"
+                >
+                  <div>
+                    {emp.name} {emp.surname}
+                  </div>
+                  <div className="text-right">{emp.email}</div>
+                  <div className="text-right">{emp.phoneNumber}</div>
+                  <div className="text-right">{emp.position}</div>
+                  <div className="text-right">
+                    <Link
+                      to={`/employees/${emp.employeeId}`}
+                      className="text-pink-600 hover:underline"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-2xl font-semibold mb-4">Products</h3>
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
+              <div>Name</div>
+              <div className="text-right">Quantity</div>
+              <div className="text-right">Unit Price</div>
+              <div className="text-right">Value</div>
+              <div className="text-right">Details</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {products.map((pr) => (
+                <div
+                  key={pr.productId}
+                  className="grid grid-cols-5 p-2 text-sm text-gray-700"
+                >
+                  <div>{pr.name}</div>
+                  <div className="text-right">{pr.quantity}</div>
+                  <div className="text-right">${pr.unitPrice.toFixed(2)}</div>
+                  <div className="text-right">
+                    ${(pr.quantity * pr.unitPrice).toFixed(2)}
+                  </div>
+                  <div className="text-right">
+                    <Link
+                      to={`/products/${pr.productId}`}
+                      className="text-pink-600 hover:underline"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h3 className="text-2xl font-semibold mb-4">Recent Transactions</h3>
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
+            <div>Date</div>
+            <div>Type</div>
+            <div className="text-right">Total</div>
+            <div className="text-right">By Employee</div>
+            <div className="text-center">Details</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {transactions.map((tx) => (
+              <div
+                key={tx.transactionId}
+                className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
+              >
+                <div>{new Date(tx.date).toLocaleDateString()}</div>
+                <div>{tx.type.replace(/_/g, " ")}</div>
+                <div className="text-right">${tx.totalPrice.toFixed(2)}</div>
+                <div className="text-right">{tx.employeeId}</div>
+                <div className="text-center">
+                  <Link
+                    to={`/transactions/${tx.transactionId}`}
+                    className="text-pink-600 hover:underline"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
@@ -1868,13 +4219,343 @@ const WarehouseDetailPage = () => {
 export default WarehouseDetailPage;
 
 
+// \pages\WarehousesFormPage.jsx
+
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  createWarehouse,
+  updateWarehouse,
+  fetchWarehouseById,
+} from "../features/warehouses/warehousesSlice";
+import { listRegions, listCountries } from "../api/geography";
+
+const WarehousesFormPage = () => {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {
+    current: warehouse,
+    status,
+    error,
+  } = useSelector((state) => state.warehouses);
+  const [regions, setRegions] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    capacity: "",
+    regionId: "",
+    countryId: "",
+    city: "",
+    postalCode: "",
+    street: "",
+    streetNumber: "",
+  });
+  useEffect(() => {
+    listRegions().then((res) => setRegions(res.data));
+  }, []);
+  useEffect(() => {
+    if (form.regionId) {
+      listCountries(Number(form.regionId)).then((res) =>
+        setCountries(res.data)
+      );
+    } else {
+      setCountries([]);
+    }
+  }, [form.regionId]);
+  useEffect(() => {
+    if (isEdit) dispatch(fetchWarehouseById(id));
+  }, [dispatch, id, isEdit]);
+  useEffect(() => {
+    if (isEdit && warehouse) {
+      setForm({
+        name: warehouse.name || "",
+        capacity: warehouse.capacity?.toString() || "",
+        regionId: warehouse.regionId?.toString() || "",
+        countryId: warehouse.countryId?.toString() || "",
+        city: warehouse.city || "",
+        postalCode: warehouse.postalCode || "",
+        street: warehouse.street || "",
+        streetNumber: warehouse.streetNumber?.toString() || "",
+      });
+    }
+  }, [warehouse, isEdit]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const payload = {
+      name: form.name,
+      capacity: parseInt(form.capacity, 10),
+      regionId: parseInt(form.regionId, 10),
+      countryId: parseInt(form.countryId, 10),
+      city: form.city,
+      postalCode: form.postalCode,
+      street: form.street,
+      streetNumber: form.streetNumber,
+    };
+    if (isEdit) {
+      dispatch(updateWarehouse({ id: parseInt(id, 10), data: payload })).then(
+        () => navigate("/warehouses")
+      );
+    } else {
+      dispatch(createWarehouse(payload)).then(() => navigate("/warehouses"));
+    }
+  };
+  if ((isEdit && status === "loading") || status === "idle") {
+    return <p>Loading...</p>;
+  }
+  return (
+    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <h1 className="text-2xl font-semibold mb-4">
+        {isEdit ? "Edit Warehouse" : "New Warehouse"}
+      </h1>
+      {status === "failed" && <p className="text-red-500">Error: {error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium">
+            Name
+          </label>
+          <input
+            id="name"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div>
+          <label htmlFor="capacity" className="block text-sm font-medium">
+            Capacity
+          </label>
+          <input
+            id="capacity"
+            name="capacity"
+            type="number"
+            value={form.capacity}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div>
+          <label htmlFor="regionId" className="block text-sm font-medium">
+            Region
+          </label>
+          <select
+            id="regionId"
+            name="regionId"
+            value={form.regionId}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          >
+            <option value="">Select region</option>
+            {regions.map((r) => (
+              <option key={r.regionId} value={r.regionId}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="countryId" className="block text-sm font-medium">
+            Country
+          </label>
+          <select
+            id="countryId"
+            name="countryId"
+            value={form.countryId}
+            onChange={handleChange}
+            required
+            disabled={!form.regionId}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          >
+            <option value="">Select country</option>
+            {countries.map((c) => (
+              <option key={c.countryId} value={c.countryId}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="city" className="block text-sm font-medium">
+            City
+          </label>
+          <input
+            id="city"
+            name="city"
+            value={form.city}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div>
+          <label htmlFor="postalCode" className="block text-sm font-medium">
+            Postal Code
+          </label>
+          <input
+            id="postalCode"
+            name="postalCode"
+            value={form.postalCode}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div>
+          <label htmlFor="street" className="block text-sm font-medium">
+            Street
+          </label>
+          <input
+            id="street"
+            name="street"
+            value={form.street}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <div>
+          <label htmlFor="streetNumber" className="block text-sm font-medium">
+            Street Number
+          </label>
+          <input
+            id="streetNumber"
+            name="streetNumber"
+            value={form.streetNumber}
+            onChange={handleChange}
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+        >
+          {isEdit ? "Update Warehouse" : "Create Warehouse"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default WarehousesFormPage;
+
+
 // \pages\WarehousesPage.jsx
 
-const WarehousesPage = () => (
-  <div>
-    <h1>Warehouses Page</h1>
-  </div>
-);
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import {
+  fetchWarehouses,
+  deleteWarehouse,
+} from "../features/warehouses/warehousesSlice";
+import { FaPlus, FaEye, FaTrash } from "react-icons/fa";
+
+const WarehousesPage = () => {
+  const dispatch = useDispatch();
+  const {
+    list: warehouses,
+    status,
+    error,
+  } = useSelector((state) => state.warehouses);
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    dispatch(fetchWarehouses());
+  }, [dispatch]);
+  const filtered = warehouses.filter((wh) =>
+    wh.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const handleDelete = (id) => {
+    if (window.confirm("Czy na pewno chcesz usunąć ten magazyn?")) {
+      dispatch(deleteWarehouse(id));
+    }
+  };
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Magazyny</h1>
+        <Link
+          to="/warehouses/new"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+        >
+          <FaPlus className="mr-2" /> Nowy Magazyn
+        </Link>
+      </div>
+      <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/2">
+        <input
+          type="text"
+          placeholder="Szukaj magazynu..."
+          className="w-full focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      {status === "loading" ? (
+        <p>Ładowanie...</p>
+      ) : status === "failed" ? (
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : (
+        <div className="bg-white rounded-lg shadow overflow-auto">
+          <div className="hidden sm:grid grid-cols-7 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div>Nazwa</div>
+            <div>Pojemność</div>
+            <div>Zajęte</div>
+            <div>Adres</div>
+            <div className="text-right">Pracownicy</div>
+            <div className="text-right">Produkty</div>
+            <div className="text-center">Akcje</div>
+          </div>
+          <div className="divide-y divide-gray-200">
+            {filtered.map((wh) => (
+              <div
+                key={wh.warehouseId}
+                className="grid grid-cols-1 sm:grid-cols-7 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+              >
+                <div>
+                  <Link
+                    to={`/warehouses/${wh.warehouseId}`}
+                    className="text-pink-600 hover:underline font-medium"
+                  >
+                    {wh.name}
+                  </Link>
+                </div>
+                <div className="text-sm text-gray-700">{wh.capacity}</div>
+                <div className="text-sm text-gray-700">
+                  {wh.occupiedCapacity}
+                </div>
+                <div className="text-sm text-gray-700">{wh.address}</div>
+                <div className="text-sm text-gray-700 text-right">
+                  {wh.employeesCount}
+                </div>
+                <div className="text-sm text-gray-700 text-right">
+                  {wh.productsCount}
+                </div>
+                <div className="flex justify-center space-x-4 text-gray-600">
+                  <Link to={`/warehouses/${wh.warehouseId}`}>
+                    <FaEye />
+                  </Link>
+                  <button onClick={() => handleDelete(wh.warehouseId)}>
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default WarehousesPage;
 
@@ -1904,6 +4585,12 @@ import GeographyPage from "../pages/GeographyPage";
 import ProtectedRoute from "../components/Layout/ProtectedRoute";
 import Layout from "../components/Layout/Layout";
 import DefaultRedirect from "../components/Layout/DefaultRedirect";
+import ProductFormPage from "../pages/ProductFormPage";
+import CategoryFormPage from "../pages/CategoryFormPage";
+import WarehousesFormPage from "../pages/WarehousesFormPage";
+import ClientFormPage from "../pages/ClientFormPage";
+import EmployeeFormPage from "../pages/EmployeeFormPage";
+import SupplierFormPage from "../pages/SupplierFormPage";
 
 const AppRouter = () => (
   <Router>
@@ -1917,9 +4604,21 @@ const AppRouter = () => (
               <Routes>
                 <Route index element={<DashboardPage />} />
                 <Route path="products" element={<ProductsPage />} />
+                <Route path="products/new" element={<ProductFormPage />} />
+                <Route path="products/:id/edit" element={<ProductFormPage />} />
                 <Route path="products/:id" element={<ProductDetailPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
+                <Route path="categories/new" element={<CategoryFormPage />} />
+                <Route
+                  path="categories/:id/edit"
+                  element={<CategoryFormPage />}
+                />
                 <Route path="warehouses" element={<WarehousesPage />} />
+                <Route path="warehouses/new" element={<WarehousesFormPage />} />
+                <Route
+                  path="warehouses/:id/edit"
+                  element={<WarehousesFormPage />}
+                />
                 <Route
                   path="warehouses/:id"
                   element={<WarehouseDetailPage />}
@@ -1942,10 +4641,13 @@ const AppRouter = () => (
                   element={<TransactionDetailPage />}
                 />
                 <Route path="clients" element={<ClientsPage />} />
+                <Route path="clients/new" element={<ClientFormPage />} />
                 <Route path="clients/:id" element={<ClientDetailPage />} />
                 <Route path="suppliers" element={<SuppliersPage />} />
+                <Route path="suppliers/new" element={<SupplierFormPage />} />
                 <Route path="suppliers/:id" element={<SupplierDetailPage />} />
                 <Route path="employees" element={<EmployeesPage />} />
+                <Route path="employees/new" element={<EmployeeFormPage />} />
                 <Route path="employees/:id" element={<EmployeeDetailPage />} />
                 <Route path="geography" element={<GeographyPage />} />
                 <Route path="*" element={<DefaultRedirect />} />
@@ -2023,7 +4725,24 @@ export const dummyClientById = {
     country: "USA",
     region: "North",
   },
-  history: [],
+  history: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "Order 1",
+      type: "WAREHOUSE_TO_CLIENT",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+    {
+      transactionId: 2,
+      date: "2025-05-02",
+      description: "Order 2",
+      type: "WAREHOUSE_TO_CLIENT",
+      employeeId: 1,
+      totalPrice: 2000.0,
+    },
+  ],
 };
 
 export const dummyEmployees = [
@@ -2049,7 +4768,24 @@ export const dummyEmployeeById = {
   warehouseId: 1,
   warehouseName: "Main",
   transactionsCount: 20,
-  history: [],
+  history: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "Order 1",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+    {
+      transactionId: 2,
+      date: "2025-05-02",
+      description: "Order 2",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 2000.0,
+    },
+  ],
 };
 
 export const dummyRegions = [
@@ -2081,33 +4817,38 @@ export const dummyWarehouseById = {
   capacity: 1000,
   occupiedCapacity: 450,
   address: "123 Elm St",
-  employees: [],
-  products: [],
-  transactions: [],
-  occupancyHistory: [],
+  employees: [
+    {
+      employeeId: 1,
+      name: "string",
+      surname: "string",
+      email: "string",
+      phoneNumber: "string",
+      position: "string",
+    },
+  ],
+  products: [
+    {
+      productId: 1,
+      name: "string",
+      quantity: 100,
+      unitPrice: 0.0,
+    },
+  ],
+  transactions: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "string",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+  ],
+  occupancyHistory: [{ date: "2025-04-01", occupiedCapacity: 400 }],
 };
 
 export const dummyProducts = [
-  {
-    productId: 1,
-    name: "Widget",
-    description: "A useful widget",
-    unitPrice: 9.99,
-    unitSize: 1.0,
-    categoryName: "Gadgets",
-    inventoryCount: 100,
-    transactionsCount: 20,
-  },
-  {
-    productId: 1,
-    name: "Widget",
-    description: "A useful widget",
-    unitPrice: 9.99,
-    unitSize: 1.0,
-    categoryName: "Gadgets",
-    inventoryCount: 100,
-    transactionsCount: 20,
-  },
   {
     productId: 1,
     name: "Widget",
@@ -2127,8 +4868,19 @@ export const dummyProductById = {
   unitPrice: 9.99,
   unitSize: 1.0,
   categoryName: "Gadgets",
-  inventory: { 1: 50 },
-  transactions: [],
+  inventory: {
+    warehouseId1: 10,
+    warehouseId2: 5,
+  },
+  transactions: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      price: 1500.0,
+      quantity: 10,
+    },
+  ],
 };
 
 export const dummyLowStock = [1, 2, 3];
@@ -2158,7 +4910,24 @@ export const dummySupplierById = {
     country: "USA",
     region: "East",
   },
-  history: [],
+  history: [
+    {
+      transactionId: 1,
+      date: "2025-05-01",
+      description: "Order 1",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 1500.0,
+    },
+    {
+      transactionId: 2,
+      date: "2025-05-02",
+      description: "Order 2",
+      type: "SUPPLIER_TO_WAREHOUSE",
+      employeeId: 1,
+      totalPrice: 2000.0,
+    },
+  ],
 };
 
 export const dummyTransactions = [
@@ -2183,9 +4952,23 @@ export const dummyTransactionById = {
   type: "WAREHOUSE_TO_CLIENT",
   employeeId: 1,
   fromWarehouseId: 1,
-  toWarehouseId: 1,
   clientId: 1,
-  products: [],
+  products: [
+    {
+      productId: 1,
+      name: "Widget",
+      categoryName: "Gadgets",
+      quantity: 10,
+      unitPrice: 9.99,
+    },
+    {
+      productId: 2,
+      name: "Gadget",
+      categoryName: "Gadgets",
+      quantity: 5,
+      unitPrice: 19.99,
+    },
+  ],
 };
 
 
