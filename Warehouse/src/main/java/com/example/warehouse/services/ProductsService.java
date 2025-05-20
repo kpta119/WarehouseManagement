@@ -7,5 +7,7 @@ import java.util.List;
 public interface ProductsService {
 
     List<Product> getAllProducts(String name, Integer categoryId, Double minPrice, Double maxPrice, Double minSize, Double maxSize, Integer warehouseId);
+    Integer getInventoryCount(Integer productId, Integer warehouseId);
+    Integer getTransactionCount(Integer productId, Integer warehouseId);
 
 }

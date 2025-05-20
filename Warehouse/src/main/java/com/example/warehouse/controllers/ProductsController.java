@@ -6,10 +6,7 @@ import com.example.warehouse.mappers.products.ProductSearchEndpointMapper;
 import com.example.warehouse.services.ProductsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,7 +36,9 @@ public class ProductsController {
         try {
             List<Product> products = productsService.getAllProducts(name, categoryId, minPrice, maxPrice, minSize, maxSize, warehouseId);
             List<ProductSearchEndpointDto> dtos = products.stream()
-                    .map(p -> productSearchEndpointMapper.mapToDto(p, warehouseId))
+                    .map(p -> productSearchEndpointMapper.mapToDto(p,
+                            productsService.getInventoryCount(p.getId(), warehouseId),
+                            productsService.getTransactionCount(p.getId(), warehouseId)))
                     .toList();
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {

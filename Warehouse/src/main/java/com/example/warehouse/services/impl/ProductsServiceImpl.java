@@ -11,13 +11,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ProductsServiceImpl implements ProductsService {
     private final ProductRepository productRepository;
+    private final ProductInventoryRepository productInventoryRepository;
+    private final TransactionProductRepository transactionProductRepository;
 
-    public ProductsServiceImpl(ProductRepository productRepository) {
+    public ProductsServiceImpl(ProductRepository productRepository, ProductInventoryRepository productInventoryRepository, TransactionProductRepository transactionProductRepository) {
         this.productRepository = productRepository;
+        this.productInventoryRepository = productInventoryRepository;
+        this.transactionProductRepository = transactionProductRepository;
     }
 
     @Override
