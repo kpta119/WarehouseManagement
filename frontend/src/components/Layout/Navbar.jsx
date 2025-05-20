@@ -12,13 +12,17 @@ const titles = {
   "/products/new": "Nowy produkt",
   "/categories": "Kategorie",
   "/warehouses": "Magazyny",
+  "/warehouses/new": "Nowy magazyn",
   "/inventory/receive": "Przyjęcie",
-  "/inventory/transfer": "Przesunięcie",
+  "/inventory/transfer": "Przeniesienie",
   "/inventory/delivery": "Wydanie",
   "/transactions": "Transakcje",
   "/clients": "Klienci",
+  "/clients/new": "Nowy klient",
   "/suppliers": "Dostawcy",
+  "/suppliers/new": "Nowy dostawca",
   "/employees": "Pracownicy",
+  "/employees/new": "Nowy pracownik",
   "/geography": "Geografia",
 };
 
@@ -47,7 +51,15 @@ export default function Navbar() {
       <div className="flex items-center">
         <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
       </div>
-      {["/products", "/"].includes(pathname) && (
+      {[
+        "/products",
+        "/",
+        "/warehouses",
+        "/transactions",
+        "/employees",
+        "/suppliers",
+        "/clients",
+      ].includes(pathname) && (
         <div className="relative mx-4">
           <select
             className="

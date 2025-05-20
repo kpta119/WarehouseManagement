@@ -6,7 +6,7 @@ import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
 import { fetchSuppliers } from "../features/suppliers/suppliersSlice";
 import { receiveInventory } from "../features/inventory/receiveSlice";
 import { searchProducts } from "../api/products";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
 
 const InventoryReceivePage = () => {
   const dispatch = useDispatch();
@@ -59,87 +59,101 @@ const InventoryReceivePage = () => {
   };
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <h1 className="text-3xl font-semibold">Receive Inventory</h1>
+      <div className="flex items-center space-x-2">
+        <FaTruck className="text-pink-500 w-6 h-6" />
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Przyjęcie towaru
+        </h1>
+      </div>
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow space-y-4"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Warehouse</label>
-            <select
-              required
-              value={form.warehouseId}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, warehouseId: e.target.value }))
-              }
-              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
-            >
-              <option value="">Select warehouse</option>
-              {warehouses.map((w) => (
-                <option key={w.warehouseId} value={w.warehouseId}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium mb-1">Magazyn</label>
+            <div className="relative">
+              <select
+                required
+                value={form.warehouseId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, warehouseId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz magazyn</option>
+                {warehouses.map((w) => (
+                  <option key={w.warehouseId} value={w.warehouseId}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Supplier</label>
-            <select
-              required
-              value={form.supplierId}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, supplierId: e.target.value }))
-              }
-              className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
-            >
-              <option value="">Select supplier</option>
-              {suppliers.map((s) => (
-                <option key={s.supplierId} value={s.supplierId}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium mb-1">Dostawca</label>
+            <div className="relative">
+              <select
+                required
+                value={form.supplierId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, supplierId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz dostawce</option>
+                {suppliers.map((s) => (
+                  <option key={s.supplierId} value={s.supplierId}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
         </div>
         <div className="space-y-3">
-          <label className="text-sm font-medium">Products & Quantities</label>
+          <label className="text-sm font-medium">Produkty oraz ich ilość</label>
           {form.items.map((item, idx) => (
             <div key={idx} className="grid grid-cols-5 gap-2 items-end">
               <div className="col-span-3">
-                <select
-                  required
-                  value={item.productId}
-                  onChange={(e) =>
-                    handleItemChange(idx, "productId", e.target.value)
-                  }
-                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
-                >
-                  <option value="">Select product</option>
-                  {products.map((p) => (
-                    <option key={p.productId} value={p.productId}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    required
+                    value={item.productId}
+                    onChange={(e) =>
+                      handleItemChange(idx, "productId", e.target.value)
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+                  >
+                    <option value="">Wybierz produkt</option>
+                    {products.map((p) => (
+                      <option key={p.productId} value={p.productId}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                  <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
               </div>
               <div>
                 <input
                   type="number"
                   min="1"
                   required
-                  placeholder="Qty"
+                  placeholder="Ilość"
                   value={item.quantity}
                   onChange={(e) =>
                     handleItemChange(idx, "quantity", e.target.value)
                   }
-                  className="w-full border-gray-300 rounded-lg px-3 py-2 focus:ring-pink-500 focus:border-pink-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => handleRemoveRow(idx)}
-                className="flex justify-center align-center text-red-500 hover:text-red-700"
+                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer"
               >
                 <FaTrash />
               </button>
@@ -148,9 +162,9 @@ const InventoryReceivePage = () => {
           <button
             type="button"
             onClick={handleAddRow}
-            className="flex items-center text-pink-600 hover:text-pink-800"
+            className="flex items-center text-pink-600 hover:text-pink-800 mt-4"
           >
-            <FaPlus className="mr-1" /> Add another product
+            <FaPlus className="mr-1" /> Dodaj następny produkt
           </button>
         </div>
         <div className="pt-4 border-t">
@@ -166,7 +180,7 @@ const InventoryReceivePage = () => {
             disabled={status === "loading"}
             className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
           >
-            {status === "loading" ? "Processing..." : "Receive Inventory"}
+            Przyjmij towar
           </button>
         </div>
       </form>

@@ -32,16 +32,16 @@ const ClientFormPage = () => {
         to="/clients"
         className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
       >
-        <FaChevronLeft className="inline mr-2" /> Back to Clients
+        <FaChevronLeft className="inline mr-2" /> Powrót do Klientów
       </Link>
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6">New Client</h1>
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">Nowy Klient</h1>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Name
+            Nazwa
           </label>
           <input
             id="name"
@@ -57,7 +57,7 @@ const ClientFormPage = () => {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Email
+            E-mail
           </label>
           <input
             id="email"
@@ -74,7 +74,7 @@ const ClientFormPage = () => {
             htmlFor="phoneNumber"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Phone Number
+            Nr. telefonu
           </label>
           <input
             id="phoneNumber"
@@ -91,7 +91,7 @@ const ClientFormPage = () => {
             htmlFor="address"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Address
+            Adres
           </label>
           <textarea
             id="address"
@@ -108,7 +108,7 @@ const ClientFormPage = () => {
           disabled={status === "loading"}
           className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition disabled:opacity-50"
         >
-          {status === "loading" ? "Saving..." : "Create Client"}
+          Stwórz Klienta
         </button>
       </form>
     </div>

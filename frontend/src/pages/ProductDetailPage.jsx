@@ -28,31 +28,31 @@ const ProductDetailPage = () => {
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
       <div className="flex items-center justify-between">
         <Link to="/products" className="text-gray-600 hover:text-pink-500">
-          <FaChevronLeft className="inline mr-2" /> Back to Products
+          <FaChevronLeft className="inline mr-2" /> Powrót do Produktów
         </Link>
         <Link
           to={`/products/${id}/edit`}
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
         >
-          <FaEdit className="mr-2" /> Edit Product
+          <FaEdit className="mr-2" /> Edytuj Produkt
         </Link>
       </div>
       <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
-      <p className="text-sm text-gray-500">Category: {categoryName}</p>
+      <p className="text-sm text-gray-500">Kategoria: {categoryName}</p>
       <p className="text-lg font-medium">${unitPrice.toFixed(2)}</p>
-      <p className="text-sm text-gray-600">Size: {unitSize}</p>
+      <p className="text-sm text-gray-600">Rozmiar: {unitSize}</p>
       {description && (
         <div>
-          <h2 className="text-xl font-semibold mb-2">Description</h2>
+          <h2 className="text-xl font-semibold mb-2">Opis</h2>
           <p className="text-gray-700 whitespace-pre-line">{description}</p>
         </div>
       )}
       {inventory && Object.keys(inventory).length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold mb-2">Inventory by Warehouse</h2>
+          <h2 className="text-xl font-semibold mb-2">Zasoby na Magazyn</h2>
           <div className="grid grid-cols-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
-            <div>Warehouse ID</div>
-            <div className="text-right">Quantity</div>
+            <div>ID Magazynu</div>
+            <div className="text-right">Ilość</div>
           </div>
           <div className="divide-y divide-gray-200">
             {Object.entries(inventory).map(([warehouseId, qty]) => (
@@ -69,13 +69,13 @@ const ProductDetailPage = () => {
       )}
       {transactions && transactions.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold mb-2">Recent Transactions</h2>
+          <h2 className="text-xl font-semibold mb-2">Ostatnie Transakcje</h2>
           <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
-            <div>Date</div>
-            <div>Type</div>
-            <div className="text-right">Quantity</div>
-            <div className="text-right">Price</div>
-            <div className="text-center">Details</div>
+            <div>Data</div>
+            <div>Typ</div>
+            <div className="text-right">Ilość</div>
+            <div className="text-right">Cena</div>
+            <div className="text-center">Detale</div>
           </div>
           <div className="divide-y divide-gray-200">
             {transactions.map((tx) => (
@@ -92,7 +92,7 @@ const ProductDetailPage = () => {
                     to={`/transactions/${tx.transactionId}`}
                     className="text-pink-600 hover:underline"
                   >
-                    View
+                    Zobacz
                   </Link>
                 </div>
               </div>

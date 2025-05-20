@@ -36,7 +36,7 @@ export default function Sidebar() {
         <SidebarLink to="/employees" icon={FaUserFriends} label="Pracownicy" />
         <SidebarLink to="/geography" icon={FaGlobe} label="Geografia" />
         <div className="mt-4 border-t pt-4">
-          <p className="text-xs uppercase text-gray-500 px-2">Magazyn</p>
+          <p className="text-xs uppercase text-gray-500 px-2 mb-2">Magazyn</p>
           <SidebarLink
             to="/inventory/receive"
             icon={FaTruck}
@@ -45,7 +45,7 @@ export default function Sidebar() {
           <SidebarLink
             to="/inventory/transfer"
             icon={FaExchangeAlt}
-            label="Przesunięcie"
+            label="Przeniesienie"
           />
           <SidebarLink
             to="/inventory/delivery"

@@ -27,6 +27,7 @@ import WarehousesFormPage from "../pages/WarehousesFormPage";
 import ClientFormPage from "../pages/ClientFormPage";
 import EmployeeFormPage from "../pages/EmployeeFormPage";
 import SupplierFormPage from "../pages/SupplierFormPage";
+import CategoryDetailPage from "../pages/CategoryDetailPage";
 
 const AppRouter = () => (
   <Router>
@@ -45,6 +46,7 @@ const AppRouter = () => (
                 <Route path="products/:id" element={<ProductDetailPage />} />
                 <Route path="categories" element={<CategoriesPage />} />
                 <Route path="categories/new" element={<CategoryFormPage />} />
+                <Route path="categories/:id" element={<CategoryDetailPage />} />
                 <Route
                   path="categories/:id/edit"
                   element={<CategoryFormPage />}

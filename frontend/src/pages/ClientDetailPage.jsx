@@ -13,7 +13,7 @@ const ClientDetailPage = () => {
     dispatch(fetchClientById(id));
   }, [dispatch, id]);
   if (!client) {
-    return <p>Ładowanie danych klienta...</p>;
+    return <p>Ładowanie...</p>;
   }
   const { name, email, phoneNumber, address, history = [] } = client;
   const addr = address.street
@@ -21,16 +21,18 @@ const ClientDetailPage = () => {
     : address;
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <Link to="/clients" className="text-gray-600 hover:text-pink-500">
-        <FaChevronLeft className="inline-block mr-2" /> Wróć do Klientów
-      </Link>
       <div className="bg-white p-6 rounded-lg shadow space-y-4">
+        <div>
+          <Link to="/clients" className="text-gray-600 hover:text-pink-500">
+            <FaChevronLeft className="inline-block mr-2" /> Powrót do Klientów
+          </Link>
+        </div>
         <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
         <p>
-          <strong>Email:</strong> {email}
+          <strong>E-mail:</strong> {email}
         </p>
         <p>
-          <strong>Telefon:</strong> {phoneNumber}
+          <strong>Nr. telefonu:</strong> {phoneNumber}
         </p>
         <p>
           <strong>Adres:</strong> {addr}
@@ -46,7 +48,7 @@ const ClientDetailPage = () => {
               <div>Data</div>
               <div>Typ</div>
               <div>Opis</div>
-              <div className="text-center">Szczegóły</div>
+              <div className="text-center">Detale</div>
             </div>
             <div className="divide-y divide-gray-200">
               {history.map((tx) => (
@@ -57,9 +59,12 @@ const ClientDetailPage = () => {
                   <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
                   <div>{tx.type.replace(/_/g, " ")}</div>
                   <div>{tx.description}</div>
-                  <div className="flex justify-center text-gray-600">
-                    <Link to={`/transactions/${tx.transactionId}`}>
-                      <FaEye />
+                  <div className="flex justify-center text-pink-600">
+                    <Link
+                      to={`/transactions/${tx.transactionId}`}
+                      className="hover:underline"
+                    >
+                      Zobacz
                     </Link>
                   </div>
                 </div>

@@ -27,10 +27,13 @@ const EmployeeDetailPage = () => {
   } = employee;
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <Link to="/employees" className="text-gray-600 hover:text-pink-500">
-        <FaChevronLeft className="inline-block mr-2" /> Wróć do Pracowników
-      </Link>
       <div className="bg-white p-6 rounded-lg shadow space-y-2">
+        <div>
+          <Link to="/employees" className="text-gray-600 hover:text-pink-500">
+            <FaChevronLeft className="inline-block mr-2" /> Powrót do
+            Pracowników
+          </Link>
+        </div>
         <h1 className="text-3xl font-semibold text-gray-800">
           {name} {surname}
         </h1>

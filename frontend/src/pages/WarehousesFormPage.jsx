@@ -7,6 +7,7 @@ import {
   fetchWarehouseById,
 } from "../features/warehouses/warehousesSlice";
 import { listRegions, listCountries } from "../api/geography";
+import { FaChevronDown } from "react-icons/fa";
 
 const WarehousesFormPage = () => {
   const { id } = useParams();
@@ -89,13 +90,13 @@ const WarehousesFormPage = () => {
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <h1 className="text-2xl font-semibold mb-4">
-        {isEdit ? "Edit Warehouse" : "New Warehouse"}
+        {isEdit ? "Edytuj Magazyn" : "Nowy Magazyn"}
       </h1>
       {status === "failed" && <p className="text-red-500">Error: {error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
-            Name
+            Nazwa
           </label>
           <input
             id="name"
@@ -108,7 +109,7 @@ const WarehousesFormPage = () => {
         </div>
         <div>
           <label htmlFor="capacity" className="block text-sm font-medium">
-            Capacity
+            Pojemność
           </label>
           <input
             id="capacity"
@@ -124,46 +125,52 @@ const WarehousesFormPage = () => {
           <label htmlFor="regionId" className="block text-sm font-medium">
             Region
           </label>
-          <select
-            id="regionId"
-            name="regionId"
-            value={form.regionId}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-          >
-            <option value="">Select region</option>
-            {regions.map((r) => (
-              <option key={r.regionId} value={r.regionId}>
-                {r.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="regionId"
+              name="regionId"
+              value={form.regionId}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+            >
+              <option value="">Wybierz region</option>
+              {regions.map((r) => (
+                <option key={r.regionId} value={r.regionId}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
         <div>
           <label htmlFor="countryId" className="block text-sm font-medium">
-            Country
+            Kraj
           </label>
-          <select
-            id="countryId"
-            name="countryId"
-            value={form.countryId}
-            onChange={handleChange}
-            required
-            disabled={!form.regionId}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-          >
-            <option value="">Select country</option>
-            {countries.map((c) => (
-              <option key={c.countryId} value={c.countryId}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="countryId"
+              name="countryId"
+              value={form.countryId}
+              onChange={handleChange}
+              required
+              disabled={!form.regionId}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+            >
+              <option value="">Wybierz region, a potem kraj</option>
+              {countries.map((c) => (
+                <option key={c.countryId} value={c.countryId}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
         <div>
           <label htmlFor="city" className="block text-sm font-medium">
-            City
+            Miasto
           </label>
           <input
             id="city"
@@ -176,7 +183,7 @@ const WarehousesFormPage = () => {
         </div>
         <div>
           <label htmlFor="postalCode" className="block text-sm font-medium">
-            Postal Code
+            Kod pocztowy
           </label>
           <input
             id="postalCode"
@@ -189,7 +196,7 @@ const WarehousesFormPage = () => {
         </div>
         <div>
           <label htmlFor="street" className="block text-sm font-medium">
-            Street
+            Ulica
           </label>
           <input
             id="street"
@@ -202,7 +209,7 @@ const WarehousesFormPage = () => {
         </div>
         <div>
           <label htmlFor="streetNumber" className="block text-sm font-medium">
-            Street Number
+            Numer domu
           </label>
           <input
             id="streetNumber"
@@ -215,9 +222,9 @@ const WarehousesFormPage = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer"
         >
-          {isEdit ? "Update Warehouse" : "Create Warehouse"}
+          {isEdit ? "Zaktualizuj Magazyn" : "Stwórz Magazyn"}
         </button>
       </form>
     </div>

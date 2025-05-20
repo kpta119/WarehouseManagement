@@ -21,16 +21,18 @@ const SupplierDetailPage = () => {
     : address;
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <Link to="/suppliers" className="text-gray-600 hover:text-pink-500">
-        <FaChevronLeft className="inline-block mr-2" /> Wróć do Dostawców
-      </Link>
       <div className="bg-white p-6 rounded-lg shadow space-y-4">
+        <div>
+          <Link to="/suppliers" className="text-gray-600 hover:text-pink-500">
+            <FaChevronLeft className="inline-block mr-2" /> Wróć do Dostawców
+          </Link>
+        </div>
         <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
         <p>
-          <strong>Email:</strong> {email}
+          <strong>E-mail:</strong> {email}
         </p>
         <p>
-          <strong>Telefon:</strong> {phoneNumber}
+          <strong>Nr. telefonu:</strong> {phoneNumber}
         </p>
         <p>
           <strong>Adres:</strong> {addr}
@@ -57,9 +59,12 @@ const SupplierDetailPage = () => {
                   <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
                   <div>{tx.type.replace(/_/g, " ")}</div>
                   <div>{tx.description}</div>
-                  <div className="flex justify-center text-gray-600">
-                    <Link to={`/transactions/${tx.transactionId}`}>
-                      <FaEye />
+                  <div className="flex justify-center text-pink-600">
+                    <Link
+                      to={`/transactions/${tx.transactionId}`}
+                      className="hover:underline"
+                    >
+                      Zobacz
                     </Link>
                   </div>
                 </div>

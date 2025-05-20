@@ -7,6 +7,7 @@ import {
   updateProduct,
 } from "../features/products/productsSlice";
 import { fetchCategories } from "../features/categories/categoriesSlice";
+import { FaChevronDown } from "react-icons/fa";
 
 const ProductFormPage = () => {
   const { id } = useParams();
@@ -131,21 +132,24 @@ const ProductFormPage = () => {
           <label htmlFor="categoryId" className="block text-sm font-medium">
             Kategoria
           </label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            value={form.categoryId}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            required
-          >
-            <option value="">Wybierz kategorię</option>
-            {categories.map((cat) => (
-              <option key={cat.categoryId} value={cat.categoryId}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="categoryId"
+              name="categoryId"
+              value={form.categoryId}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              required
+            >
+              <option value="">Wybierz kategorię</option>
+              {categories.map((cat) => (
+                <option key={cat.categoryId} value={cat.categoryId}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
         {prodError && <p className="text-red-500">{prodError}</p>}
         <button

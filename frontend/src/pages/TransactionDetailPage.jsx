@@ -28,72 +28,84 @@ const TransactionDetailPage = () => {
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
       <Link to="/transactions" className="text-gray-600 hover:text-pink-500">
-        <FaChevronLeft className="inline-block mr-2" /> Back to Transactions
+        <FaChevronLeft className="inline-block mr-2" /> Powrót do Transakcji
       </Link>
-      <h1 className="text-3xl font-semibold mt-2">
-        Transaction #{transactionId}
+      <h1 className="text-3xl font-semibold mt-4">
+        Transakcja #{transactionId}
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <strong>Date:</strong> {format(new Date(date), "yyyy-MM-dd")}
+          <strong>Data:</strong> {format(new Date(date), "yyyy-MM-dd")}
         </div>
         <div>
-          <strong>Type:</strong> {type.replace(/_/g, " ")}
+          <strong>Typ:</strong> {type.replace(/_/g, " ")}
         </div>
         <div>
-          <strong>Description:</strong> {description}
+          <strong>Opis:</strong> {description}
         </div>
         <div>
-          <strong>Handled by:</strong>{" "}
-          <Link to={`/employees/${employeeId}`} className="text-pink-600">
-            Employee {employeeId}
+          <strong>Wykonana przez:</strong>{" "}
+          <Link
+            to={`/employees/${employeeId}`}
+            className="text-pink-600 hover:underline"
+          >
+            Pracownik {employeeId}
           </Link>
         </div>
         {supplierId && (
           <div>
-            <strong>Supplier:</strong>{" "}
-            <Link to={`/suppliers/${supplierId}`} className="text-pink-600">
-              Supplier {supplierId}
+            <strong>Dostawca:</strong>{" "}
+            <Link
+              to={`/suppliers/${supplierId}`}
+              className="text-pink-600 hover:underline"
+            >
+              Dostawca {supplierId}
             </Link>
           </div>
         )}
         {clientId && (
           <div>
-            <strong>Client:</strong>{" "}
-            <Link to={`/clients/${clientId}`} className="text-pink-600">
-              Client {clientId}
+            <strong>Klient:</strong>{" "}
+            <Link
+              to={`/clients/${clientId}`}
+              className="text-pink-600 hover:underline"
+            >
+              Klient {clientId}
             </Link>
           </div>
         )}
         {fromWarehouseId && (
           <div>
-            <strong>From Warehouse:</strong>{" "}
+            <strong>Z magazynu:</strong>{" "}
             <Link
               to={`/warehouses/${fromWarehouseId}`}
-              className="text-pink-600"
+              className="text-pink-600 hover:underline"
             >
-              Warehouse {fromWarehouseId}
+              Magazyn {fromWarehouseId}
             </Link>
           </div>
         )}
         {toWarehouseId && (
           <div>
-            <strong>To Warehouse:</strong>{" "}
-            <Link to={`/warehouses/${toWarehouseId}`} className="text-pink-600">
-              Warehouse {toWarehouseId}
+            <strong>Do magazynu:</strong>{" "}
+            <Link
+              to={`/warehouses/${toWarehouseId}`}
+              className="text-pink-600 hover:underline"
+            >
+              Magazyn {toWarehouseId}
             </Link>
           </div>
         )}
       </div>
       {products && products.length > 0 && (
         <section>
-          <h2 className="text-xl font-semibold mb-4">Products</h2>
+          <h2 className="text-xl font-semibold mb-4">Produkty</h2>
           <div className="bg-gray-50 grid grid-cols-5 p-2 text-xs uppercase font-medium text-gray-500 rounded-t-lg">
-            <div>Product</div>
-            <div className="text-right">Quantity</div>
-            <div className="text-right">Unit Price</div>
-            <div className="text-right">Category</div>
-            <div className="text-right">Total</div>
+            <div>Produkt</div>
+            <div className="text-right">Ilość</div>
+            <div className="text-right">Cena jednostkowa</div>
+            <div className="text-right">Kategoria</div>
+            <div className="text-right">Łącznie</div>
           </div>
           <div className="divide-y divide-gray-200">
             {products.map((p) => (
@@ -118,7 +130,7 @@ const TransactionDetailPage = () => {
               </div>
             ))}
           </div>
-          <div className="text-right p-2">
+          <div className="text-right p-2 font-bold">
             $
             {products
               .reduce((acc, p) => acc + p.quantity * p.unitPrice, 0)

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { FaChevronLeft } from "react-icons/fa";
+import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import { createSupplier } from "../features/suppliers/suppliersSlice";
 import { listRegions, listCountries } from "../api/geography";
 
@@ -60,10 +60,10 @@ const SupplierFormPage = () => {
         to="/suppliers"
         className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
       >
-        <FaChevronLeft className="inline mr-2" /> Back to Suppliers
+        <FaChevronLeft className="inline mr-2" /> Powrót do Dostawców
       </Link>
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
-        New Supplier
+        Nowy Dostawca
       </h1>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -71,7 +71,7 @@ const SupplierFormPage = () => {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Name
+            Nazwa
           </label>
           <input
             type="text"
@@ -88,7 +88,7 @@ const SupplierFormPage = () => {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Email
+            E-mail
           </label>
           <input
             type="email"
@@ -105,7 +105,7 @@ const SupplierFormPage = () => {
             htmlFor="phoneNumber"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Phone Number
+            Nr. telefonu
           </label>
           <input
             type="tel"
@@ -124,52 +124,58 @@ const SupplierFormPage = () => {
           >
             Region
           </label>
-          <select
-            id="regionId"
-            name="regionId"
-            value={form.regionId}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
-          >
-            <option value="">Select region</option>
-            {regions.map((r) => (
-              <option key={r.regionId} value={r.regionId}>
-                {r.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="regionId"
+              name="regionId"
+              value={form.regionId}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition appearance-none"
+            >
+              <option value="">Wybierz region</option>
+              {regions.map((r) => (
+                <option key={r.regionId} value={r.regionId}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
         <div>
           <label
             htmlFor="countryId"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Country
+            Kraj
           </label>
-          <select
-            id="countryId"
-            name="countryId"
-            value={form.countryId}
-            onChange={handleChange}
-            required
-            disabled={!form.regionId}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
-          >
-            <option value="">Select country</option>
-            {countries.map((c) => (
-              <option key={c.countryId} value={c.countryId}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="countryId"
+              name="countryId"
+              value={form.countryId}
+              onChange={handleChange}
+              required
+              disabled={!form.regionId}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition appearance-none"
+            >
+              <option value="">Wybierz region, a potem kraj</option>
+              {countries.map((c) => (
+                <option key={c.countryId} value={c.countryId}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          </div>
         </div>
         <div>
           <label
             htmlFor="city"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            City
+            Miasto
           </label>
           <input
             type="text"
@@ -186,7 +192,7 @@ const SupplierFormPage = () => {
             htmlFor="postalCode"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Postal Code
+            Kod pocztowy
           </label>
           <input
             type="text"
@@ -203,7 +209,7 @@ const SupplierFormPage = () => {
             htmlFor="street"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Street
+            Ulica
           </label>
           <input
             type="text"
@@ -220,7 +226,7 @@ const SupplierFormPage = () => {
             htmlFor="streetNumber"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Street Number
+            Numer domu
           </label>
           <input
             type="text"
@@ -234,9 +240,9 @@ const SupplierFormPage = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition cursor-pointer"
         >
-          Create Supplier
+          Stwórz dostawcę
         </button>
       </form>
     </div>

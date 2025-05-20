@@ -19,11 +19,13 @@ const GeographyPage = () => {
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
         <FaGlobe className="text-pink-500 w-6 h-6" />
-        <h1 className="text-3xl font-semibold">Geography</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Lista regionów i krajów
+        </h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Regions</h2>
+          <h2 className="text-xl font-semibold mb-4">Regiony</h2>
           <ul className="space-y-2">
             {regions.map((r) => (
               <li key={r.regionId}>
@@ -46,9 +48,9 @@ const GeographyPage = () => {
         </div>
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">
-            Countries{" "}
+            Kraje{" "}
             {selectedRegion &&
-              `in ${regions.find((r) => r.regionId === selectedRegion)?.name}`}
+              `w: ${regions.find((r) => r.regionId === selectedRegion)?.name}`}
           </h2>
 
           {!selectedRegion ? (

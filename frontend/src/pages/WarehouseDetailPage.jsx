@@ -35,35 +35,35 @@ const WarehouseDetailPage = () => {
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
         <Link to="/warehouses" className="text-gray-600 hover:text-pink-500">
-          <FaChevronLeft className="inline mr-2" /> Back to Warehouses
+          <FaChevronLeft className="inline mr-2" /> Powrót do Magazynów
         </Link>
         <Link
           to={`/warehouses/${id}/edit`}
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
         >
-          <FaEdit className="mr-2" /> Edit Warehouse
+          <FaEdit className="mr-2" /> Edytuj Magazyn
         </Link>
       </div>
       <div className="bg-white rounded-lg shadow p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <h2 className="text-lg font-semibold mb-2">Name</h2>
+          <h2 className="text-lg font-semibold mb-2">Nazwa</h2>
           <p className="text-gray-800">{name}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Capacity</h2>
+          <h2 className="text-lg font-semibold mb-2">Pojemność</h2>
           <p className="text-gray-800">{capacity}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Occupied</h2>
+          <h2 className="text-lg font-semibold mb-2">Zajęte</h2>
           <p className="text-gray-800">{occupiedCapacity}</p>
         </div>
         <div className="md:col-span-3">
-          <h2 className="text-lg font-semibold mb-2">Address</h2>
+          <h2 className="text-lg font-semibold mb-2">Adres</h2>
           <p className="text-gray-800">{address}</p>
         </div>
       </div>
       <section>
-        <h3 className="text-2xl font-semibold mb-4">Occupancy History</h3>
+        <h3 className="text-2xl font-semibold mb-4">Historia Zajętości</h3>
         <div className="bg-white rounded-lg shadow p-6">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={occupancyHistory}>
@@ -83,14 +83,14 @@ const WarehouseDetailPage = () => {
       </section>
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Employees</h3>
+          <h3 className="text-2xl font-semibold mb-4">Pracownicy</h3>
           <div className="bg-white rounded-lg shadow overflow-auto">
             <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-              <div>Name</div>
-              <div className="text-right">Email</div>
-              <div className="text-right">Phone</div>
-              <div className="text-right">Position</div>
-              <div className="text-right">Details</div>
+              <div>Imię i Nazwisko</div>
+              <div className="text-right">E-mail</div>
+              <div className="text-right">Nr. telefonu</div>
+              <div className="text-right">Stanowisko</div>
+              <div className="text-right">Detale</div>
             </div>
             <div className="divide-y divide-gray-200">
               {employees.map((emp) => (
@@ -109,7 +109,7 @@ const WarehouseDetailPage = () => {
                       to={`/employees/${emp.employeeId}`}
                       className="text-pink-600 hover:underline"
                     >
-                      View
+                      Zobacz
                     </Link>
                   </div>
                 </div>
@@ -118,14 +118,14 @@ const WarehouseDetailPage = () => {
           </div>
         </div>
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Products</h3>
+          <h3 className="text-2xl font-semibold mb-4">Produkty</h3>
           <div className="bg-white rounded-lg shadow overflow-auto">
             <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-              <div>Name</div>
-              <div className="text-right">Quantity</div>
-              <div className="text-right">Unit Price</div>
-              <div className="text-right">Value</div>
-              <div className="text-right">Details</div>
+              <div>Nazwa</div>
+              <div className="text-right">Ilość</div>
+              <div className="text-right">Cena za szt.</div>
+              <div className="text-right">Wartość</div>
+              <div className="text-right">Detale</div>
             </div>
             <div className="divide-y divide-gray-200">
               {products.map((pr) => (
@@ -144,7 +144,7 @@ const WarehouseDetailPage = () => {
                       to={`/products/${pr.productId}`}
                       className="text-pink-600 hover:underline"
                     >
-                      View
+                      Zobacz
                     </Link>
                   </div>
                 </div>
@@ -154,14 +154,14 @@ const WarehouseDetailPage = () => {
         </div>
       </section>
       <section>
-        <h3 className="text-2xl font-semibold mb-4">Recent Transactions</h3>
+        <h3 className="text-2xl font-semibold mb-4">Ostatnie Transakcje</h3>
         <div className="bg-white rounded-lg shadow overflow-auto">
           <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-            <div>Date</div>
-            <div>Type</div>
-            <div className="text-right">Total</div>
-            <div className="text-right">By Employee</div>
-            <div className="text-center">Details</div>
+            <div>Data</div>
+            <div>Typ</div>
+            <div className="text-right">Łącznie</div>
+            <div className="text-right">Przez pracownika</div>
+            <div className="text-right">Detale</div>
           </div>
           <div className="divide-y divide-gray-200">
             {transactions.map((tx) => (
@@ -173,12 +173,12 @@ const WarehouseDetailPage = () => {
                 <div>{tx.type.replace(/_/g, " ")}</div>
                 <div className="text-right">${tx.totalPrice.toFixed(2)}</div>
                 <div className="text-right">{tx.employeeId}</div>
-                <div className="text-center">
+                <div className="text-right">
                   <Link
                     to={`/transactions/${tx.transactionId}`}
                     className="text-pink-600 hover:underline"
                   >
-                    View
+                    Zobacz
                   </Link>
                 </div>
               </div>
