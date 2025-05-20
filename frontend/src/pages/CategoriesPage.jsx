@@ -5,7 +5,7 @@ import {
   fetchCategories,
   deleteCategory,
 } from "../features/categories/categoriesSlice";
-import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+import { FaPlus, FaTrash, FaEdit, FaSearch } from "react-icons/fa";
 
 const CategoriesPage = () => {
   const dispatch = useDispatch();
@@ -15,25 +15,23 @@ const CategoriesPage = () => {
     error,
   } = useSelector((state) => state.categories);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [sortOption, setSortOption] = useState("");
+  const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
-
   const filtered = categories.filter((cat) =>
     cat.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const handleDelete = (id) => {
     if (window.confirm("Czy na pewno chcesz usunąć tę kategorię?")) {
       dispatch(deleteCategory(id));
     }
   };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Kategorie</h1>
+        <h1 className="text-2xl font-semibold">Lista kategorii</h1>
         <Link
           to="/categories/new"
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
@@ -41,15 +39,28 @@ const CategoriesPage = () => {
           <FaPlus className="mr-2" /> Nowa Kategoria
         </Link>
       </div>
-
-      <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/2">
-        <input
-          type="text"
-          placeholder="Szukaj kategorii..."
-          className="w-full focus:outline-none"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex items-center space-x-2 justify-between">
+        <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 w-1/4 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
+          <FaSearch className="text-gray-500 mr-2" />
+          <input
+            type="text"
+            placeholder="Szukaj kategorii..."
+            className="w-full focus:outline-none"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <select
+          className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="">Sortuj przez</option>
+          <option value="name">Nazwa (od A do Z)</option>
+          <option value="name-reverse">Nazwa (od Z do A)</option>
+          <option value="description">Opis (od A do Z)</option>
+          <option value="description-reverse">Opis (od Z do A)</option>
+        </select>
       </div>
 
       {status === "loading" ? (
@@ -70,14 +81,25 @@ const CategoriesPage = () => {
                 className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
               >
                 <div className="font-medium text-pink-600">
-                  <Link to={`/categories/${cat.categoryId}`}>{cat.name}</Link>
+                  <Link
+                    to={`/categories/${cat.categoryId}`}
+                    className="hover:underline"
+                  >
+                    {cat.name}
+                  </Link>
                 </div>
                 <div className="text-sm text-gray-700">{cat.description}</div>
                 <div className="flex justify-center space-x-4 text-gray-600">
-                  <Link to={`/categories/${cat.categoryId}/edit`}>
+                  <Link
+                    to={`/categories/${cat.categoryId}/edit`}
+                    className="hover:text-pink-500 transition duration-200"
+                  >
                     <FaEdit />
                   </Link>
-                  <button onClick={() => handleDelete(cat.categoryId)}>
+                  <button
+                    onClick={() => handleDelete(cat.categoryId)}
+                    className="hover:text-pink-500 transition duration-200 cursor-pointer"
+                  >
                     <FaTrash />
                   </button>
                 </div>

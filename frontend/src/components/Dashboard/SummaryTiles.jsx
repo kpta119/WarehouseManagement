@@ -32,43 +32,43 @@ const SummaryTiles = ({ summary }) => {
   const tiles = [
     {
       icon: <FaBox className="text-pink-400 w-6 h-6" />,
-      label: "Products",
+      label: "Produkty",
       value: productsCount,
       to: "/products",
     },
     {
       icon: <FaTags className="text-pink-400 w-6 h-6" />,
-      label: "Categories",
+      label: "Kategorie",
       value: categoriesCount,
       to: "/categories",
     },
     {
       icon: <FaTruckLoading className="text-pink-400 w-6 h-6" />,
-      label: "Receipts (M)",
+      label: "Przyjęcia (mies.)",
       value: monthlyReceipts,
       to: "/inventory/receive",
     },
     {
       icon: <FaTruckPickup className="text-pink-400 w-6 h-6" />,
-      label: "Deliveries (M)",
+      label: "Wydania (mies.)",
       value: monthlyDeliveries,
       to: "/inventory/delivery",
     },
     {
       icon: <FaExclamationTriangle className="text-pink-400 w-6 h-6" />,
-      label: "Low stock",
+      label: "Niski stan",
       value: lowStockCount,
       to: "/products?filter=low-stock",
     },
     {
       icon: <FaStar className="text-pink-400 w-6 h-6" />,
-      label: "Top product",
+      label: "Bestseller",
       value: topProduct,
       to: topProductId ? `/products/${topProductId}` : "/products",
     },
     {
       icon: <FaDollarSign className="text-pink-400 w-6 h-6" />,
-      label: "Inventory $",
+      label: "Wartość zapasów",
       value: inventoryValue?.toLocaleString(undefined, {
         style: "currency",
         currency: "USD",
@@ -78,7 +78,7 @@ const SummaryTiles = ({ summary }) => {
     },
     {
       icon: <FaSyncAlt className="text-pink-400 w-6 h-6" />,
-      label: "Turnover LW",
+      label: "Obrót (ost. tydz.)",
       value: turnoverLastWeek?.toLocaleString(undefined, {
         style: "currency",
         currency: "USD",
@@ -88,13 +88,13 @@ const SummaryTiles = ({ summary }) => {
     },
     {
       icon: <FaCalendarCheck className="text-pink-400 w-6 h-6" />,
-      label: "Last receipt",
+      label: "Ostatnie przyjęcie",
       value: new Date(lastReceiptDate).toLocaleDateString(),
       to: lastReceiptId ? `/transactions/${lastReceiptId}` : "/transactions",
     },
     {
       icon: <FaCalendarDay className="text-pink-400 w-6 h-6" />,
-      label: "Last delivery",
+      label: "Ostatnie wydanie",
       value: new Date(lastDeliveryDate).toLocaleDateString(),
       to: lastDeliveryId ? `/transactions/${lastDeliveryId}` : "/transactions",
     },

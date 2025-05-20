@@ -8,7 +8,7 @@ import { FaEdit, FaChevronLeft } from "react-icons/fa";
 const ProductDetailPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { current: product, error } = useSelector((state) => state.products);
+  const { current: product } = useSelector((state) => state.products);
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
@@ -50,12 +50,10 @@ const ProductDetailPage = () => {
       {inventory && Object.keys(inventory).length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-2">Inventory by Warehouse</h2>
-          {/* Header */}
           <div className="grid grid-cols-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
             <div>Warehouse ID</div>
             <div className="text-right">Quantity</div>
           </div>
-          {/* Rows */}
           <div className="divide-y divide-gray-200">
             {Object.entries(inventory).map(([warehouseId, qty]) => (
               <div

@@ -62,17 +62,17 @@ const ProductFormPage = () => {
     }
   };
   if ((isEdit && prodStatus === "loading") || prodStatus === "idle") {
-    return <p>Loading...</p>;
+    return <p>Ładowanie...</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <h1 className="text-2xl font-semibold mb-4">
-        {isEdit ? "Edit Product" : "New Product"}
+        {isEdit ? "Edytuj Produkt" : "Nowy Produkt"}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
-            Name
+            Nazwa
           </label>
           <input
             id="name"
@@ -85,7 +85,7 @@ const ProductFormPage = () => {
         </div>
         <div>
           <label htmlFor="description" className="block text-sm font-medium">
-            Description
+            Opis
           </label>
           <textarea
             id="description"
@@ -98,7 +98,7 @@ const ProductFormPage = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="unitPrice" className="block text-sm font-medium">
-              Unit Price
+              Cena jednostkowa
             </label>
             <input
               id="unitPrice"
@@ -113,7 +113,7 @@ const ProductFormPage = () => {
           </div>
           <div>
             <label htmlFor="unitSize" className="block text-sm font-medium">
-              Unit Size
+              Rozmiar jednostkowy
             </label>
             <input
               id="unitSize"
@@ -129,7 +129,7 @@ const ProductFormPage = () => {
         </div>
         <div>
           <label htmlFor="categoryId" className="block text-sm font-medium">
-            Category
+            Kategoria
           </label>
           <select
             id="categoryId"
@@ -139,7 +139,7 @@ const ProductFormPage = () => {
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
             required
           >
-            <option value="">Select category</option>
+            <option value="">Wybierz kategorię</option>
             {categories.map((cat) => (
               <option key={cat.categoryId} value={cat.categoryId}>
                 {cat.name}
@@ -150,9 +150,9 @@ const ProductFormPage = () => {
         {prodError && <p className="text-red-500">{prodError}</p>}
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer"
         >
-          {isEdit ? "Update Product" : "Create Product"}
+          {isEdit ? "Aktualizuj Produkt" : "Stwórz Produkt"}
         </button>
       </form>
     </div>

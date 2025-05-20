@@ -14,34 +14,34 @@ import {
 export default function Charts({ summary }) {
   const barData = [
     {
-      name: "Monthly",
-      Receipts: summary.monthlyReceipts,
-      Deliveries: summary.monthlyDeliveries,
+      name: "Miesięczne",
+      Przyjęcia: summary.monthlyReceipts,
+      Wydania: summary.monthlyDeliveries,
     },
   ];
   const inStock = summary.productsCount - summary.lowStockCount;
   const pieData = [
-    { name: "Low stock", value: summary.lowStockCount },
-    { name: "In stock", value: inStock },
+    { name: "Niski stan", value: summary.lowStockCount },
+    { name: "W magazynie", value: inStock },
   ];
   const COLORS = ["#EF4444", "#10B981"];
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Monthly movements</h2>
+        <h2 className="text-lg font-semibold mb-4">Ruchy miesięczne</h2>
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={barData}>
             <XAxis dataKey="name" tick={{ fill: "#6B7280" }} />
             <YAxis tick={{ fill: "#6B7280" }} />
             <Tooltip />
             <Legend />
-            <Bar dataKey="Receipts" fill="#3B82F6" />
-            <Bar dataKey="Deliveries" fill="#8B5CF6" />
+            <Bar dataKey="Przyjęcia" fill="#3B82F6" />
+            <Bar dataKey="Wydania" fill="#8B5CF6" />
           </BarChart>
         </ResponsiveContainer>
       </div>
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Stock status</h2>
+        <h2 className="text-lg font-semibold mb-4">Stan zapasów</h2>
         <ResponsiveContainer width="100%" height={260}>
           <PieChart>
             <Pie

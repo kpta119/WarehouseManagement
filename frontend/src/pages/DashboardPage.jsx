@@ -11,7 +11,7 @@ const DashboardPage = () => {
   useEffect(() => {
     dispatch(fetchDashboardSummary(selectedWarehouse));
   }, [dispatch, selectedWarehouse]);
-  if (status === "loading" || status === "idle") return <p>Loading...</p>;
+  if (status === "loading" || status === "idle") return <p>Ładowanie...</p>;
   if (status === "failed") return <p className="text-red-500">{error}</p>;
   return (
     <div className="space-y-6">

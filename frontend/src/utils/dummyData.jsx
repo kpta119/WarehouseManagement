@@ -174,8 +174,8 @@ export const dummyProducts = [
     unitPrice: 9.99,
     unitSize: 1.0,
     categoryName: "Gadgets",
-    inventoryCount: 100,
-    transactionsCount: 20,
+    inventoryCount: 3,
+    transactionsCount: 10,
   },
 ];
 
