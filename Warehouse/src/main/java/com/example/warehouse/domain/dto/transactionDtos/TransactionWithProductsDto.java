@@ -1,5 +1,6 @@
-package com.example.warehouse.domain.dto;
+package com.example.warehouse.domain.dto.transactionDtos;
 
+import com.example.warehouse.domain.dto.productDtos.ProductInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransactionDto {
+public class TransactionWithProductsDto {
     private Integer transactionId;
     private String type;
     private String date;

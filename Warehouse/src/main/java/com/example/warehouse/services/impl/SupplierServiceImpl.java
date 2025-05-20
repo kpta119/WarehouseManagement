@@ -1,36 +1,31 @@
 package com.example.warehouse.services.impl;
 
-import com.example.warehouse.domain.Address;
-import com.example.warehouse.domain.City;
-import com.example.warehouse.domain.Client;
-import com.example.warehouse.domain.Country;
+import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.repositories.*;
-import com.example.warehouse.services.ClientService;
+import com.example.warehouse.services.SupplierService;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-
 @Service
-public class ClientServiceImpl implements ClientService {
+public class SupplierServiceImpl implements SupplierService {
     private final CityRepository cityRepository;
     private final CountryRepository countryRepository;
     private final AddressRepository addressRepository;
-    private final ClientRepository clientRepository;
+    private final SupplierRepository supplierRepository;
 
-
-    public ClientServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, ClientRepository clientRepository) {
+    public SupplierServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, SupplierRepository supplierRepository) {
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.addressRepository = addressRepository;
-        this.clientRepository = clientRepository;
+        this.supplierRepository = supplierRepository;
     }
 
     @Override
-    public Client createClient(BusinessEntityDto request) {
+    public Supplier createSupplier(BusinessEntityDto request) {
         AddressDto addressDto = request.getAddress();
         Optional<City> existingCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
                 addressDto.getPostalCode(), addressDto.getCity(), addressDto.getCountryId()
@@ -55,13 +50,12 @@ public class ClientServiceImpl implements ClientService {
         address.setStreetNumber(addressDto.getStreetNumber());
         address = addressRepository.save(address);
 
-        Client client = new Client();
-        client.setName(request.getName());
-        client.setEmail(request.getEmail());
-        client.setPhoneNumber(request.getPhoneNumber());
-        client.setAddress(address);
+        Supplier supplier = new Supplier();
+        supplier.setName(request.getName());
+        supplier.setEmail(request.getEmail());
+        supplier.setPhoneNumber(request.getPhoneNumber());
+        supplier.setAddress(address);
 
-        return clientRepository.save(client);
-
+        return supplierRepository.save(supplier);
     }
 }
