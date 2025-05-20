@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.dto.productEndpoints.ProductSearchEndpointDto;
+import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
 import com.example.warehouse.mappers.products.ProductSearchEndpointMapper;
 import com.example.warehouse.services.ProductsService;
 import org.springframework.http.HttpStatus;

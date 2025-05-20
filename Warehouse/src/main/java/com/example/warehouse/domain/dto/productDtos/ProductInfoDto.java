@@ -1,4 +1,4 @@
-package com.example.warehouse.domain.dto.productEndpoints;
+package com.example.warehouse.domain.dto.productDtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class ProductInfoDto {
     private Integer productId;
     private String name;
-    private String description;
+    private Integer quantity;
     private Double unitPrice;
-    private Double unitSize;
+    private String categoryName;
 }

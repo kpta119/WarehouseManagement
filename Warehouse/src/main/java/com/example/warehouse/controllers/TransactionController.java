@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.TransactionSummaryDto;
+import com.example.warehouse.domain.dto.TransactionDtos.TransactionSummaryDto;
 import com.example.warehouse.mappers.TransactionMapper;
 import com.example.warehouse.mappers.TransactionSummaryMapper;
 import com.example.warehouse.services.TransactionService;
@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/transactions")
 public class TransactionController {
-    private TransactionService transactionService;
-    private TransactionMapper transactionMapper;
-    private TransactionSummaryMapper transactionSummaryMapper;
+    private final TransactionService transactionService;
+    private final TransactionMapper transactionMapper;
+    private final TransactionSummaryMapper transactionSummaryMapper;
 
     public TransactionController(TransactionMapper transactionMapper, TransactionService transactionService, TransactionSummaryMapper transactionSummaryMapper) {
         this.transactionMapper = transactionMapper;

@@ -1,7 +1,7 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.TransactionSummaryDto;
+import com.example.warehouse.domain.dto.TransactionDtos.TransactionSummaryDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 @Component
 public class TransactionSummaryMapper {
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public TransactionSummaryDto mapToDto(Transaction transaction) {

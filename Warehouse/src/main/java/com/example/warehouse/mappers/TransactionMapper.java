@@ -1,8 +1,8 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.ProductInfoDto;
-import com.example.warehouse.domain.dto.TransactionDto;
+import com.example.warehouse.domain.dto.productDtos.ProductInfoDto;
+import com.example.warehouse.domain.dto.TransactionDtos.TransactionWithProductsDto;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 @Component
 public class TransactionMapper {
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
-    public TransactionDto mapToDto(Transaction transaction) {
-        TransactionDto dto = new TransactionDto();
+    public TransactionWithProductsDto mapToDto(Transaction transaction) {
+        TransactionWithProductsDto dto = new TransactionWithProductsDto();
 
         dto.setTransactionId(transaction.getId());
         dto.setType(transaction.getTransactionType().name());

@@ -2,7 +2,7 @@ package com.example.warehouse.mappers.products;
 
 
 import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.dto.productEndpoints.ProductSearchEndpointDto;
+import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
 import com.example.warehouse.repositories.ProductInventoryRepository;
 import com.example.warehouse.repositories.TransactionProductRepository;
 import org.springframework.stereotype.Component;
