@@ -16,8 +16,8 @@ public interface TransactionProductRepository extends CrudRepository<Transaction
                     AND (t.fromWarehouse.id = :warehouseId OR t.toWarehouse.id = :warehouseId)
             
             """)
-    Integer countTransactionsByProductIdAndWarehouseId(@Param("id") Integer productId, @Param("warehouseId") Integer warehouseId);
+    Integer countTransactionsByProductIdAndWarehouseId(@Param("productId") Integer productId, @Param("warehouseId") Integer warehouseId);
 
-    @Query("SELECT COUNT(tp) FROM TransactionProduct tp WHERE tp.product.id = :id")
-    Integer countTransactionByProductId(@Param("id") Integer productId);
+    @Query("SELECT COUNT(tp) FROM TransactionProduct tp WHERE tp.product.id = :productId")
+    Integer countTransactionByProductId(@Param("productId") Integer productId);
 }

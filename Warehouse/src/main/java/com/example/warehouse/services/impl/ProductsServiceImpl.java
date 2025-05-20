@@ -45,8 +45,8 @@ public class ProductsServiceImpl implements ProductsService {
             }
 
             if (warehouseId != null) {
-                Join<Product, ProductInventory> inventoryJoin = root.join("productInventories", JoinType.LEFT);
-                predicates.add(cb.equal(inventoryJoin.get("warehouseID"), warehouseId));
+                Join<Product, ProductInventory> inventoryJoin = root.join("productInventories", JoinType.INNER);
+                predicates.add(cb.equal(inventoryJoin.get("warehouse").get("id"), warehouseId));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

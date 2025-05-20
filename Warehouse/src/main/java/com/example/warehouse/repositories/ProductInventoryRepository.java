@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductInventoryRepository extends CrudRepository<ProductInventory, Integer>, JpaRepository<ProductInventory, Integer> {
     @Query("SELECT SUM(pi.quantity) FROM ProductInventory pi WHERE pi.product.id = :productId AND pi.warehouse.id = :warehouseId")
-    Integer getInventoryCountByProductIdAndWarehouseId(@Param("id") Integer productId, @Param("warehouseId") Integer warehouseId);
+    Integer getInventoryCountByProductIdAndWarehouseId(@Param("productId") Integer productId, @Param("warehouseId") Integer warehouseId);
 
-    @Query("SELECT SUM(pi.quantity) FROM ProductInventory pi WHERE pi.product.id = :id")
-    Integer getInventoryCountByProductId(@Param("id") Integer productId);
+    @Query("SELECT SUM(pi.quantity) FROM ProductInventory pi WHERE pi.product.id = :productId")
+    Integer getInventoryCountByProductId(@Param("productId") Integer productId);
 }
