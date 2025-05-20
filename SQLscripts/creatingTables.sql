@@ -72,8 +72,8 @@ CREATE TABLE Warehouse
 (
     WarehouseID      INT AUTO_INCREMENT PRIMARY KEY,
     Name             VARCHAR(100) NOT NULL,
-    Capacity         DECIMAL(4, 2)          NOT NULL,
-    OccupiedCapacity DECIMAL(4, 2)          NOT NULL,
+    Capacity         DECIMAL(6, 2)          NOT NULL,
+    OccupiedCapacity DECIMAL(6, 2)          NOT NULL,
     AddressID        INT,
     FOREIGN KEY (AddressID) REFERENCES Address (AddressID)
 );
@@ -146,8 +146,8 @@ CREATE TABLE Transaction
     ToWarehouseID                           INT,
     ClientID                                INT,
     SupplierID                              INT,
-    SourceWarehouseCapacityAfterTransaction INT,
-    TargetWarehouseCapacityAfterTransaction INT,
+    SourceWarehouseCapacityAfterTransaction DECIMAL(6, 2),
+    TargetWarehouseCapacityAfterTransaction DECIMAL(6, 2),
     FOREIGN KEY (EmployeeID) REFERENCES Employee (EmployeeID),
     FOREIGN KEY (FromWarehouseID) REFERENCES Warehouse (WarehouseID),
     FOREIGN KEY (ToWarehouseID) REFERENCES Warehouse (WarehouseID),

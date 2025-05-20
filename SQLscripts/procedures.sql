@@ -20,12 +20,12 @@ BEGIN
     DECLARE v_ProductID INT;
     DECLARE v_Quantity INT;
     DECLARE v_UnitPrice DECIMAL(10,2);
-    DECLARE v_UnitSize INT;
-    DECLARE v_ChangeInCapacity INT;
-    DECLARE v_SourceCapacityAfter INT DEFAULT NULL;
-    DECLARE v_TargetCapacityAfter INT DEFAULT NULL;
-    DECLARE v_FromWarehouseOccupied INT;
-    DECLARE v_ToWarehouseOccupied INT;
+    DECLARE v_UnitSize DECIMAL(4,2);
+    DECLARE v_ChangeInCapacity DECIMAL(6,2);
+    DECLARE v_SourceCapacityAfter DECIMAL(6,2) DEFAULT NULL;
+    DECLARE v_TargetCapacityAfter DECIMAL(6,2) DEFAULT NULL;
+    DECLARE v_FromWarehouseOccupied DECIMAL(6,2);
+    DECLARE v_ToWarehouseOccupied DECIMAL(6,2);
 
     INSERT INTO `Transaction` 
       (TransactionType, Date, Description, EmployeeID, FromWarehouseID, ToWarehouseID, ClientID, SupplierID,
@@ -105,88 +105,6 @@ BEGIN
         TargetWarehouseCapacityAfterTransaction = v_TargetCapacityAfter
     WHERE TransactionID = v_TransactionID;
 
-END$$
-
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS receive_delivery;
-
-DELIMITER $$
-
-CREATE PROCEDURE receive_delivery(
-    IN p_Date DATE,
-    IN p_Description VARCHAR(200),
-    IN p_EmployeeID INT,
-    IN p_SupplierID INT,
-    IN p_ToWarehouseID INT,
-    IN p_ProductsJSON TEXT
-)
-BEGIN
-    CALL add_transaction(
-        'SUPPLIER_TO_WAREHOUSE',
-        p_Date,
-        p_Description,
-        p_EmployeeID,
-        NULL,
-        p_ToWarehouseID,
-        NULL,
-        p_SupplierID,
-        p_ProductsJSON
-    );
-END$$
-
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS sell_to_client;
-
-DELIMITER $$
-
-CREATE PROCEDURE sell_to_client(
-    IN p_Date DATE,
-    IN p_Description VARCHAR(200),
-    IN p_EmployeeID INT,
-    IN p_FromWarehouseID INT,
-    IN p_ClientID INT,
-    IN p_ProductsJSON TEXT
-)
-BEGIN
-    DECLARE v_ProductCount INT;
-    DECLARE v_i INT DEFAULT 0;
-    DECLARE v_ProductID INT;
-    DECLARE v_Quantity INT;
-    DECLARE v_AvailableQuantity INT;
-    DECLARE v_ErrorMessage VARCHAR(255);
-
-    SET v_ProductCount = JSON_LENGTH(p_ProductsJSON);
-
-    WHILE v_i < v_ProductCount DO
-        SET v_ProductID = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].ProductID')));
-        SET v_Quantity = JSON_UNQUOTE(JSON_EXTRACT(p_ProductsJSON, CONCAT('$[', v_i, '].Quantity')));
-
-        SELECT COALESCE(SUM(Quantity), 0)
-        INTO v_AvailableQuantity
-        FROM ProductInventory
-        WHERE ProductID = v_ProductID AND WarehouseID = p_FromWarehouseID;
-        IF v_AvailableQuantity < v_Quantity THEN
-            SET v_ErrorMessage = CONCAT('Niewystarczająca ilość produktu ID: ', v_ProductID, '. Dostępne: ', v_AvailableQuantity, ', wymagane: ', v_Quantity);
-            SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = v_ErrorMessage;
-        END IF;
-
-        SET v_i = v_i + 1;
-    END WHILE;
-
-    CALL add_transaction(
-        'WAREHOUSE_TO_CUSTOMER',
-        p_Date,
-        p_Description,
-        p_EmployeeID,
-        p_FromWarehouseID,
-        NULL,
-        p_ClientID,
-        NULL,
-        p_ProductsJSON
-    );
 END$$
 
 DELIMITER ;
