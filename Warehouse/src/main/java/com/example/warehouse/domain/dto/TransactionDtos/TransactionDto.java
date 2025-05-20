@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionDto {
-    private Integer id;
+    private Integer transactionId;
     private String date;
     private String type;
     private Double price;

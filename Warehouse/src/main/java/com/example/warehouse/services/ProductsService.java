@@ -1,8 +1,10 @@
 package com.example.warehouse.services;
 
 import com.example.warehouse.domain.Product;
+import com.example.warehouse.domain.dto.TransactionDtos.TransactionDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductsService {
 
@@ -10,4 +12,7 @@ public interface ProductsService {
     Integer getInventoryCount(Integer productId, Integer warehouseId);
     Integer getTransactionCount(Integer productId, Integer warehouseId);
 
+    Product getProductById(Integer productId);
+    Map<Integer, Integer> getInventoryMap(Integer productId);
+    List<TransactionDto> getTransactionsDto(Integer productId);
 }

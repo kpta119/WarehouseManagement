@@ -154,5 +154,35 @@ public class ProductControllerTests {
         );
     }
 
+    @Test
+    public void testReturnsSingleProduct() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("Laptop")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.categoryName").value("Electronics")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.inventory.length()").value(2)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.inventory['1']").value(50)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.inventory['2']").value(20)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.transactions.length()").value(2)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.transactions[0].transactionId").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.transactions[0].quantity").value(10)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.transactions[1].transactionId").value(2)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.transactions[1].quantity").value(5)
+        );
+    }
+
 
 }

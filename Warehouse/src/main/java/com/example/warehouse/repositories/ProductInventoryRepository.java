@@ -7,6 +7,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProductInventoryRepository extends CrudRepository<ProductInventory, Integer>, JpaRepository<ProductInventory, Integer> {
     @Query("SELECT SUM(pi.quantity) FROM ProductInventory pi WHERE pi.product.id = :productId AND pi.warehouse.id = :warehouseId")
@@ -14,4 +16,6 @@ public interface ProductInventoryRepository extends CrudRepository<ProductInvent
 
     @Query("SELECT SUM(pi.quantity) FROM ProductInventory pi WHERE pi.product.id = :productId")
     Integer sumInventoryQuantityByProductId(@Param("productId") Integer productId);
+
+    List<ProductInventory> findByProductId(Integer productId);
 }
