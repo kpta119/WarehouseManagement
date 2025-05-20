@@ -72,8 +72,8 @@ CREATE TABLE Warehouse
 (
     WarehouseID      INT AUTO_INCREMENT PRIMARY KEY,
     Name             VARCHAR(100) NOT NULL,
-    Capacity         INT          NOT NULL,
-    OccupiedCapacity INT          NOT NULL,
+    Capacity         DECIMAL(4, 2)          NOT NULL,
+    OccupiedCapacity DECIMAL(4, 2)          NOT NULL,
     AddressID        INT,
     FOREIGN KEY (AddressID) REFERENCES Address (AddressID)
 );
@@ -105,7 +105,7 @@ CREATE TABLE Product
     Name        VARCHAR(50)   NOT NULL,
     Description VARCHAR(200),
     UnitPrice   DECIMAL(6, 2) NOT NULL,
-    UnitSize    INT NOT NULL,
+    UnitSize    DECIMAL(4, 2) NOT NULL,
     CategoryID  INT,
     FOREIGN KEY (CategoryID) REFERENCES Category (CategoryID)
 );

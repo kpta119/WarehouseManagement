@@ -87,16 +87,16 @@ INSERT INTO Client (ClientID, Name, Email, PhoneNumber, AddressID) VALUES
 (10, 'Emma Johnson', 'emma.johnson@example.au', '+61 000 111 222', 10);
 
 INSERT INTO Warehouse (WarehouseID, Name, Capacity, OccupiedCapacity, AddressID) VALUES
-(1, 'Central Warehouse', 10000, 0, 1),
-(2, 'North Warehouse', 8000, 0, 2),
-(3, 'South Warehouse', 12000, 0, 3),
-(4, 'East Warehouse', 7000, 0, 4),
-(5, 'West Warehouse', 9000, 0, 5),
-(6, 'Warehouse A', 5000, 0, 6),
-(7, 'Warehouse B', 11000, 0, 7),
-(8, 'Warehouse C', 6000, 0, 8),
-(9, 'Warehouse D', 13000, 0, 9),
-(10, 'Warehouse E', 4000, 0, 10);
+(1, 'Central Warehouse', 1000.0, 0.0, 1),
+(2, 'North Warehouse', 800.0, 0.0, 2),
+(3, 'South Warehouse', 1200.0, 0.0, 3),
+(4, 'East Warehouse', 700.0, 0.0, 4),
+(5, 'West Warehouse', 900.0, 0.0, 5),
+(6, 'Warehouse A', 500.0, 0.0, 6),
+(7, 'Warehouse B', 1100.0, 0.0, 7),
+(8, 'Warehouse C', 600.0, 0.0, 8),
+(9, 'Warehouse D', 1300.0, 0.0, 9),
+(10, 'Warehouse E', 400.0, 0.0, 10);
 
 INSERT INTO Employee (EmployeeID, Name, Surname, Position, Email, PhoneNumber, AddressID, WarehouseID) VALUES
 (1, 'Jan', 'Kowalski', 'Manager', 'jan.kowalski@example.com', '+48 111 222 333', 1, 1),
@@ -123,13 +123,13 @@ INSERT INTO Category (CategoryID, Name, Description) VALUES
 (10, 'Garden & Outdoors', 'Tools and equipment for gardening and outdoor activities');
 
 INSERT INTO Product (ProductID, Name, Description, UnitPrice, UnitSize, CategoryID) VALUES
-(1, 'Smartphone', 'Latest model smartphone with 128GB storage', 699.99, 1, 1),
-(2, 'Office Chair', 'Ergonomic office chair with adjustable height', 149.99, 15, 2),
-(3, 'Jeans', 'Comfortable blue denim jeans', 39.99, 5, 3),
-(4, 'Novel Book', 'Bestselling fiction novel', 14.99, 3, 4),
-(5, 'Building Blocks', 'Plastic building blocks for children', 24.99, 1, 5),
-(6, 'Olive Oil', 'Extra virgin olive oil 1L bottle', 9.99, 4, 6),
-(7, 'Soccer Ball', 'Standard size 5 soccer ball', 29.99, 2, 7),
-(8, 'Shampoo', 'Herbal shampoo for all hair types, 500ml', 6.99, 1, 8),
-(9, 'Car Battery', '12V car battery with 60Ah capacity', 89.99, 15, 9),
-(10, 'Garden Hose', '25 meters flexible garden hose', 34.99, 3, 10);
+(1, 'Smartphone', 'Latest model smartphone with 128GB storage', 699.99, 0.1, 1),
+(2, 'Office Chair', 'Ergonomic office chair with adjustable height', 149.99, 1.5, 2),
+(3, 'Jeans', 'Comfortable blue denim jeans', 39.99, 0.5, 3),
+(4, 'Novel Book', 'Bestselling fiction novel', 14.99, 0.3, 4),
+(5, 'Building Blocks', 'Plastic building blocks for children', 24.99, 0.1, 5),
+(6, 'Olive Oil', 'Extra virgin olive oil 1L bottle', 9.99, 0.4, 6),
+(7, 'Soccer Ball', 'Standard size 5 soccer ball', 29.99, 0.2, 7),
+(8, 'Shampoo', 'Herbal shampoo for all hair types, 500ml', 6.99, 0.1, 8),
+(9, 'Car Battery', '12V car battery with 60Ah capacity', 89.99, 1.5, 9),
+(10, 'Garden Hose', '25 meters flexible garden hose', 34.99, 0.3, 10);
