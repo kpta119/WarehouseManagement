@@ -370,7 +370,7 @@ public class ProductControllerTests {
 
     @Test
     public void testCreateProductWithValidationErrors() throws Exception {
-        String invalidProductJson = "{\"name\": \"\", \"description\": \"\", \"unitPrice\": -1.5, \"unitSize\": 0}";
+        String invalidProductJson = "{\"name\":  \"\", \"description\":  \"\", \"unitPrice\": -1.5, \"unitSize\": 0}";
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/products")
@@ -403,6 +403,64 @@ public class ProductControllerTests {
                 MockMvcResultMatchers.status().isNotFound()
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$").value("Resource not found: Category not found with ID: 999")
+        );
+    }
+
+    @Test
+    public void testUpdateProduct() throws Exception {
+        String updatedProductJson = "{\"description\": \"Ola Boga\", \"unitPrice\": 99.4, \"unitSize\": 2.0, \"categoryId\": 4}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedProductJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.description").value("Ola Boga")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitPrice").value(99.4)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitSize").value(2.0)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.categoryId").value(4)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("Laptop")
+        );
+
+        // Verify that the product was updated in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.description").value("Ola Boga")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitPrice").value(99.4)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitSize").value(2.0)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.categoryName").value("Furniture")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("Laptop")
+        );
+    }
+
+    @Test
+    public void testUpdateProductValidationErrors() throws Exception {
+        String invalidProductJson = "{\"name\": \"LaptopNr2\", \"description\": \"LaptopsDesc\", \"unitPrice\": -1.5, \"unitSize\": 0}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidProductJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isBadRequest()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitPrice").value("Unit price must be positive")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitSize").value("Unit size must be positive")
         );
     }
 

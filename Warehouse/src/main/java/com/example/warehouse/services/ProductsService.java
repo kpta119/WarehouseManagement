@@ -28,4 +28,6 @@ public interface ProductsService {
     List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod, int topN);
 
     Product createProduct(@Valid ProductDataBaseDto product);
+
+    Product updateProduct(Integer productId, ProductDataBaseDto product);
 }
