@@ -86,7 +86,7 @@ VALUES ('Laptop', '15-inch laptop', 999.99, 2.5, 1),
        ('Apple', 'Red apple', 0.99, 0.1, 3),
        ('Chair', 'Wooden chair', 49.99, 5.0, 4),
        ('Novel', 'Bestseller novel', 14.99, 1.0, 5),
-        ('Smartphone', 'Latest model smartphone', 799.99, 0.3, 1);
+       ('Smartphone', 'Latest model smartphone', 799.99, 0.3, 1);
 
 
 INSERT INTO ProductInventory (ProductID, WarehouseID, Quantity, Price)
@@ -96,19 +96,21 @@ VALUES (1, 1, 2, 999.99),
        (4, 4, 3, 49.99),
        (5, 5, 1, 14.99),
        (1, 2, 3, 900.00),
-         (2, 3, 4, 18.99);
+       (2, 3, 4, 18.99);
 
 INSERT INTO Transaction (TransactionType, Date, Description, EmployeeID, FromWarehouseID, ToWarehouseID, ClientID,
                          SupplierID, SourceWarehouseCapacityAfterTransaction, TargetWarehouseCapacityAfterTransaction)
-VALUES ('WAREHOUSE_TO_WAREHOUSE', '2024-03-01', 'Transfer between warehouses', 1, 1, 2, NULL, NULL, 450, 1100),
-       ('SUPPLIER_TO_WAREHOUSE', '2024-03-02', 'Supplier restock', 2, 1, NULL, NULL, 1, 550, NULL),
-       ('WAREHOUSE_TO_CUSTOMER', '2024-03-03', 'Customer order', 3, 3, NULL, 3, NULL, 700, NULL),
-       ('WAREHOUSE_TO_WAREHOUSE', '2024-03-04', 'Inter-warehouse transfer', 4, 4, 5, NULL, NULL, 800, 650),
-       ('SUPPLIER_TO_WAREHOUSE', '2024-03-05', 'Supplier delivery', 5, 5, NULL, NULL, 5, 700, NULL);
+VALUES ('WAREHOUSE_TO_WAREHOUSE', '2024-06-01', 'Transfer between warehouses', 1, 1, 2, NULL, NULL, 450, 1100),
+       ('SUPPLIER_TO_WAREHOUSE', '2024-06-02', 'Supplier restock', 2, 1, NULL, NULL, 1, 550, NULL),
+       ('WAREHOUSE_TO_CUSTOMER', '2025-04-29', 'Customer order', 3, 3, NULL, 3, NULL, 700, NULL),
+       ('WAREHOUSE_TO_WAREHOUSE', '2025-05-20', 'Inter-warehouse transfer', 4, 4, 5, NULL, NULL, 800, 650),
+       ('SUPPLIER_TO_WAREHOUSE', '2024-03-05', 'Supplier delivery', 5, 5, NULL, NULL, 5, 700, NULL),
+       ('WAREHOUSE_TO_CUSTOMER', '2024-07-15', 'Customer order', 1, 2, NULL, 2, NULL, 600, NULL);
 
 INSERT INTO TransactionProduct (TransactionID, ProductID, Quantity, TransactionPrice)
 VALUES (1, 1, 10, 999.99),
        (2, 1, 5, 999.99),
        (3, 3, 100, 0.99),
        (4, 4, 20, 49.99),
-       (5, 5, 50, 14.99);
+       (5, 5, 50, 14.99),
+       (1, 2, 2, 900.00);

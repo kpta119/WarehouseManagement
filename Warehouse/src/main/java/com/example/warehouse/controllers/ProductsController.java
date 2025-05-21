@@ -2,6 +2,7 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
 import com.example.warehouse.mappers.products.ProductGetSingleProductMapper;
 import com.example.warehouse.mappers.products.ProductSearchEndpointMapper;
@@ -72,6 +73,20 @@ public class ProductsController {
             int lowStockThreshold = 5;
             List<Integer> lowStockProductIds = productsService.getLowStockProductIds(warehouseId, lowStockThreshold);
             return ResponseEntity.ok(lowStockProductIds);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/best-selling")
+    public ResponseEntity<?> getTop3BestSellingProducts(@RequestParam(required = false) Integer warehouseId, @RequestParam String period) {
+        try {
+            Period parsedPeriod = Period.valueOf(period.toLowerCase());
+            int topN = 3;
+            List<Integer> products = productsService.getBestSellingProducts(warehouseId, parsedPeriod, topN);
+            return ResponseEntity.ok(products);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid period argument: " + period);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

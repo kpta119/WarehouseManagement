@@ -2,6 +2,7 @@ package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.ProductInventory;
+import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
 import com.example.warehouse.repositories.ProductInventoryRepository;
 import com.example.warehouse.repositories.ProductRepository;
@@ -10,9 +11,13 @@ import com.example.warehouse.services.ProductsService;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +29,13 @@ public class ProductsServiceImpl implements ProductsService {
     private final ProductRepository productRepository;
     private final ProductInventoryRepository productInventoryRepository;
     private final TransactionProductRepository transactionProductRepository;
+    private final Clock clock;
 
-    public ProductsServiceImpl(ProductRepository productRepository, ProductInventoryRepository productInventoryRepository, TransactionProductRepository transactionProductRepository) {
+    public ProductsServiceImpl(ProductRepository productRepository, ProductInventoryRepository productInventoryRepository, TransactionProductRepository transactionProductRepository, Clock clock) {
         this.productRepository = productRepository;
         this.productInventoryRepository = productInventoryRepository;
         this.transactionProductRepository = transactionProductRepository;
+        this.clock = clock;
     }
 
     @Override
@@ -122,9 +129,18 @@ public class ProductsServiceImpl implements ProductsService {
                 : productInventoryRepository.findLowStockProducts(lowStockThreshold);
     }
 
-//    @Override
-//    public List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod, int topN) {
-//
-//    }
+
+    @Override
+    public List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod, int topN) {
+        LocalDate now = LocalDate.now(clock);
+        Date fromDate = switch (parsedPeriod) {
+            case week -> Date.valueOf(now.minusWeeks(1));
+            case month -> Date.valueOf(now.minusMonths(1));
+            case year -> Date.valueOf(now.minusYears(1));
+        };
+        PageRequest pageRequest = PageRequest.of(0, topN);
+        return (warehouseId != null) ? transactionProductRepository.findTopNBestSellingProductsByWarehouseId(warehouseId, fromDate, pageRequest)
+                : transactionProductRepository.findTopNBestSellingProducts(fromDate, pageRequest);
+    }
 
 }

@@ -5,15 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Sql(scripts = "classpath:test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@ActiveProfiles("test")
 public class ProductControllerTests {
 
     @Autowired
@@ -121,7 +130,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(10)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(0)
+                MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(1)
         );
     }
 
@@ -142,7 +151,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(6)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(0)
+                MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(1)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[1].name").value("Laptop")
         ).andExpect(
@@ -184,7 +193,6 @@ public class ProductControllerTests {
         );
     }
 
-
     @Test
     public void testReturnsProductIdsWithLowStock() throws Exception {
         mockMvc.perform(
@@ -214,6 +222,128 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0]").value(1)
         );
+    }
+
+    @Test
+    public void testGetTop3BestSellingErrorReturnsBadPeriodName() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "moonth")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isBadRequest()
+        );
+    }
+
+    @Test
+    public void testGetTop3BestSellingPeriodWeek() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "week")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(4)
+        );
+    }
+
+    @Test
+    public void testGetTop3BestSellingPeriodMonth() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "month")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(2)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(3)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[1]").value(4)
+        );
+    }
+
+    @Test
+    public void testGetTop3BestSellingPeriodYear() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "year")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(3)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(3)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[1]").value(4)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[2]").value(1)
+        );
+    }
+
+    @Test
+    public void testGetTop3BestSellingPeriodYearWithWarehouseId() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "year")
+                        .param("warehouseId", "2")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(2)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[1]").value(2)
+        );
+    }
+
+    @Test
+    public void testGetTop3BestSellingWarehouseToWarehouseTransactionFromWarehouseId() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "month")
+                        .param("warehouseId", "4")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(4)
+        );
+    }
+
+    @Test
+    public void testGetTop3BestSellingWarehouseToWarehouseTransactionToWarehouseId() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "month")
+                        .param("warehouseId", "5")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(4)
+        );
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+
+        @Bean
+        @Profile("test")
+        public Clock clock() {
+            return Clock.fixed(Instant.parse("2025-05-21T00:00:00Z"), ZoneId.of("UTC"));
+        }
     }
 
 
