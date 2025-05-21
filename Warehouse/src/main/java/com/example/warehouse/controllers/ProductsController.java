@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
 import com.example.warehouse.mappers.products.ProductGetSingleProductMapper;
 import com.example.warehouse.mappers.products.ProductSearchEndpointMapper;

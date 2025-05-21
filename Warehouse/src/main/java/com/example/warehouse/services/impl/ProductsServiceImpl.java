@@ -2,7 +2,7 @@ package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.ProductInventory;
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
 import com.example.warehouse.repositories.ProductInventoryRepository;
 import com.example.warehouse.repositories.ProductRepository;
 import com.example.warehouse.repositories.TransactionProductRepository;

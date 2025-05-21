@@ -2,7 +2,7 @@ package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.dto.productDtos.ProductInfoDto;
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionWithProductsDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;

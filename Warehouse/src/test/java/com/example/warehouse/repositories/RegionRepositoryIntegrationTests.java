@@ -2,10 +2,10 @@ package com.example.warehouse.repositories;
 
 import com.example.warehouse.TestDataUtil;
 import com.example.warehouse.domain.Region;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 

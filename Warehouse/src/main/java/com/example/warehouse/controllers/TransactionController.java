@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionSummaryDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
 import com.example.warehouse.mappers.TransactionMapper;
 import com.example.warehouse.mappers.TransactionSummaryMapper;
 import com.example.warehouse.services.TransactionService;

@@ -28,4 +28,11 @@ public class Address {
 
     @OneToOne(mappedBy = "address")
     private Supplier supplier;
+
+
+
+    @Override
+    public String toString() {
+         return getCity().getCountry().getName() + " " + city.getName() + " " + street + " " + streetNumber;
+    }
 }

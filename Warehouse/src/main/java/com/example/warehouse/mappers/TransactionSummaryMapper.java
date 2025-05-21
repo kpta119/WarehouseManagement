@@ -1,7 +1,7 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionSummaryDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

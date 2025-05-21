@@ -2,8 +2,8 @@ package com.example.warehouse;
 
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.AddressDto;
-import com.example.warehouse.domain.dto.ClientDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 
 public class TestDataUtil {
 
@@ -51,13 +51,13 @@ public class TestDataUtil {
         return country;
     }
 
-    public static ClientDto createClientDto1(AddressDto addressDto){
-        ClientDto clientDto = new ClientDto();
-        clientDto.setAddress(addressDto);
-        clientDto.setName("ExampleName");
-        clientDto.setPhoneNumber("660 222 125");
-        clientDto.setEmail("example@gmail.com");
-        return clientDto;
+    public static BusinessEntityDto createClientDto1(AddressDto addressDto){
+        BusinessEntityDto businessEntityDto = new BusinessEntityDto();
+        businessEntityDto.setAddress(addressDto);
+        businessEntityDto.setName("ExampleName");
+        businessEntityDto.setPhoneNumber("660 222 125");
+        businessEntityDto.setEmail("example@gmail.com");
+        return businessEntityDto;
     }
 
     public static AddressDto createAddressDto1(Country country){

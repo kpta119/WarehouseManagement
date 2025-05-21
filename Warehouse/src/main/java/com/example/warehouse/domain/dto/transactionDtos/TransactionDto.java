@@ -1,4 +1,4 @@
-package com.example.warehouse.domain.dto.TransactionDtos;
+package com.example.warehouse.domain.dto.transactionDtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

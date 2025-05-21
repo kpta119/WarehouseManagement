@@ -3,8 +3,8 @@ package com.example.warehouse.controllers;
 import com.example.warehouse.TestDataUtil;
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.AddressDto;
-import com.example.warehouse.domain.dto.ClientDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.repositories.RegionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,9 +40,9 @@ public class ClientControllerTests {
         Country country = TestDataUtil.createCountry1(region);
         countryRepository.save(country);
         AddressDto addressDto = TestDataUtil.createAddressDto1(country);
-        ClientDto clientDto = TestDataUtil.createClientDto1(addressDto);
+        BusinessEntityDto businessEntityDto = TestDataUtil.createClientDto1(addressDto);
 
-        String createClientAsJson = objectMapper.writeValueAsString(clientDto);
+        String createClientAsJson = objectMapper.writeValueAsString(businessEntityDto);
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -1,7 +1,7 @@
 package com.example.warehouse.mappers.products;
 
 import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
 import com.example.warehouse.domain.dto.productDtos.ProductGetSingleProductDto;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package com.example.warehouse.domain.dto.productDtos;
 
-import com.example.warehouse.domain.dto.TransactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
