@@ -1,8 +1,7 @@
 package com.example.warehouse.domain.dto.clientAndSupplierDtos;
 
-import com.example.warehouse.domain.dto.AddressDto;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,18 +9,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BusinessEntityDto {
-    private Integer id;
-
+public class BusinessEntitySummaryDto {
+    private Integer clientId;
     @NotBlank(message = "Name cannot be empty")
     private String name;
-
-    @Email(message = "Invalid email format")
+    @Email(message = "Wrong email format")
     private String email;
-
     private String phoneNumber;
-
-    @Valid
-    private AddressDto address;
+    private String address;
+    private Integer transactionsCount;
 }
+
 

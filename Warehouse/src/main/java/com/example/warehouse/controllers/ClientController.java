@@ -2,18 +2,17 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntitySummaryDto;
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
-import org.springframework.validation.FieldError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -28,6 +27,16 @@ public class ClientController {
     public ClientController(ClientService clientService, BusinessEntityMapper businessEntityMapper) {
         this.clientService = clientService;
         this.businessEntityMapper = businessEntityMapper;
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllClients(){
+        try{
+            List<BusinessEntitySummaryDto> allClients = clientService.getClientsWithTransactionCount();
+            return ResponseEntity.status(HttpStatus.OK).body(allClients);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
     }
 
     @PostMapping()

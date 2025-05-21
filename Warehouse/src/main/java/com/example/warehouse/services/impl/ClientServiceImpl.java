@@ -6,10 +6,16 @@ import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.dto.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
-import com.example.warehouse.repositories.*;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntitySummaryDto;
+import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
+import com.example.warehouse.repositories.AddressRepository;
+import com.example.warehouse.repositories.CityRepository;
+import com.example.warehouse.repositories.ClientRepository;
+import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.services.ClientService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -20,13 +26,15 @@ public class ClientServiceImpl implements ClientService {
     private final CountryRepository countryRepository;
     private final AddressRepository addressRepository;
     private final ClientRepository clientRepository;
+    private final BusinessEntitySummaryMapper businessEntitySummaryMapper;
 
 
-    public ClientServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, ClientRepository clientRepository) {
+    public ClientServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, ClientRepository clientRepository, BusinessEntitySummaryMapper businessEntitySummaryMapper) {
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.addressRepository = addressRepository;
         this.clientRepository = clientRepository;
+        this.businessEntitySummaryMapper = businessEntitySummaryMapper;
     }
 
     @Override
@@ -63,5 +71,13 @@ public class ClientServiceImpl implements ClientService {
 
         return clientRepository.save(client);
 
+    }
+
+
+    public List<BusinessEntitySummaryDto> getClientsWithTransactionCount(){
+        return clientRepository.findAllClientsWithTransactionCounts()
+                .stream()
+                .map(businessEntitySummaryMapper::mapToDto)
+                .toList();
     }
 }
