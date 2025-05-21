@@ -33,7 +33,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].unitPrice").value(999.99)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(70)
+                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(5)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(2)
         );
@@ -54,7 +54,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].unitPrice").value(999.99)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(70)
+                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(5)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(2)
         );
@@ -97,7 +97,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].unitPrice").value(49.99)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(100)
+                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(3)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(1)
         );
@@ -119,7 +119,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].unitPrice").value(19.99)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(350)
+                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(10)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(0)
         );
@@ -140,7 +140,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].unitPrice").value(19.99)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(200)
+                MockMvcResultMatchers.jsonPath("$[0].inventoryCount").value(6)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[0].transactionCount").value(0)
         ).andExpect(
@@ -148,7 +148,7 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[1].unitPrice").value(999.99)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$[1].inventoryCount").value(20)
+                MockMvcResultMatchers.jsonPath("$[1].inventoryCount").value(3)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$[1].transactionCount").value(1)
         );
@@ -168,9 +168,9 @@ public class ProductControllerTests {
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.inventory.length()").value(2)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.inventory['1']").value(50)
+                MockMvcResultMatchers.jsonPath("$.inventory['1']").value(2)
         ).andExpect(
-                MockMvcResultMatchers.jsonPath("$.inventory['2']").value(20)
+                MockMvcResultMatchers.jsonPath("$.inventory['2']").value(3)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.transactions.length()").value(2)
         ).andExpect(
@@ -181,6 +181,38 @@ public class ProductControllerTests {
                 MockMvcResultMatchers.jsonPath("$.transactions[1].transactionId").value(2)
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.transactions[1].quantity").value(5)
+        );
+    }
+
+
+    @Test
+    public void testReturnsProductIdsWithLowStock() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/low-stock")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(2)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(4)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[1]").value(5)
+        );
+    }
+
+    @Test
+    public void restReturnsProductIdsWithLowStockInDefinedWarehouse() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/low-stock")
+                        .param("warehouseId", "2")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0]").value(1)
         );
     }
 

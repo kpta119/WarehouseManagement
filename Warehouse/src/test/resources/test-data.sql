@@ -90,13 +90,13 @@ VALUES ('Laptop', '15-inch laptop', 999.99, 2.5, 1),
 
 
 INSERT INTO ProductInventory (ProductID, WarehouseID, Quantity, Price)
-VALUES (1, 1, 50, 999.99),
-       (2, 2, 200, 19.99),
-       (3, 3, 500, 0.99),
-       (4, 4, 100, 49.99),
-       (5, 5, 300, 14.99),
-       (1, 2, 20, 900.00),
-         (2, 3, 150, 18.99);
+VALUES (1, 1, 2, 999.99),
+       (2, 2, 6, 19.99),
+       (3, 3, 5, 0.99),
+       (4, 4, 3, 49.99),
+       (5, 5, 1, 14.99),
+       (1, 2, 3, 900.00),
+         (2, 3, 4, 18.99);
 
 INSERT INTO Transaction (TransactionType, Date, Description, EmployeeID, FromWarehouseID, ToWarehouseID, ClientID,
                          SupplierID, SourceWarehouseCapacityAfterTransaction, TargetWarehouseCapacityAfterTransaction)

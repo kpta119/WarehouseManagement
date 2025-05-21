@@ -15,4 +15,6 @@ public interface ProductsService {
     Product getProductById(Integer productId);
     Map<Integer, Integer> getInventoryMap(Integer productId);
     List<TransactionDto> getTransactionsDto(Integer productId);
+
+    List<Integer> getLowStockProductIds(Integer warehouseId, int lowStockThreshold);
 }

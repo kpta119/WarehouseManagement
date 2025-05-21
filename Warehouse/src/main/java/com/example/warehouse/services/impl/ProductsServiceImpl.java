@@ -116,4 +116,21 @@ public class ProductsServiceImpl implements ProductsService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Integer> getLowStockProductIds(Integer warehouseId, int lowStockThreshold) {
+        List<ProductInventory> lowStockProducts;
+        List<Object[]> lowStockProductsWithoutWarehouseId;
+        if (warehouseId != null) {
+            lowStockProducts = productInventoryRepository.findLowStockProductsByWarehouseId(warehouseId, lowStockThreshold);
+            return lowStockProducts.stream()
+                    .map(productInventory -> productInventory.getProduct().getId())
+                    .collect(Collectors.toList());
+        } else{
+            lowStockProductsWithoutWarehouseId = productInventoryRepository.findLowStockProducts(lowStockThreshold);
+            return lowStockProductsWithoutWarehouseId.stream()
+                    .map(productInventory -> (Integer) productInventory[0])
+                    .collect(Collectors.toList());
+        }
+    }
+
 }

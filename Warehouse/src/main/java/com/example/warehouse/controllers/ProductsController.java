@@ -65,4 +65,15 @@ public class ProductsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
+
+    @GetMapping("/low-stock")
+    public ResponseEntity<?> getLowStockProducts(@RequestParam(required = false) Integer warehouseId) {
+        try {
+            int lowStockThreshold = 5;
+            List<Integer> lowStockProductIds = productsService.getLowStockProductIds(warehouseId, lowStockThreshold);
+            return ResponseEntity.ok(lowStockProductIds);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
+    }
 }
