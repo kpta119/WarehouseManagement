@@ -4,8 +4,7 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
-import com.example.warehouse.mappers.products.ProductGetSingleProductMapper;
-import com.example.warehouse.mappers.products.ProductSearchEndpointMapper;
+import com.example.warehouse.mappers.ProductMapper;
 import com.example.warehouse.services.ProductsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +19,12 @@ import java.util.NoSuchElementException;
 public class ProductsController {
 
     private final ProductsService productsService;
-    private final ProductSearchEndpointMapper productSearchEndpointMapper;
-    private final ProductGetSingleProductMapper productGetSingleProductMapper;
+    private final ProductMapper productMapper;
 
 
-    public ProductsController(ProductsService productsService, ProductSearchEndpointMapper productSearchEndpointMapper, ProductGetSingleProductMapper productGetSingleProductMapper) {
+    public ProductsController(ProductsService productsService, ProductMapper productMapper) {
         this.productsService = productsService;
-        this.productSearchEndpointMapper = productSearchEndpointMapper;
-        this.productGetSingleProductMapper = productGetSingleProductMapper;
+        this.productMapper = productMapper;
     }
 
     @GetMapping("/search")
@@ -43,7 +40,7 @@ public class ProductsController {
         try {
             List<Product> products = productsService.getAllProducts(name, categoryId, minPrice, maxPrice, minSize, maxSize, warehouseId);
             List<ProductSearchEndpointDto> dtos = products.stream()
-                    .map(p -> productSearchEndpointMapper.mapToDto(p,
+                    .map(p -> productMapper.mapToDto(p,
                             productsService.getInventoryCount(p.getId(), warehouseId),
                             productsService.getTransactionCount(p.getId(), warehouseId)))
                     .toList();
@@ -59,7 +56,7 @@ public class ProductsController {
             Product product = productsService.getProductById(productId);
             Map<Integer, Integer> inventory = productsService.getInventoryMap(productId);
             List<TransactionDto> transactions = productsService.getTransactionsDto(productId);
-            return ResponseEntity.ok(productGetSingleProductMapper.mapToDto(product, inventory, transactions));
+            return ResponseEntity.ok(productMapper.mapToDto(product, inventory, transactions));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -91,4 +88,24 @@ public class ProductsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
+
+//    @PostMapping()
+//    public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, BindingResult result) {
+//        if (result.hasErrors()) {
+//            Map<String, String> errors = result.getFieldErrors().stream()
+//                    .collect(Collectors.toMap(
+//                            FieldError::getField,
+//                            error -> Objects.toString(error.getDefaultMessage(), "Invalid value")
+//                    ));
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+//        }
+//        try {
+//            Product savedProduct = productsService.createProduct(product);
+//            return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+//        } catch (NoSuchElementException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+//        }
+//    }
 }
