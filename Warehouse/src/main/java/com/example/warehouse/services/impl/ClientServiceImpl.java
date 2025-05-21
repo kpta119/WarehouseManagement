@@ -7,7 +7,9 @@ import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.dto.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntitySummaryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityWithHistoryDto;
 import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
+import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
 import com.example.warehouse.repositories.AddressRepository;
 import com.example.warehouse.repositories.CityRepository;
 import com.example.warehouse.repositories.ClientRepository;
@@ -27,14 +29,15 @@ public class ClientServiceImpl implements ClientService {
     private final AddressRepository addressRepository;
     private final ClientRepository clientRepository;
     private final BusinessEntitySummaryMapper businessEntitySummaryMapper;
+    private final BusinesEntityWithHistoryMapper businessEntityWithHistoryMapper;
 
-
-    public ClientServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, ClientRepository clientRepository, BusinessEntitySummaryMapper businessEntitySummaryMapper) {
+    public ClientServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, ClientRepository clientRepository, BusinessEntitySummaryMapper businessEntitySummaryMapper, BusinesEntityWithHistoryMapper businessEntityWithHistoryMapper) {
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.addressRepository = addressRepository;
         this.clientRepository = clientRepository;
         this.businessEntitySummaryMapper = businessEntitySummaryMapper;
+        this.businessEntityWithHistoryMapper = businessEntityWithHistoryMapper;
     }
 
     @Override
@@ -73,11 +76,18 @@ public class ClientServiceImpl implements ClientService {
 
     }
 
-
+    @Override
     public List<BusinessEntitySummaryDto> getClientsWithTransactionCount(){
         return clientRepository.findAllClientsWithTransactionCounts()
                 .stream()
-                .map(businessEntitySummaryMapper::mapToDto)
+                .map(businessEntitySummaryMapper::mapToClientDto)
                 .toList();
+    }
+
+    @Override
+    public BusinessEntityWithHistoryDto getClientWithHistory(Integer clientId) {
+        Client client = clientRepository.findClientWithHistoryById(clientId)
+                .orElseThrow(() -> new NoSuchElementException("Client not found"));
+        return businessEntityWithHistoryMapper.mapToDto(client);
     }
 }

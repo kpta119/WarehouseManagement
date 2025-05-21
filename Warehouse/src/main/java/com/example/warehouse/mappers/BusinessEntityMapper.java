@@ -1,12 +1,19 @@
 package com.example.warehouse.mappers;
 
-import com.example.warehouse.domain.*;
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.Address;
+import com.example.warehouse.domain.Client;
+import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BusinessEntityMapper {
+
+    private final AddressMapper addressMapper;
+
+    public BusinessEntityMapper(AddressMapper addressMapper) {
+        this.addressMapper = addressMapper;
+    }
 
     public BusinessEntityDto mapToDto(Client client) {
         BusinessEntityDto dto = new BusinessEntityDto();
@@ -17,26 +24,7 @@ public class BusinessEntityMapper {
         dto.setPhoneNumber(client.getPhoneNumber());
 
         Address address = client.getAddress();
-        if (address != null) {
-            AddressDto addressDto = new AddressDto();
-            addressDto.setStreet(address.getStreet());
-            addressDto.setStreetNumber(address.getStreetNumber());
-
-            City city = address.getCity();
-            if (city != null) {
-                addressDto.setCity(city.getName());
-                addressDto.setPostalCode(city.getPostalCode());
-
-                if (city.getCountry() != null) {
-                    addressDto.setCountryId(city.getCountry().getId());
-                }
-
-                if (city.getCountry().getRegion() != null) {
-                    addressDto.setRegionId(city.getCountry().getRegion().getId());
-                }
-            }
-            dto.setAddress(addressDto);
-        }
+        dto.setAddress(addressMapper.mapToDto(address));
         return dto;
     }
 
@@ -49,27 +37,7 @@ public class BusinessEntityMapper {
         dto.setPhoneNumber(supplier.getPhoneNumber());
 
         Address address = supplier.getAddress();
-        if (address != null) {
-            AddressDto addressDto = new AddressDto();
-            addressDto.setStreet(address.getStreet());
-            addressDto.setStreetNumber(address.getStreetNumber());
-
-            City city = address.getCity();
-            if (city != null) {
-                addressDto.setCity(city.getName());
-                addressDto.setPostalCode(city.getPostalCode());
-
-                if (city.getCountry() != null) {
-                    addressDto.setCountryId(city.getCountry().getId());
-                }
-
-                if (city.getCountry().getRegion() != null) {
-                    addressDto.setRegionId(city.getCountry().getRegion().getId());
-                }
-            }
-
-            dto.setAddress(addressDto);
-        }
+        dto.setAddress(addressMapper.mapToDto(address));
         return dto;
     }
 }

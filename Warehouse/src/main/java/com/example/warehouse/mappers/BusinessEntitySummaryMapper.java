@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BusinessEntitySummaryMapper {
-    public BusinessEntitySummaryDto mapToDto(Object[] queryResult) {
+    public BusinessEntitySummaryDto mapToClientDto(Object[] queryResult) {
         Client client = (Client) queryResult[0];
         Long transactionFromDb = (Long) queryResult[1];
         Integer transactionCount = transactionFromDb.intValue();
