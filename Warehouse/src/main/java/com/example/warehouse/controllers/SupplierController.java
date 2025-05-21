@@ -2,6 +2,7 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.SupplierService;
 import jakarta.validation.Valid;
@@ -9,11 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -21,12 +20,22 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/suppliers")
 public class SupplierController {
-    private BusinessEntityMapper businessEntityMapper;
-    private SupplierService supplierService;
+    private final BusinessEntityMapper businessEntityMapper;
+    private final SupplierService supplierService;
 
     public SupplierController(BusinessEntityMapper businessEntityMapper, SupplierService supplierService) {
         this.businessEntityMapper = businessEntityMapper;
         this.supplierService = supplierService;
+    }
+
+    @GetMapping()
+    public ResponseEntity<?> getAllSuppliers(){
+        try{
+            List<SupplierSummaryDto> allSuppliers = supplierService.getSuppliersWithTransactionCount();
+            return ResponseEntity.status(HttpStatus.OK).body(allSuppliers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
     }
 
     @PostMapping()
