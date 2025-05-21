@@ -1,6 +1,6 @@
 package com.example.warehouse.domain.dto.clientAndSupplierDtos;
 
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BusinessEntityWithHistoryDto {
+public class ClientWithHistoryDto {
     private Integer clientId;
     @NotBlank(message = "Name cannot be empty")
     private String name;

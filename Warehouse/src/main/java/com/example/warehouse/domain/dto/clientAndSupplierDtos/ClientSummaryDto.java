@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BusinessEntitySummaryDto {
+public class ClientSummaryDto {
     private Integer clientId;
     @NotBlank(message = "Name cannot be empty")
     private String name;

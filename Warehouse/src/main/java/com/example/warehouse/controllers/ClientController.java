@@ -2,8 +2,8 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntitySummaryDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityWithHistoryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class ClientController {
     @GetMapping()
     public ResponseEntity<?> getAllClients(){
         try{
-            List<BusinessEntitySummaryDto> allClients = clientService.getClientsWithTransactionCount();
+            List<ClientSummaryDto> allClients = clientService.getClientsWithTransactionCount();
             return ResponseEntity.status(HttpStatus.OK).body(allClients);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
@@ -43,8 +43,8 @@ public class ClientController {
     @GetMapping("/{clientId}")
     public ResponseEntity<?> getClientWithHistory(@PathVariable("clientId") Integer clientId){
         try{
-            BusinessEntityWithHistoryDto businessEntityWithHistoryDto = clientService.getClientWithHistory(clientId);
-            return ResponseEntity.status(HttpStatus.OK).body(businessEntityWithHistoryDto);
+            ClientWithHistoryDto clientWithHistoryDto = clientService.getClientWithHistory(clientId);
+            return ResponseEntity.status(HttpStatus.OK).body(clientWithHistoryDto);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {

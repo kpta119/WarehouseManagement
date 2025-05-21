@@ -4,10 +4,10 @@ import com.example.warehouse.domain.Address;
 import com.example.warehouse.domain.City;
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.Country;
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntitySummaryDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityWithHistoryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
 import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
 import com.example.warehouse.repositories.AddressRepository;
@@ -77,7 +77,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<BusinessEntitySummaryDto> getClientsWithTransactionCount(){
+    public List<ClientSummaryDto> getClientsWithTransactionCount(){
         return clientRepository.findAllClientsWithTransactionCounts()
                 .stream()
                 .map(businessEntitySummaryMapper::mapToClientDto)
@@ -85,7 +85,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public BusinessEntityWithHistoryDto getClientWithHistory(Integer clientId) {
+    public ClientWithHistoryDto getClientWithHistory(Integer clientId) {
         Client client = clientRepository.findClientWithHistoryById(clientId)
                 .orElseThrow(() -> new NoSuchElementException("Client not found"));
         return businessEntityWithHistoryMapper.mapToDto(client);

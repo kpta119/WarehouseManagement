@@ -1,7 +1,7 @@
 package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.*;
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.repositories.*;
 import com.example.warehouse.services.SupplierService;

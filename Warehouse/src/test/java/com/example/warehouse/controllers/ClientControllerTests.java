@@ -3,7 +3,7 @@ package com.example.warehouse.controllers;
 import com.example.warehouse.TestDataUtil;
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.repositories.RegionRepository;

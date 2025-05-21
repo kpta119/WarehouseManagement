@@ -1,6 +1,6 @@
 package com.example.warehouse.domain.dto.clientAndSupplierDtos;
 
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

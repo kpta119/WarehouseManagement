@@ -1,4 +1,4 @@
-package com.example.warehouse.domain.dto;
+package com.example.warehouse.domain.dto.addressDtos;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

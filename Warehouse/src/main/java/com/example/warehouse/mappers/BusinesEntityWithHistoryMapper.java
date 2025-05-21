@@ -1,7 +1,7 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Client;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityWithHistoryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
 import org.springframework.stereotype.Component;
 
@@ -19,8 +19,8 @@ public class BusinesEntityWithHistoryMapper {
         this.addressMapper = addressMapper;
     }
 
-    public BusinessEntityWithHistoryDto mapToDto(Client client) {
-        BusinessEntityWithHistoryDto dto = new BusinessEntityWithHistoryDto();
+    public ClientWithHistoryDto mapToDto(Client client) {
+        ClientWithHistoryDto dto = new ClientWithHistoryDto();
         dto.setClientId(client.getId());
         dto.setAddress(addressMapper.mapToDto(client.getAddress()));
         dto.setEmail(client.getEmail());

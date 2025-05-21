@@ -2,7 +2,7 @@ package com.example.warehouse;
 
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 
 public class TestDataUtil {
