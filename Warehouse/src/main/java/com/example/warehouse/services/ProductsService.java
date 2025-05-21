@@ -2,7 +2,9 @@ package com.example.warehouse.services;
 
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
+import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
@@ -24,4 +26,6 @@ public interface ProductsService {
     List<Integer> getLowStockProductIds(Integer warehouseId, int lowStockThreshold);
 
     List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod, int topN);
+
+    Product createProduct(@Valid ProductDataBaseDto product);
 }

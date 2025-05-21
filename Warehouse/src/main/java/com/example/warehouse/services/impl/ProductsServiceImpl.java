@@ -1,9 +1,12 @@
 package com.example.warehouse.services.impl;
 
+import com.example.warehouse.domain.Category;
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.ProductInventory;
 import com.example.warehouse.domain.dto.dateDtos.Period;
+import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.repositories.CategoryRepository;
 import com.example.warehouse.repositories.ProductInventoryRepository;
 import com.example.warehouse.repositories.ProductRepository;
 import com.example.warehouse.repositories.TransactionProductRepository;
@@ -29,12 +32,14 @@ public class ProductsServiceImpl implements ProductsService {
     private final ProductRepository productRepository;
     private final ProductInventoryRepository productInventoryRepository;
     private final TransactionProductRepository transactionProductRepository;
+    private final CategoryRepository categoryRepository;
     private final Clock clock;
 
-    public ProductsServiceImpl(ProductRepository productRepository, ProductInventoryRepository productInventoryRepository, TransactionProductRepository transactionProductRepository, Clock clock) {
+    public ProductsServiceImpl(ProductRepository productRepository, ProductInventoryRepository productInventoryRepository, TransactionProductRepository transactionProductRepository, CategoryRepository categoryRepository, Clock clock) {
         this.productRepository = productRepository;
         this.productInventoryRepository = productInventoryRepository;
         this.transactionProductRepository = transactionProductRepository;
+        this.categoryRepository = categoryRepository;
         this.clock = clock;
     }
 
@@ -141,6 +146,21 @@ public class ProductsServiceImpl implements ProductsService {
         PageRequest pageRequest = PageRequest.of(0, topN);
         return (warehouseId != null) ? transactionProductRepository.findTopNBestSellingProductsByWarehouseId(warehouseId, fromDate, pageRequest)
                 : transactionProductRepository.findTopNBestSellingProducts(fromDate, pageRequest);
+    }
+
+    @Override
+    public Product createProduct(ProductDataBaseDto productDto) {
+        Product product = new Product();
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new NoSuchElementException("Category not found with ID: " + productDto.getCategoryId()));
+
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
+        product.setUnitPrice(productDto.getUnitPrice());
+        product.setUnitSize(productDto.getUnitSize());
+        product.setCategory(category);
+
+        return productRepository.save(product);
     }
 
 }

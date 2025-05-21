@@ -336,6 +336,76 @@ public class ProductControllerTests {
         );
     }
 
+    @Test
+    public void testCreateProduct() throws Exception {
+        String newProductJson = "{\"name\": \"New Product\", \"description\": \"Description for New Product\", \"unitPrice\": 100.0, \"unitSize\": 1.0, \"categoryId\": 1}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newProductJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isCreated()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("New Product")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitPrice").value(100.0)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitSize").value(1.0)
+        );
+
+        // Verify that the product was created in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/search")
+                        .param("name", "New Product")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.length()").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].name").value("New Product")
+        );
+    }
+
+    @Test
+    public void testCreateProductWithValidationErrors() throws Exception {
+        String invalidProductJson = "{\"name\": \"\", \"description\": \"\", \"unitPrice\": -1.5, \"unitSize\": 0}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidProductJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isBadRequest()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("Name cannot be empty")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitPrice").value("Unit price must be positive")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitSize").value("Unit size must be positive")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.description").value("Description cannot be empty")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.categoryId").value("Category ID cannot be null")
+        );
+    }
+
+    @Test
+    public void testCreateProductCategoryNotFound() throws Exception {
+        String invalidProductJson = "{\"name\": \"New Product\", \"description\": \"Description for New Product\", \"unitPrice\": 100.0, \"unitSize\": 1.0, \"categoryId\": 999}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidProductJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$").value("Resource not found: Category not found with ID: 999")
+        );
+    }
+
     @TestConfiguration
     static class TestConfig {
 

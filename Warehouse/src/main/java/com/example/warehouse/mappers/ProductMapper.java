@@ -2,6 +2,7 @@ package com.example.warehouse.mappers;
 
 
 import com.example.warehouse.domain.Product;
+import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductGetSingleProductDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
@@ -42,6 +43,20 @@ public class ProductMapper {
         }
         dto.setInventory(inventory);
         dto.setTransactions(transactions);
+        return dto;
+    }
+
+    public ProductDataBaseDto mapToDto(Product product) {
+        ProductDataBaseDto dto = new ProductDataBaseDto();
+
+        dto.setProductId(product.getId());
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setUnitPrice(product.getUnitPrice());
+        dto.setUnitSize(product.getUnitSize());
+        if (product.getCategory() != null) {
+            dto.setCategoryId(product.getCategory().getId());
+        }
         return dto;
     }
 }
