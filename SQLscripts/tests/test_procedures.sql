@@ -7,7 +7,7 @@ CALL add_transaction(
     1,      -- cel
     NULL,   -- klient
     1,      -- supplier
-    '[{"ProductID": 2, "Quantity": 10}, {"ProductID": 2, "Quantity": 5}]'
+    '[{"ProductID": 2, "Quantity": 10}, {"ProductID": 3, "Quantity": 5}]'
 );
 
 CALL add_transaction(
@@ -74,4 +74,22 @@ CALL sell_to_client(
     2,      -- źródło
     1,      -- klient
     '[{"ProductID": 2, "Quantity": 1}]'
+);
+
+CALL exchange_between_warehouses(
+    '2025-05-17',
+    'Wymiana między magazynami',
+    8,      -- pracownik
+    1,      -- źródło
+    2,      -- cel
+    '[{"ProductID": 3, "Quantity": 15}]'
+);
+
+CALL receive_delivery(
+    '2025-05-17',
+    'Nowa dostawa produktu 3',
+    5,      -- pracownik
+    1,      -- supplier
+    1,      -- cel
+    '[{"ProductID": 3, "Quantity": 5}]'
 );
