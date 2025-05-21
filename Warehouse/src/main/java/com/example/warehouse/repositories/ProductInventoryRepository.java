@@ -19,16 +19,16 @@ public interface ProductInventoryRepository extends CrudRepository<ProductInvent
 
     List<ProductInventory> findByProductId(Integer productId);
 
-    @Query("SELECT pi FROM ProductInventory pi WHERE pi.quantity < :lowStockThreshold AND pi.warehouse.id = :warehouseId")
-    List<ProductInventory> findLowStockProductsByWarehouseId(@Param("warehouseId") Integer warehouseId, @Param("lowStockThreshold") int lowStockThreshold);
+    @Query("SELECT pi.product.id FROM ProductInventory pi WHERE pi.quantity < :lowStockThreshold AND pi.warehouse.id = :warehouseId")
+    List<Integer> findLowStockProductsByWarehouseId(@Param("warehouseId") Integer warehouseId, @Param("lowStockThreshold") int lowStockThreshold);
 
     @Query("""
             
-                    SELECT pi.product.id, SUM(pi.quantity)
+                    SELECT pi.product.id
                     FROM ProductInventory pi
                     GROUP BY pi.product.id
                     HAVING SUM(pi.quantity) < :lowStockThreshold
             
             """)
-    List<Object[]> findLowStockProducts(@Param("lowStockThreshold") int lowStockThreshold);
+    List<Integer> findLowStockProducts(@Param("lowStockThreshold") int lowStockThreshold);
 }

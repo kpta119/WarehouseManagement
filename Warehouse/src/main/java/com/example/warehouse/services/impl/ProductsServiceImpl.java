@@ -118,19 +118,13 @@ public class ProductsServiceImpl implements ProductsService {
 
     @Override
     public List<Integer> getLowStockProductIds(Integer warehouseId, int lowStockThreshold) {
-        List<ProductInventory> lowStockProducts;
-        List<Object[]> lowStockProductsWithoutWarehouseId;
-        if (warehouseId != null) {
-            lowStockProducts = productInventoryRepository.findLowStockProductsByWarehouseId(warehouseId, lowStockThreshold);
-            return lowStockProducts.stream()
-                    .map(productInventory -> productInventory.getProduct().getId())
-                    .collect(Collectors.toList());
-        } else{
-            lowStockProductsWithoutWarehouseId = productInventoryRepository.findLowStockProducts(lowStockThreshold);
-            return lowStockProductsWithoutWarehouseId.stream()
-                    .map(productInventory -> (Integer) productInventory[0])
-                    .collect(Collectors.toList());
-        }
+        return (warehouseId != null) ? productInventoryRepository.findLowStockProductsByWarehouseId(warehouseId, lowStockThreshold)
+                : productInventoryRepository.findLowStockProducts(lowStockThreshold);
     }
+
+//    @Override
+//    public List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod, int topN) {
+//
+//    }
 
 }
