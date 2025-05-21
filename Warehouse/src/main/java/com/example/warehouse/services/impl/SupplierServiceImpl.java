@@ -4,6 +4,7 @@ import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
 import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
 import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.repositories.*;
@@ -56,13 +57,13 @@ public class SupplierServiceImpl implements SupplierService {
         address.setCity(city);
         address.setStreet(addressDto.getStreet());
         address.setStreetNumber(addressDto.getStreetNumber());
-        address = addressRepository.save(address);
+        Address addressSaved = addressRepository.save(address);
 
         Supplier supplier = new Supplier();
         supplier.setName(request.getName());
         supplier.setEmail(request.getEmail());
         supplier.setPhoneNumber(request.getPhoneNumber());
-        supplier.setAddress(address);
+        supplier.setAddress(addressSaved);
 
         return supplierRepository.save(supplier);
     }
@@ -73,5 +74,13 @@ public class SupplierServiceImpl implements SupplierService {
                 .stream()
                 .map(businessEntitySummaryMapper::mapToSupplierDto)
                 .toList();
+    }
+
+    @Override
+    public SupplierWithHistoryDto getSupplierWithHistory(Integer supplierId) {
+        Supplier supplier = supplierRepository.findSupplierWithHistoryById(supplierId)
+                .orElseThrow(() -> new NoSuchElementException("Supplier not found"));
+        return businessEntityWithHistoryMapper.mapToDto(supplier);
+
     }
 }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,7 +24,14 @@ public class Employee {
     private String email;
     private String phoneNumber;
 
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "AddressID")
+    private Address address;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "WarehouseID")
     private Warehouse warehouse;
+
+    @OneToMany(mappedBy = "employee")
+    private List<Transaction> transactions;
 }

@@ -12,6 +12,7 @@ public class BusinessEntitySummaryMapper {
         Client client = (Client) queryResult[0];
         Long transactionFromDb = (Long) queryResult[1];
         Integer transactionCount = transactionFromDb.intValue();
+
         ClientSummaryDto dto = new ClientSummaryDto();
         dto.setClientId(client.getId());
         dto.setName(client.getName());
@@ -26,6 +27,7 @@ public class BusinessEntitySummaryMapper {
         Supplier supplier = (Supplier) queryResult[0];
         Long transactionFromDb = (Long) queryResult[1];
         Integer transactionCount = transactionFromDb.intValue();
+
         SupplierSummaryDto dto = new SupplierSummaryDto();
         dto.setSupplierId(supplier.getId());
         dto.setName(supplier.getName());
