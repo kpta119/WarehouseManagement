@@ -30,4 +30,6 @@ public interface ProductsService {
     Product createProduct(@Valid ProductDataBaseDto product);
 
     Product updateProduct(Integer productId, ProductDataBaseDto product);
+
+    Product deleteProduct(Integer productId);
 }

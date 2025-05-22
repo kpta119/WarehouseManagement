@@ -464,6 +464,71 @@ public class ProductControllerTests {
         );
     }
 
+    @Test
+    public void testUpdateProductNotFound() throws Exception {
+        String updatedProductJson = "{\"description\": \"Updated Description\", \"unitPrice\": 99.99, \"unitSize\": 1.5, \"categoryId\": 2}";
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/products/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedProductJson)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$").value("Resource not found: Product not found with ID: 999")
+        );
+    }
+
+    @Test
+    public void testDeleteProductCannotDeleteBecauseProductIsInHistory() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/products/5")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().is(409)
+        );
+
+        // Verify that the product was not deleted
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/5")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.name").value("Novel")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.productId").value(5)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitPrice").value(14.99)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.unitSize").value(1)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$.categoryName").value("Books")
+        );
+    }
+
+    @Test
+    public void testDeleteProduct() throws Exception {
+        this.testCreateProduct();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/products/7")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNoContent()
+        );
+
+        // Verify that the product was deleted
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/7")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isNotFound()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$").value("Resource not found: Product not found with ID: 7")
+        );
+    }
+
     @TestConfiguration
     static class TestConfig {
 

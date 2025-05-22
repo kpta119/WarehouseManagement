@@ -189,4 +189,12 @@ public class ProductsServiceImpl implements ProductsService {
         return productRepository.save(existingProduct);
     }
 
+    @Override
+    public Product deleteProduct(Integer productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NoSuchElementException("Product not found with ID: " + productId));
+        productRepository.deleteById(productId);
+        return product;
+    }
+
 }
