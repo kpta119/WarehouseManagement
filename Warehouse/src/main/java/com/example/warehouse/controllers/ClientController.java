@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/clients")
 public class ClientController {
 
-    private BusinessEntityMapper businessEntityMapper;
-    private ClientService clientService;
+    private final BusinessEntityMapper businessEntityMapper;
+    private final ClientService clientService;
 
     public ClientController(ClientService clientService, BusinessEntityMapper businessEntityMapper) {
         this.clientService = clientService;
@@ -58,7 +58,7 @@ public class ClientController {
             Map<String, String> errors = result.getFieldErrors().stream()
                     .collect(Collectors.toMap(
                             FieldError::getField,
-                            FieldError::getDefaultMessage
+                            e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : "Invalid value"
                     ));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }

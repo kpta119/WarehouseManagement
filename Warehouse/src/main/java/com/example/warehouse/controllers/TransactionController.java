@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/transactions")
 public class TransactionController {
-    private TransactionService transactionService;
-    private TransactionMapper transactionMapper;
-    private TransactionSummaryMapper transactionSummaryMapper;
+    private final TransactionService transactionService;
+    private final TransactionMapper transactionMapper;
+    private final TransactionSummaryMapper transactionSummaryMapper;
 
     public TransactionController(TransactionMapper transactionMapper, TransactionService transactionService, TransactionSummaryMapper transactionSummaryMapper) {
         this.transactionMapper = transactionMapper;
@@ -52,7 +52,7 @@ public class TransactionController {
             List<TransactionSummaryDto> dtos = transactions.stream()
                     .map(transactionSummaryMapper::mapToDto)
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(dtos);
+            return ResponseEntity.status(HttpStatus.OK).body(dtos);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e){

@@ -60,7 +60,7 @@ public class EmployeeController {
             Map<String, String> errors = result.getFieldErrors().stream()
                     .collect(Collectors.toMap(
                             FieldError::getField,
-                            FieldError::getDefaultMessage
+                            e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : "Invalid value"
                     ));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
