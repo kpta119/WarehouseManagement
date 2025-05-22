@@ -45,4 +45,13 @@ public class CategoryServiceImpl implements CategoryService {
 
         return categoryRepository.save(category);
     }
+
+    @Override
+    public Category deleteCategory(Integer categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + categoryId));
+
+        categoryRepository.delete(category);
+        return category;
+    }
 }

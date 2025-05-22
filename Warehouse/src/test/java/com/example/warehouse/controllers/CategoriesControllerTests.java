@@ -194,4 +194,70 @@ public class CategoriesControllerTests {
                 jsonPath("$[0].categoryId").value(1)
         );
     }
+
+    @Test
+    public void testDeleteCategoryNotFound() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/categories/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Resource not found: Category not found with id: 999")
+        );
+    }
+
+    @Test
+    public void testDeleteCategoryConflict() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isConflict()
+        );
+
+        // Check if the category was not deleted in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.length()").value(5)
+        ).andExpect(
+                jsonPath("$[0].name").value("Electronics")
+        ).andExpect(
+                jsonPath("$[0].description").value("Gadgets and devices")
+        ).andExpect(
+                jsonPath("$[0].categoryId").value(1)
+        );
+    }
+
+    @Test
+    public void testDeleteCategory() throws Exception {
+        this.testCreateCategory();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/categories/6")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNoContent()
+        ).andExpect(
+                jsonPath("$.name").value("New Category")
+        ).andExpect(
+                jsonPath("$.description").value("Description of new category")
+        ).andExpect(
+                jsonPath("$.categoryId").value(6)
+        );
+
+        // Check if the category was actually deleted in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.length()").value(5)
+        );
+    }
 }

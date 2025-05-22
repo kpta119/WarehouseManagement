@@ -5,6 +5,7 @@ import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
 import com.example.warehouse.mappers.CategoryMapper;
 import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -39,7 +40,7 @@ public class CategoriesController {
                     .toList();
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
 
@@ -58,7 +59,7 @@ public class CategoriesController {
             Category savedCategory = categoryService.createCategory(categoryDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(categoryMapper.mapToDto(savedCategory));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
 
@@ -70,7 +71,22 @@ public class CategoriesController {
         } catch(NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<?> deleteCategory(@PathVariable Integer categoryId) {
+        try {
+            Category category = categoryService.deleteCategory(categoryId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(categoryMapper.mapToDto(category));
+        } catch(NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot delete delete category because some products use it: " + e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
 }
