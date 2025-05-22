@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,18 @@ public class CategoriesController {
         try {
             Category savedCategory = categoryService.createCategory(categoryDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(categoryMapper.mapToDto(savedCategory));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<?> updateCategory(@PathVariable Integer categoryId, @RequestBody CategoryDto categoryDto) {
+        try {
+            Category updatedCategory = categoryService.updateCategory(categoryId, categoryDto);
+            return ResponseEntity.ok(categoryMapper.mapToDto(updatedCategory));
+        } catch(NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Server error: " + e.getMessage());
         }

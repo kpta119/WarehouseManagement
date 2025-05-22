@@ -98,4 +98,100 @@ public class CategoriesControllerTests {
                 jsonPath("$.description").value("Description cannot be blank")
         );
     }
+
+    @Test
+    public void testUpdateCategory() throws Exception {
+        String updatedCategoryJson = """
+                {
+                    "name": "Updated Category",
+                    "description": "Updated description"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedCategoryJson)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.name").value("Updated Category")
+        ).andExpect(
+                jsonPath("$.description").value("Updated description")
+        ).andExpect(
+                jsonPath("$.categoryId").value(1)
+        );
+
+        // Check if the category was actually updated in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$[0].name").value("Updated Category")
+        ).andExpect(
+                jsonPath("$[0].description").value("Updated description")
+        ).andExpect(
+                jsonPath("$[0].categoryId").value(1)
+        );
+    }
+
+    @Test
+    public void testUpdateCategoryNotFound() throws Exception {
+        String updatedCategoryJson = """
+                {
+                    "name": "Updated Category",
+                    "description": "Updated description"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/categories/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updatedCategoryJson)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Resource not found: Category not found with id: 999")
+        );
+    }
+
+    @Test
+    public void testUpdateCategoryWithOnlyOneData() throws Exception {
+        String invalidCategoryJson = """
+                {
+                    "name": "New name"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidCategoryJson)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.name").value("New name")
+        ).andExpect(
+                jsonPath("$.description").value("Gadgets and devices")
+        ).andExpect(
+                jsonPath("$.categoryId").value(1)
+        );
+
+        // Check if the category was actually updated in the database
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$[0].name").value("New name")
+        ).andExpect(
+                jsonPath("$[0].description").value("Gadgets and devices")
+        ).andExpect(
+                jsonPath("$[0].categoryId").value(1)
+        );
+    }
 }
