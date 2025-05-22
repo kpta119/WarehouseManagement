@@ -340,7 +340,15 @@ public class ProductControllerTests {
 
     @Test
     public void testCreateProduct() throws Exception {
-        String newProductJson = "{\"name\": \"New Product\", \"description\": \"Description for New Product\", \"unitPrice\": 100.0, \"unitSize\": 1.0, \"categoryId\": 1}";
+        String newProductJson = """
+                {
+                    "name": "New Product",
+                    "description": "Description for New Product",
+                    "unitPrice": 100.0,
+                    "unitSize": 1.0,
+                    "categoryId": 1
+                }
+                """;
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/products")
@@ -372,7 +380,14 @@ public class ProductControllerTests {
 
     @Test
     public void testCreateProductWithValidationErrors() throws Exception {
-        String invalidProductJson = "{\"name\":  \"\", \"description\":  \"\", \"unitPrice\": -1.5, \"unitSize\": 0}";
+        String invalidProductJson = """
+                {
+                    "name": "",
+                    "description": "",
+                    "unitPrice": -1.5,
+                    "unitSize": 0
+                }
+                """;
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/products")
@@ -395,7 +410,15 @@ public class ProductControllerTests {
 
     @Test
     public void testCreateProductCategoryNotFound() throws Exception {
-        String invalidProductJson = "{\"name\": \"New Product\", \"description\": \"Description for New Product\", \"unitPrice\": 100.0, \"unitSize\": 1.0, \"categoryId\": 999}";
+        String invalidProductJson = """
+                {
+                    "name": "New Product",
+                    "description": "Description for New Product",
+                    "unitPrice": 100.0,
+                    "unitSize": 1.0,
+                    "categoryId": 999
+                }
+                """;
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/products")
@@ -410,7 +433,14 @@ public class ProductControllerTests {
 
     @Test
     public void testUpdateProduct() throws Exception {
-        String updatedProductJson = "{\"description\": \"Ola Boga\", \"unitPrice\": 99.4, \"unitSize\": 2.0, \"categoryId\": 4}";
+        String updatedProductJson = """
+                {
+                    "description": "Ola Boga",
+                    "unitPrice": 99.4,
+                    "unitSize": 2.0,
+                    "categoryId": 4
+                }
+                """;
 
         mockMvc.perform(
                 MockMvcRequestBuilders.put("/api/products/1")
@@ -451,7 +481,14 @@ public class ProductControllerTests {
 
     @Test
     public void testUpdateProductValidationErrors() throws Exception {
-        String invalidProductJson = "{\"name\": \"LaptopNr2\", \"description\": \"LaptopsDesc\", \"unitPrice\": -1.5, \"unitSize\": 0}";
+        String invalidProductJson = """
+                {
+                    "name": "LaptopNr2",
+                    "description": "LaptopsDesc",
+                    "unitPrice": -1.5,
+                    "unitSize": 0
+                }
+                """;
 
         mockMvc.perform(
                 MockMvcRequestBuilders.put("/api/products/1")
@@ -468,7 +505,14 @@ public class ProductControllerTests {
 
     @Test
     public void testUpdateProductNotFound() throws Exception {
-        String updatedProductJson = "{\"description\": \"Updated Description\", \"unitPrice\": 99.99, \"unitSize\": 1.5, \"categoryId\": 2}";
+        String updatedProductJson = """
+                {
+                    "description": "Updated Description",
+                    "unitPrice": 99.99,
+                    "unitSize": 1.5,
+                    "categoryId": 2
+                }
+                """;
 
         mockMvc.perform(
                 MockMvcRequestBuilders.put("/api/products/999")

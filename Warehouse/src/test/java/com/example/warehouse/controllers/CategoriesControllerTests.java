@@ -37,4 +37,65 @@ public class CategoriesControllerTests {
                 jsonPath("$[0].categoryId").value(1)
         );
     }
+
+    @Test
+    public void testCreateCategory() throws Exception {
+        String newCategoryJson = """
+                {
+                    "name": "New Category",
+                    "description": "Description of new category"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newCategoryJson)
+        ).andExpect(
+                status().isCreated()
+        ).andExpect(
+                jsonPath("$.name").value("New Category")
+        ).andExpect(
+                jsonPath("$.description").value("Description of new category")
+        ).andExpect(
+                jsonPath("$.categoryId").value(6)
+        );
+
+        // Check if the category was actually created in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.length()").value(6)
+        ).andExpect(
+                jsonPath("$[5].name").value("New Category")
+        ).andExpect(
+                jsonPath("$[5].description").value("Description of new category")
+        ).andExpect(
+                jsonPath("$[5].categoryId").value(6)
+        );
+    }
+
+    @Test
+    public void testCreateCategoryWithValidationErrors() throws Exception {
+        String invalidCategoryJson = """
+                {
+                    "name": ""
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidCategoryJson)
+        ).andExpect(
+                status().isBadRequest()
+        ).andExpect(
+                jsonPath("$.name").value("Name cannot be blank")
+        ).andExpect(
+                jsonPath("$.description").value("Description cannot be blank")
+        );
+    }
 }

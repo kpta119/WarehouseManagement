@@ -1,6 +1,7 @@
 package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.Category;
+import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
 import com.example.warehouse.repositories.CategoryRepository;
 import com.example.warehouse.services.CategoryService;
 import org.springframework.stereotype.Service;
@@ -18,5 +19,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    @Override
+    public Category createCategory(CategoryDto categoryDto) {
+        Category category = new Category();
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
+
+        return categoryRepository.save(category);
     }
 }
