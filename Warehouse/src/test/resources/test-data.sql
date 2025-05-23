@@ -71,7 +71,8 @@ VALUES ('John', 'Doe', 'Manager', 'john@example.com', '+111222333', 1, 1),
        ('Jane', 'Smith', 'Clerk', 'jane@example.com', '+222333444', 2, 2),
        ('Bob', 'Johnson', 'Driver', 'bob@example.com', '+333444555', 3, 3),
        ('Alice', 'Brown', 'Supervisor', 'alice@example.com', '+444555666', 4, 4),
-       ('Charlie', 'Wilson', 'Assistant', 'charlie@example.com', '+555666777', 5, 5);
+       ('Charlie', 'Wilson', 'Assistant', 'charlie@example.com', '+555666777', 5, 5),
+       ('David', 'Garcia', 'Intern', 'lol@gmail.com', '+666777888', 1, 1);
 
 
 INSERT INTO Category (Name, Description)
