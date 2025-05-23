@@ -4,7 +4,7 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import com.example.warehouse.mappers.ProductMapper;
 import com.example.warehouse.services.ProductsService;
 import com.example.warehouse.validation.OnCreate;
@@ -64,7 +64,7 @@ public class ProductsController {
         try {
             Product product = productsService.getProductById(productId);
             Map<Integer, Integer> inventory = productsService.getInventoryMap(productId);
-            List<TransactionDto> transactions = productsService.getTransactionsDto(productId);
+            List<ProductTransactionInfoDto> transactions = productsService.getTransactionsDto(productId);
             return ResponseEntity.ok(productMapper.mapToDto(product, inventory, transactions));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());

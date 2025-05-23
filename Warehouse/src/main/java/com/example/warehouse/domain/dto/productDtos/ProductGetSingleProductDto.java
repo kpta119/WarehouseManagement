@@ -1,6 +1,6 @@
 package com.example.warehouse.domain.dto.productDtos;
 
-import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,6 +16,6 @@ import java.util.Map;
 public class ProductGetSingleProductDto extends ProductDto {
     private String categoryName;
     private Map<Integer, Integer> inventory;
-    private List<TransactionDto> transactions;
+    private List<ProductTransactionInfoDto> transactions;
 
 }

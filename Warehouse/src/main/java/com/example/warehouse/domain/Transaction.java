@@ -16,6 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "Transaction")
 public class Transaction {
+
     public enum TransactionType {
         WAREHOUSE_TO_WAREHOUSE,
         SUPPLIER_TO_WAREHOUSE,
@@ -53,11 +54,18 @@ public class Transaction {
     private Supplier supplier;
 
     @Column(name = "SourceWarehouseCapacityAfterTransaction")
-    private Integer sourceWarehouseCapacityAfterTransaction;
+    private Double sourceWarehouseCapacityAfterTransaction;
 
     @Column(name = "TargetWarehouseCapacityAfterTransaction")
-    private Integer targetWarehouseCapacityAfterTransaction;
+    private Double targetWarehouseCapacityAfterTransaction;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL)
     private List<TransactionProduct> products;
+
+    public Double getTotalPrice() {
+        return products.stream()
+                .mapToDouble(transactionProduct ->
+                        transactionProduct.getTransactionPrice() * transactionProduct.getQuantity())
+                .sum();
+    }
 }

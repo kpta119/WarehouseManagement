@@ -3,7 +3,7 @@ package com.example.warehouse.services;
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public interface ProductsService {
 
     Map<Integer, Integer> getInventoryMap(Integer productId);
 
-    List<TransactionDto> getTransactionsDto(Integer productId);
+    List<ProductTransactionInfoDto> getTransactionsDto(Integer productId);
 
     List<Integer> getLowStockProductIds(Integer warehouseId, int lowStockThreshold);
 

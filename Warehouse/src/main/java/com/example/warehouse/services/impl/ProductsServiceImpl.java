@@ -5,7 +5,7 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.ProductInventory;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import com.example.warehouse.repositories.CategoryRepository;
 import com.example.warehouse.repositories.ProductInventoryRepository;
 import com.example.warehouse.repositories.ProductRepository;
@@ -115,10 +115,10 @@ public class ProductsServiceImpl implements ProductsService {
     }
 
     @Override
-    public List<TransactionDto> getTransactionsDto(Integer productId) {
+    public List<ProductTransactionInfoDto> getTransactionsDto(Integer productId) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return transactionProductRepository.findByProductId(productId).stream()
-                .map(transactionProduct -> new TransactionDto(
+                .map(transactionProduct -> new ProductTransactionInfoDto(
                         transactionProduct.getTransaction().getId(),
                         simpleDateFormat.format(transactionProduct.getTransaction().getDate()),
                         transactionProduct.getTransaction().getTransactionType().name(),

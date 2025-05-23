@@ -5,7 +5,7 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductGetSingleProductDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionDto;
+import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class ProductMapper {
         return dto;
     }
 
-    public ProductGetSingleProductDto mapToDto(Product product, Map<Integer, Integer> inventory, List<TransactionDto> transactions) {
+    public ProductGetSingleProductDto mapToDto(Product product, Map<Integer, Integer> inventory, List<ProductTransactionInfoDto> transactions) {
         ProductGetSingleProductDto dto = new ProductGetSingleProductDto();
         dto.setProductId(product.getId());
         dto.setName(product.getName());
