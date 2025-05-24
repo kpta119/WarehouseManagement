@@ -67,19 +67,11 @@ BEGIN
                 VALUES (v_ProductID, p_ToWarehouseID, v_Quantity, v_UnitPrice);
             END IF;
 
-            UPDATE Warehouse
-            SET OccupiedCapacity = OccupiedCapacity + v_ChangeInCapacity
-            WHERE WarehouseID = p_ToWarehouseID;
-
         ELSEIF p_TransactionType = 'WAREHOUSE_TO_CUSTOMER' THEN
 
             UPDATE ProductInventory
             SET Quantity = Quantity - v_Quantity
             WHERE ProductID = v_ProductID AND WarehouseID = p_FromWarehouseID;
-
-            UPDATE Warehouse
-            SET OccupiedCapacity = OccupiedCapacity - v_ChangeInCapacity
-            WHERE WarehouseID = p_FromWarehouseID;
 
         ELSEIF p_TransactionType = 'WAREHOUSE_TO_WAREHOUSE' THEN
 
@@ -100,14 +92,6 @@ BEGIN
                 INSERT INTO ProductInventory (ProductID, WarehouseID, Quantity, Price)
                 VALUES (v_ProductID, p_ToWarehouseID, v_Quantity, v_UnitPrice);
             END IF;
-
-            UPDATE Warehouse
-            SET OccupiedCapacity = OccupiedCapacity - v_ChangeInCapacity
-            WHERE WarehouseID = p_FromWarehouseID;
-
-            UPDATE Warehouse
-            SET OccupiedCapacity = OccupiedCapacity + v_ChangeInCapacity
-            WHERE WarehouseID = p_ToWarehouseID;
         END IF;
 
         SET v_i = v_i + 1;
