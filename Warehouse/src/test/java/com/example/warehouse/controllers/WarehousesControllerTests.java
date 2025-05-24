@@ -45,4 +45,66 @@ public class WarehousesControllerTests {
                 jsonPath("$[0].transactionsCount").value(2)
         );
     }
+
+    @Test
+    public void testGetWarehouseByIdNotFound() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Warehouse not found: Warehouse not found with ID: 999")
+        );
+    }
+
+    @Test
+    public void testGetWarehouseById() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.warehouseId").value(1)
+        ).andExpect(
+                jsonPath("$.name").value("Warehouse Paris")
+        ).andExpect(
+                jsonPath("$.capacity").value(1000.0)
+        ).andExpect(
+                jsonPath("$.occupiedCapacity").value(500.0)
+        ).andExpect(
+                jsonPath("$.address").value("Champs-Élysées 101, Paris")
+        ).andExpect(
+                jsonPath("$.employees.length()").value(2)
+        ).andExpect(
+                jsonPath("$.employees[0].employeeId").value(1)
+        ).andExpect(
+                jsonPath("$.products.length()").value(1)
+        ).andExpect(
+                jsonPath("$.products[0].productId").value(1)
+        ).andExpect(
+                jsonPath("$.products[0].quantity").value(2)
+        ).andExpect(
+                jsonPath("$.transactions.length()").value(2)
+        ).andExpect(
+                jsonPath("$.transactions[0].transactionId").value(1)
+        ).andExpect(
+                jsonPath("$.transactions[0].date").value("2024-06-01")
+        ).andExpect(
+                jsonPath("$.transactions[0].type").value("WAREHOUSE_TO_WAREHOUSE")
+        ).andExpect(
+                jsonPath("$.transactions[0].totalPrice").value(11799.9)
+        ).andExpect(
+                jsonPath("$.occupancyHistory.length()").value(2)
+        ).andExpect(
+                jsonPath("$.occupancyHistory[0].date").value("2024-05-31")
+        ).andExpect(
+                jsonPath("$.occupancyHistory[0].occupiedCapacity").value(550.0)
+        ).andExpect(
+                jsonPath("$.occupancyHistory[1].date").value("2024-06-01")
+        ).andExpect(
+                jsonPath("$.occupancyHistory[1].occupiedCapacity").value(450)
+        );
+    }
 }

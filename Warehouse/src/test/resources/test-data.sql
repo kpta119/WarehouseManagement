@@ -102,7 +102,7 @@ VALUES (1, 1, 2, 999.99),
 INSERT INTO Transaction (TransactionType, Date, Description, EmployeeID, FromWarehouseID, ToWarehouseID, ClientID,
                          SupplierID, SourceWarehouseCapacityAfterTransaction, TargetWarehouseCapacityAfterTransaction)
 VALUES ('WAREHOUSE_TO_WAREHOUSE', '2024-06-01', 'Transfer between warehouses', 1, 1, 2, NULL, NULL, 450, 1100),
-       ('SUPPLIER_TO_WAREHOUSE', '2024-06-02', 'Supplier restock', 2, 1, NULL, NULL, 1, 550, NULL),
+       ('SUPPLIER_TO_WAREHOUSE', '2024-05-31', 'Supplier restock', 2, 1, NULL, NULL, 1, 550, NULL),
        ('WAREHOUSE_TO_CUSTOMER', '2025-04-29', 'Customer order', 3, 3, NULL, 3, NULL, 700, NULL),
        ('WAREHOUSE_TO_WAREHOUSE', '2025-05-20', 'Inter-warehouse transfer', 4, 4, 5, NULL, NULL, 800, 650),
        ('SUPPLIER_TO_WAREHOUSE', '2024-03-05', 'Supplier delivery', 5, 5, NULL, NULL, 5, 700, NULL),

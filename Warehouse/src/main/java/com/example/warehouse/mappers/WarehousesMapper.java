@@ -12,6 +12,7 @@ import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -72,7 +73,7 @@ public class WarehousesMapper {
             transactionDto.setTotalPrice(transaction.getTotalPrice());
             return transactionDto;
         }).toList());
-
+        transactions.sort(Comparator.comparing(Transaction::getDate));
         dto.setOccupancyHistory(transactions.stream().map(transaction -> {
             OccupancyDto occupancyDto = new OccupancyDto();
             occupancyDto.setDate(dateFormat.format(transaction.getDate()));
