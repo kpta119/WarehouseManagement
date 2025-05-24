@@ -1,15 +1,10 @@
 package com.example.warehouse.services.impl;
 
-import com.example.warehouse.domain.Employee;
-import com.example.warehouse.domain.Supplier;
-import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.Warehouse;
+import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.ReceiveDeliveryDto;
+import com.example.warehouse.domain.dto.InventoryOperationsDtos.SellToClientDto;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenDto;
-import com.example.warehouse.repositories.EmployeeRepository;
-import com.example.warehouse.repositories.SupplierRepository;
-import com.example.warehouse.repositories.TransactionRepository;
-import com.example.warehouse.repositories.WarehouseRepository;
+import com.example.warehouse.repositories.*;
 import com.example.warehouse.services.InventoryOperationsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.PageRequest;
@@ -28,16 +23,19 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
     private final SupplierRepository supplierRepository;
     private final WarehouseRepository warehouseRepository;
     private final EmployeeRepository employeeRepository;
+    private final ClientRepository clientRepository;
 
     public InventoryOperationsServiceImpl(TransactionRepository transactionRepository,
                                           SupplierRepository supplierRepository,
                                           WarehouseRepository warehouseRepository,
-                                          EmployeeRepository employeeRepository) {
+                                          EmployeeRepository employeeRepository,
+                                          ClientRepository clientRepository) {
         this.warehouseRepository = warehouseRepository;
         this.transactionRepository = transactionRepository;
         this.objectMapper = new ObjectMapper();
         this.supplierRepository = supplierRepository;
         this.employeeRepository = employeeRepository;
+        this.clientRepository = clientRepository;
     }
 
     @Override
@@ -50,8 +48,8 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
                 .orElseThrow(() -> new Exception("Employee not found with ID: " + receiveTransferDto.getEmployeeId()));
         Warehouse warehouse = warehouseRepository.findById(receiveTransferDto.getWarehouseId())
                 .orElseThrow(() -> new Exception("Warehouse not found with ID: " + receiveTransferDto.getWarehouseId()));
-        String description = "Supplier: " + supplier.getName() + " supplied warehouse " + warehouse.getName() +
-                " by " + employee.getName() + " " + employee.getSurname();
+        String description = "Supplier: " + supplier.getName() + " supplied warehouse: " + warehouse.getName() +
+                " by: " + employee.getName() + " " + employee.getSurname();
         transactionRepository.receiveDelivery(
                 LocalDate.now(),
                 description,
@@ -82,8 +80,8 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
                 .orElseThrow(() -> new Exception("From Warehouse not found with ID: " + transferDto.getFromWarehouseId()));
         Warehouse toWarehouse = warehouseRepository.findById(transferDto.getToWarehouseId())
                 .orElseThrow(() -> new Exception("To Warehouse not found with ID: " + transferDto.getToWarehouseId()));
-        String description = "Warehouse " + fromWarehouse.getName() + " supplied warehouse " +
-                toWarehouse.getName() + " by " + employee.getName() + " " + employee.getSurname();
+        String description = "Warehouse " + fromWarehouse.getName() + " supplied warehouse: " +
+                toWarehouse.getName() + " by: " + employee.getName() + " " + employee.getSurname();
 
         transactionRepository.exchangeBetweenWarehouses(
                 LocalDate.now(),
@@ -97,5 +95,31 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
         return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getToWarehouseId(), PageRequest.of(0, 1))
                 .stream().findFirst().orElse(null);
 
+    }
+
+    @Override
+    public Transaction sellToClient(SellToClientDto transferDto) throws Exception {
+        List<Map<String, Integer>> items = this.transformItems(transferDto.getItems());
+        String productsJson = objectMapper.writeValueAsString(items);
+        Employee employee = employeeRepository.findById(transferDto.getEmployeeId())
+                .orElseThrow(() -> new Exception("Employee not found with ID: " + transferDto.getEmployeeId()));
+        Warehouse warehouse = warehouseRepository.findById(transferDto.getWarehouseId())
+                .orElseThrow(() -> new Exception("Warehouse not found with ID: " + transferDto.getWarehouseId()));
+        Client client = clientRepository.findById(transferDto.getClientId())
+                .orElseThrow(() -> new Exception("Client not found with ID: " + transferDto.getClientId()));
+        String description = "Warehouse " + warehouse.getName() + " sold items to: " + client.getName() +
+                " by: " + employee.getName() + " " + employee.getSurname();
+
+        transactionRepository.sellToClient(
+                LocalDate.now(),
+                description,
+                transferDto.getEmployeeId(),
+                transferDto.getWarehouseId(),
+                transferDto.getClientId(),
+                productsJson
+        );
+
+        return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getWarehouseId(), PageRequest.of(0, 1))
+                .stream().findFirst().orElse(null);
     }
 }

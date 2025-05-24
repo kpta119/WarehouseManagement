@@ -44,6 +44,14 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
                                     @Param("p_ToWarehouseID") Integer toWarehouseId,
                                     @Param("p_ProductsJSON") String productsJson);
 
+    @Procedure(procedureName = "sell_to_client")
+    void sellToClient(@Param("p_Date") LocalDate date,
+                      @Param("p_Description") String description,
+                      @Param("p_EmployeeID") Integer employeeId,
+                      @Param("p_FromWarehouseID") Integer warehouseId,
+                      @Param("p_ClientID") Integer clientId,
+                      @Param("p_ProductsJSON") String productsJson);
+
     @Query("""
             SELECT t FROM Transaction t
             WHERE t.toWarehouse.id = :warehouseId OR t.fromWarehouse.id = :warehouseId

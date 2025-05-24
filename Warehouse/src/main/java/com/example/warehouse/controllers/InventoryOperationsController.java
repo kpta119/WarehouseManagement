@@ -2,6 +2,7 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.ReceiveDeliveryDto;
+import com.example.warehouse.domain.dto.InventoryOperationsDtos.SellToClientDto;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenDto;
 import com.example.warehouse.mappers.InventoryOperationsMapper;
 import com.example.warehouse.services.InventoryOperationsService;
@@ -44,6 +45,16 @@ public class InventoryOperationsController {
             return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Server error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/delivery")
+    public ResponseEntity<?> sellToClient(@Validated(OnCreate.class) @RequestBody SellToClientDto transferDto) {
+        try {
+            Transaction transaction = inventoryOperationsService.sellToClient(transferDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
     }
 
