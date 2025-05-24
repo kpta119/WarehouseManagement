@@ -21,11 +21,11 @@ BEGIN
     DECLARE v_Quantity INT;
     DECLARE v_UnitPrice DECIMAL(10,2);
     DECLARE v_UnitSize DECIMAL(4,2);
-    DECLARE v_ChangeInCapacity DECIMAL(6,2);
-    DECLARE v_SourceCapacityAfter DECIMAL(6,2) DEFAULT NULL;
-    DECLARE v_TargetCapacityAfter DECIMAL(6,2) DEFAULT NULL;
-    DECLARE v_FromWarehouseOccupied DECIMAL(6,2);
-    DECLARE v_ToWarehouseOccupied DECIMAL(6,2);
+    DECLARE v_ChangeInCapacity DECIMAL(10,2);
+    DECLARE v_SourceCapacityAfter DECIMAL(10,2) DEFAULT NULL;
+    DECLARE v_TargetCapacityAfter DECIMAL(10,2) DEFAULT NULL;
+    DECLARE v_FromWarehouseOccupied DECIMAL(10,2);
+    DECLARE v_ToWarehouseOccupied DECIMAL(10,2);
     DECLARE v_InventoryID INT;
 
     INSERT INTO `Transaction`
@@ -215,6 +215,7 @@ BEGIN
     DECLARE v_ProductID INT;
     DECLARE v_Quantity INT;
     DECLARE v_InventoryQuantity INT;
+    DECLARE v_ErrorMessage VARCHAR(255);
 
     SET v_ProductCount = JSON_LENGTH(p_ProductsJSON);
 
@@ -227,8 +228,9 @@ BEGIN
         WHERE ProductID = v_ProductID AND WarehouseID = p_FromWarehouseID;
 
         IF v_InventoryQuantity IS NULL OR v_InventoryQuantity < v_Quantity THEN
-            SIGNAL SQLSTATE '45000' 
-            SET MESSAGE_TEXT = CONCAT('Insufficient quantity of product ID ', v_ProductID, ' in warehouse.');
+            SET v_ErrorMessage = CONCAT('Insufficient quantity of product ID ', v_ProductID, ' in source warehouse.');
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = v_ErrorMessage;
         END IF;
 
         SET v_i = v_i + 1;
@@ -271,9 +273,9 @@ BEGIN
     DECLARE v_Quantity INT;
     DECLARE v_InventoryQuantity INT;
     DECLARE v_UnitSize DECIMAL(4,2);
-    DECLARE v_TotalVolumeChange DECIMAL(6,2) DEFAULT 0;
-    DECLARE v_ToWarehouseCapacity DECIMAL(6,2);
-    DECLARE v_ToWarehouseOccupied DECIMAL(6,2);
+    DECLARE v_TotalVolumeChange DECIMAL(10,2) DEFAULT 0;
+    DECLARE v_ToWarehouseCapacity DECIMAL(10,2);
+    DECLARE v_ToWarehouseOccupied DECIMAL(10,2);
     DECLARE v_ErrorMessage VARCHAR(255);
 
     SET v_ProductCount = JSON_LENGTH(p_ProductsJSON);
