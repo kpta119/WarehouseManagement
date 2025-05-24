@@ -90,8 +90,10 @@ public class WarehousesMapper {
 
     public WarehouseDataBaseDto mapToDto(Warehouse warehouse) {
         WarehouseDataBaseDto dto = new WarehouseDataBaseDto();
+        dto.setWarehouseId(warehouse.getId());
         dto.setName(warehouse.getName());
         dto.setCapacity(warehouse.getCapacity());
+        dto.setOccupiedCapacity(warehouse.getOccupiedCapacity());
         dto.setAddressId(warehouse.getAddress().getId());
         return dto;
     }

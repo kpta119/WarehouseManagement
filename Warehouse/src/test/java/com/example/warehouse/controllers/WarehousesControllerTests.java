@@ -107,4 +107,111 @@ public class WarehousesControllerTests {
                 jsonPath("$.occupancyHistory[1].occupiedCapacity").value(450)
         );
     }
+
+    @Test
+    public void testCreateWarehouseValidationError() throws Exception {
+        String invalidProductJson = """
+                {
+                    "capacity": 0,
+                    "regionId": 1,
+                    "city": "Paris",
+                    "postalCode": "75001",
+                    "street": "",
+                    "streetNumber": "101"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidProductJson)
+        ).andExpect(
+                status().isBadRequest()
+        ).andExpect(
+                jsonPath("$.name").value("Name cannot be blank")
+        ).andExpect(
+                jsonPath("$.capacity").value("Capacity must be positive")
+        ).andExpect(
+                jsonPath("$.street").value("Street cannot be blank")
+        );
+    }
+
+    @Test
+    public void testCreateWarehouseCountryNotFound() throws Exception {
+        String newWarehouseJson = """
+                {
+                    "name": "New Warehouse",
+                    "capacity": 1500.0,
+                    "regionId": 1,
+                    "countryId": 1999,
+                    "city": "Paris",
+                    "postalCode": "75001",
+                    "street": "Champs-Élysées",
+                    "streetNumber": "102"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newWarehouseJson)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Resource not found: Country not found with ID: 1999")
+        );
+    }
+
+    @Test
+    public void testCreateWarehouse() throws Exception {
+        String newWarehouseJson = """
+                {
+                    "name": "New Warehouse",
+                    "capacity": 1500.0,
+                    "regionId": 1,
+                    "countryId": 1,
+                    "city": "Paris",
+                    "postalCode": "75001",
+                    "street": "Champs-Élysées",
+                    "streetNumber": "102"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newWarehouseJson)
+        ).andExpect(
+                status().isCreated()
+        ).andExpect(
+                jsonPath("$.warehouseId").value(6)
+        ).andExpect(
+                jsonPath("$.name").value("New Warehouse")
+        ).andExpect(
+                jsonPath("$.capacity").value(1500.0)
+        ).andExpect(
+                jsonPath("$.occupiedCapacity").value(0.0)
+        ).andExpect(
+                jsonPath("$.addressId").value(6)
+        );
+
+        // Verify the warehouse was created in the database
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/6")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.warehouseId").value(6)
+        ).andExpect(
+                jsonPath("$.name").value("New Warehouse")
+        ).andExpect(
+                jsonPath("$.capacity").value(1500.0)
+        ).andExpect(
+                jsonPath("$.occupiedCapacity").value(0.0)
+        ).andExpect(
+                jsonPath("$.address").value("Champs-Élysées 102, Paris")
+        );
+    }
 }

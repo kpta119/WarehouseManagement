@@ -45,10 +45,12 @@ public class WarehousesController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createWarehouse(@RequestBody @Validated(OnCreate.class) WarehouseModifyDto warehouseDto) {
+    public ResponseEntity<?> createWarehouse(@Validated(OnCreate.class) @RequestBody WarehouseModifyDto warehouseDto) {
         try {
             Warehouse warehouse = warehousesService.createWarehouse(warehouseDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(warehousesMapper.mapToDto(warehouse));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
