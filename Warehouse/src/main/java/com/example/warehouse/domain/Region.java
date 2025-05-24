@@ -16,6 +16,5 @@ public class Region {
     @Column(name = "RegionID")
     private Integer id;
 
-    @Column(name = "Name")
     private String name;
 }

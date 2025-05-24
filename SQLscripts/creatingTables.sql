@@ -71,9 +71,9 @@ CREATE TABLE Supplier
 CREATE TABLE Warehouse
 (
     WarehouseID      INT AUTO_INCREMENT PRIMARY KEY,
-    Name             VARCHAR(100) NOT NULL,
-    Capacity         DECIMAL(6, 2)          NOT NULL,
-    OccupiedCapacity DECIMAL(6, 2)          NOT NULL DEFAULT 0,
+    Name             VARCHAR(100)  NOT NULL,
+    Capacity         DECIMAL(6, 2) NOT NULL,
+    OccupiedCapacity DECIMAL(6, 2) NOT NULL DEFAULT 0,
     AddressID        INT,
     FOREIGN KEY (AddressID) REFERENCES Address (AddressID)
 );
