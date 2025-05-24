@@ -64,13 +64,13 @@ public class ClientServiceImpl implements ClientService {
         address.setCity(city);
         address.setStreet(addressDto.getStreet());
         address.setStreetNumber(addressDto.getStreetNumber());
-        address = addressRepository.save(address);
+        Address addressSaved = addressRepository.save(address);
 
         Client client = new Client();
         client.setName(request.getName());
         client.setEmail(request.getEmail());
         client.setPhoneNumber(request.getPhoneNumber());
-        client.setAddress(address);
+        client.setAddress(addressSaved);
 
         return clientRepository.save(client);
 

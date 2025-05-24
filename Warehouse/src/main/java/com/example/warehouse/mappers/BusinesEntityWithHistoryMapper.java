@@ -1,7 +1,9 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Client;
+import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,22 @@ public class BusinesEntityWithHistoryMapper {
         dto.setName(client.getName());
         dto.setPhoneNumber(client.getPhoneNumber());
         List<TransactionWithProductsDto> listOfTransactions = client.getTransactions()
+                .stream()
+                .map(transactionMapper::mapToDto)
+                .collect(Collectors.toList());
+        dto.setHistory(listOfTransactions);
+        return dto;
+    }
+
+
+    public SupplierWithHistoryDto mapToDto(Supplier supplier) {
+        SupplierWithHistoryDto dto = new SupplierWithHistoryDto();
+        dto.setSupplierId(supplier.getId());
+        dto.setAddress(addressMapper.mapToDto(supplier.getAddress()));
+        dto.setEmail(supplier.getEmail());
+        dto.setName(supplier.getName());
+        dto.setPhoneNumber(supplier.getPhoneNumber());
+        List<TransactionWithProductsDto> listOfTransactions = supplier.getTransactions()
                 .stream()
                 .map(transactionMapper::mapToDto)
                 .collect(Collectors.toList());

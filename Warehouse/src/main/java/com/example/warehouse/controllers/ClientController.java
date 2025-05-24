@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,7 +58,7 @@ public class ClientController {
             Map<String, String> errors = result.getFieldErrors().stream()
                     .collect(Collectors.toMap(
                             FieldError::getField,
-                            fieldError -> Objects.toString(fieldError.getDefaultMessage(), "")
+                            e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : "Invalid value"
                     ));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }

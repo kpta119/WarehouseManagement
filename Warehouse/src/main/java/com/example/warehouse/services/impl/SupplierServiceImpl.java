@@ -3,10 +3,15 @@ package com.example.warehouse.services.impl;
 import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
+import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
+import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.repositories.*;
 import com.example.warehouse.services.SupplierService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -16,12 +21,16 @@ public class SupplierServiceImpl implements SupplierService {
     private final CountryRepository countryRepository;
     private final AddressRepository addressRepository;
     private final SupplierRepository supplierRepository;
+    private final BusinessEntitySummaryMapper businessEntitySummaryMapper;
+    private final BusinesEntityWithHistoryMapper businessEntityWithHistoryMapper;
 
-    public SupplierServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, SupplierRepository supplierRepository) {
+    public SupplierServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, SupplierRepository supplierRepository, BusinessEntitySummaryMapper businessEntitySummaryMapper, BusinesEntityWithHistoryMapper businessEntityWithHistoryMapper) {
         this.cityRepository = cityRepository;
         this.countryRepository = countryRepository;
         this.addressRepository = addressRepository;
         this.supplierRepository = supplierRepository;
+        this.businessEntitySummaryMapper = businessEntitySummaryMapper;
+        this.businessEntityWithHistoryMapper = businessEntityWithHistoryMapper;
     }
 
     @Override
@@ -48,14 +57,30 @@ public class SupplierServiceImpl implements SupplierService {
         address.setCity(city);
         address.setStreet(addressDto.getStreet());
         address.setStreetNumber(addressDto.getStreetNumber());
-        address = addressRepository.save(address);
+        Address addressSaved = addressRepository.save(address);
 
         Supplier supplier = new Supplier();
         supplier.setName(request.getName());
         supplier.setEmail(request.getEmail());
         supplier.setPhoneNumber(request.getPhoneNumber());
-        supplier.setAddress(address);
+        supplier.setAddress(addressSaved);
 
         return supplierRepository.save(supplier);
+    }
+
+    @Override
+    public List<SupplierSummaryDto> getSuppliersWithTransactionCount() {
+        return supplierRepository.findAllSuppliersWithTransactionCounts()
+                .stream()
+                .map(businessEntitySummaryMapper::mapToSupplierDto)
+                .toList();
+    }
+
+    @Override
+    public SupplierWithHistoryDto getSupplierWithHistory(Integer supplierId) {
+        Supplier supplier = supplierRepository.findSupplierWithHistoryById(supplierId)
+                .orElseThrow(() -> new NoSuchElementException("Supplier not found"));
+        return businessEntityWithHistoryMapper.mapToDto(supplier);
+
     }
 }

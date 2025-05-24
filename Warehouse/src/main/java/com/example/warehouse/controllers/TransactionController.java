@@ -52,7 +52,7 @@ public class TransactionController {
             List<TransactionSummaryDto> dtos = transactions.stream()
                     .map(transactionSummaryMapper::mapToDto)
                     .collect(Collectors.toList());
-            return ResponseEntity.ok(dtos);
+            return ResponseEntity.status(HttpStatus.OK).body(dtos);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e){
