@@ -12,15 +12,12 @@ import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -97,15 +94,7 @@ public class ProductsController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createProduct(@Validated(OnCreate.class) @RequestBody ProductDataBaseDto product, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = result.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            FieldError::getField,
-                            error -> Objects.toString(error.getDefaultMessage(), "Invalid value")
-                    ));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+    public ResponseEntity<?> createProduct(@Validated(OnCreate.class) @RequestBody ProductDataBaseDto product) {
         try {
             Product savedProduct = productsService.createProduct(product);
             return ResponseEntity.status(HttpStatus.CREATED).body(productMapper.mapToDto(savedProduct));
@@ -117,15 +106,7 @@ public class ProductsController {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable Integer productId, @Validated(OnUpdate.class) @RequestBody ProductDataBaseDto product, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = result.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            FieldError::getField,
-                            error -> Objects.toString(error.getDefaultMessage(), "Invalid value")
-                    ));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+    public ResponseEntity<?> updateProduct(@PathVariable Integer productId, @Validated(OnUpdate.class) @RequestBody ProductDataBaseDto product) {
         try {
             Product updatedProduct = productsService.updateProduct(productId, product);
             return ResponseEntity.status(HttpStatus.OK).body(productMapper.mapToDto(updatedProduct));

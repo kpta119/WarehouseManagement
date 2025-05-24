@@ -9,14 +9,10 @@ import com.example.warehouse.services.SupplierService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/suppliers")
@@ -30,8 +26,8 @@ public class SupplierController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllSuppliers(){
-        try{
+    public ResponseEntity<?> getAllSuppliers() {
+        try {
             List<SupplierSummaryDto> allSuppliers = supplierService.getSuppliersWithTransactionCount();
             return ResponseEntity.status(HttpStatus.OK).body(allSuppliers);
         } catch (Exception e) {
@@ -40,8 +36,8 @@ public class SupplierController {
     }
 
     @GetMapping("/{supplierId}")
-    public ResponseEntity<?> getClientWithHistory(@PathVariable("supplierId") Integer supplierId){
-        try{
+    public ResponseEntity<?> getClientWithHistory(@PathVariable("supplierId") Integer supplierId) {
+        try {
             SupplierWithHistoryDto supplierWithHistory = supplierService.getSupplierWithHistory(supplierId);
             return ResponseEntity.status(HttpStatus.OK).body(supplierWithHistory);
         } catch (NoSuchElementException e) {
@@ -53,15 +49,7 @@ public class SupplierController {
 
 
     @PostMapping()
-    public ResponseEntity<?> createSupplier(@Valid @RequestBody BusinessEntityDto request, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = result.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            FieldError::getField,
-                            e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : "Invalid value"
-                    ));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+    public ResponseEntity<?> createSupplier(@Valid @RequestBody BusinessEntityDto request) {
         try {
             Supplier savedSupplier = supplierService.createSupplier(request);
             BusinessEntityDto responseDto = businessEntityMapper.mapToDto(savedSupplier);

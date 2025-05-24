@@ -7,15 +7,10 @@ import com.example.warehouse.services.WarehousesService;
 import com.example.warehouse.validation.OnCreate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/warehouses")
@@ -50,15 +45,7 @@ public class WarehousesController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createWarehouse(@RequestBody @Validated(OnCreate.class) WarehouseModifyDto warehouseDto, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = result.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            FieldError::getField,
-                            error -> Objects.toString(error.getDefaultMessage(), "Invalid value")
-                    ));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+    public ResponseEntity<?> createWarehouse(@RequestBody @Validated(OnCreate.class) WarehouseModifyDto warehouseDto) {
         try {
             Warehouse warehouse = warehousesService.createWarehouse(warehouseDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(warehousesMapper.mapToDto(warehouse));
