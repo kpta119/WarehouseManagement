@@ -1,4 +1,4 @@
-package com.example.warehouse.config;
+package com.example.warehouse.validation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

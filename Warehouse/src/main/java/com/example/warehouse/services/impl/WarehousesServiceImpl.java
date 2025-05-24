@@ -1,14 +1,13 @@
 package com.example.warehouse.services.impl;
 
-import com.example.warehouse.domain.Address;
-import com.example.warehouse.domain.Employee;
-import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.Warehouse;
+import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
 import com.example.warehouse.mappers.WarehousesMapper;
+import com.example.warehouse.repositories.CityRepository;
+import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.repositories.WarehouseRepository;
 import com.example.warehouse.services.AddressService;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class WarehousesServiceImpl implements WarehousesService {
@@ -25,13 +25,18 @@ public class WarehousesServiceImpl implements WarehousesService {
     private final WarehousesMapper warehousesMapper;
     private final TransactionRepository transactionRepository;
     private final AddressService addressService;
+    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
 
     public WarehousesServiceImpl(WarehouseRepository warehouseRepository, WarehousesMapper warehousesMapper,
-                                 TransactionRepository transactionRepository, AddressService addressService) {
+                                 TransactionRepository transactionRepository, AddressService addressService,
+                                 CityRepository cityRepository, CountryRepository countryRepository) {
         this.warehouseRepository = warehouseRepository;
         this.warehousesMapper = warehousesMapper;
         this.transactionRepository = transactionRepository;
         this.addressService = addressService;
+        this.cityRepository = cityRepository;
+        this.countryRepository = countryRepository;
     }
 
     @Override
@@ -65,5 +70,39 @@ public class WarehousesServiceImpl implements WarehousesService {
         newWarehouse.setOccupiedCapacity(0.0);
 
         return warehouseRepository.save(newWarehouse);
+    }
+
+    @Override
+    public Warehouse updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId) {
+        Warehouse existingWarehouse = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
+        Address Address = existingWarehouse.getAddress();
+        if (warehouseDto.getName() != null) {
+            existingWarehouse.setName(warehouseDto.getName());
+        }
+        if (warehouseDto.getCapacity() != null) {
+            existingWarehouse.setCapacity(warehouseDto.getCapacity());
+        }
+        if (warehouseDto.getStreetNumber() != null) {
+            Address.setStreetNumber(Integer.valueOf(warehouseDto.getStreetNumber()));
+        }
+        if (warehouseDto.getStreet() != null) {
+            Address.setStreet(warehouseDto.getStreet());
+        }
+        if (warehouseDto.getCity() != null && warehouseDto.getPostalCode() != null && warehouseDto.getCountryId() != null) {
+            Optional<City> foundCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
+                    warehouseDto.getPostalCode(), warehouseDto.getCity(), warehouseDto.getCountryId());
+            Country foundCountry = countryRepository.findById(warehouseDto.getCountryId())
+                    .orElseThrow(() -> new NoSuchElementException("Country not found with ID: " + warehouseDto.getCountryId()));
+            City city = foundCity.orElseGet(() -> {
+                City newCity = new City();
+                newCity.setName(warehouseDto.getCity());
+                newCity.setPostalCode(warehouseDto.getPostalCode());
+                newCity.setCountry(foundCountry);
+                return cityRepository.save(newCity);
+            });
+            Address.setCity(city);
+        }
+        return warehouseRepository.save(existingWarehouse);
     }
 }

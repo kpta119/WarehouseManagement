@@ -13,4 +13,6 @@ public interface WarehousesService {
     WarehouseDetailsDto getWarehouseById(Integer warehouseId);
 
     Warehouse createWarehouse(WarehouseModifyDto warehouseDto);
+
+    Warehouse updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId);
 }

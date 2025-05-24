@@ -30,9 +30,8 @@ public class Address {
     private Supplier supplier;
 
 
-
     @Override
     public String toString() {
-         return getCity().getCountry().getName() + " " + city.getName() + " " + street + " " + streetNumber;
+        return getCity().getCountry().getName() + " " + city.getName() + " " + street + " " + streetNumber;
     }
 }

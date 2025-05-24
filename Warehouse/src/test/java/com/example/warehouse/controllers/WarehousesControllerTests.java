@@ -214,4 +214,164 @@ public class WarehousesControllerTests {
                 jsonPath("$.address").value("Champs-Élysées 102, Paris")
         );
     }
+
+    @Test
+    public void testUpdateWarehouseValidationError() throws Exception {
+        String invalidWarehouseJson = """
+                {
+                    "name": "New Warehouse",
+                    "capacity": -100,
+                    "regionId": 1,
+                    "countryId": -2
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidWarehouseJson)
+        ).andExpect(
+                status().isBadRequest()
+        ).andExpect(
+                jsonPath("$.capacity").value("Capacity must be positive")
+        ).andExpect(
+                jsonPath("$.countryId").value("CountryId must be positive")
+        );
+    }
+
+    @Test
+    public void testUpdateWarehouseNotFound() throws Exception {
+        String updateWarehouseJson = """
+                {
+                    "name": "Updated Warehouse",
+                    "capacity": 2000.0,
+                    "regionId": 1,
+                    "countryId": 1,
+                    "city": "Paris",
+                    "postalCode": "75001",
+                    "street": "Champs-Élysées",
+                    "streetNumber": "103"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/warehouses/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateWarehouseJson)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Warehouse not found: Warehouse not found with ID: 999")
+        );
+    }
+
+    @Test
+    public void testUpdateWarehouseChangeOfNameCapacityAndStreet() throws Exception {
+        String updateWarehouseJson = """
+                {
+                    "name": "Updated Warehouse",
+                    "capacity": 2000.0,
+                    "street": "Champs-Élysées",
+                    "streetNumber": "103"
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateWarehouseJson)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.warehouseId").value(1)
+        ).andExpect(
+                jsonPath("$.name").value("Updated Warehouse")
+        ).andExpect(
+                jsonPath("$.capacity").value(2000.0)
+        ).andExpect(
+                jsonPath("$.addressId").value(1)
+        );
+
+        // Verify the warehouse was updated in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.name").value("Updated Warehouse")
+        ).andExpect(
+                jsonPath("$.capacity").value(2000.0)
+        ).andExpect(
+                jsonPath("$.address").value("Champs-Élysées 103, Paris")
+        );
+    }
+
+    @Test
+    public void testUpdateWarehouseChangeAddressNewCityNameAndPostCode() throws Exception {
+        String updateWarehouseJson = """
+                {
+                    "city": "Lyon",
+                    "postalCode": "69001",
+                    "countryId": 1
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateWarehouseJson)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.warehouseId").value(1)
+        ).andExpect(
+                jsonPath("$.addressId").value(1)
+        );
+
+        // Verify the address was updated in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.address").value("Champs-Élysées 101, Lyon")
+        );
+    }
+
+    @Test
+    public void testUpdateWarehouseChangeAddressCityExists() throws Exception {
+        String updateWarehouseJson = """
+                {
+                    "city": "New York",
+                    "postalCode": "10001",
+                    "countryId": 3
+                }
+                """;
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateWarehouseJson)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.warehouseId").value(1)
+        ).andExpect(
+                jsonPath("$.addressId").value(1)
+        );
+
+        // Verify the address was updated in the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.address").value("Champs-Élysées 101, New York")
+        );
+    }
+
+
 }
