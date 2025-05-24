@@ -6,6 +6,7 @@ import com.example.warehouse.mappers.WarehousesMapper;
 import com.example.warehouse.services.WarehousesService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -65,6 +66,20 @@ public class WarehousesController {
             return ResponseEntity.ok(warehousesMapper.mapToDto(warehouse));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Warehouse not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping({"/{warehouseId}"})
+    public ResponseEntity<?> deleteWarehouse(@PathVariable Integer warehouseId) {
+        try {
+            Warehouse warehouse = warehousesService.deleteWarehouse(warehouseId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(warehousesMapper.mapToDto(warehouse));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Warehouse not found: " + e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot delete delete warehouse because other table use this warehouse: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

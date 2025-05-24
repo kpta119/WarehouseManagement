@@ -373,5 +373,49 @@ public class WarehousesControllerTests {
         );
     }
 
+    @Test
+    public void testDeleteWarehouseNotFound() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/warehouses/999")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Warehouse not found: Warehouse not found with ID: 999")
+        );
+    }
+
+    @Test
+    public void testDeleteWarehouseDeleteUsedWarehouse() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isConflict()
+        );
+    }
+
+    @Test
+    public void testDeleteWarehouse() throws Exception {
+        this.testCreateWarehouse();
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/api/warehouses/6")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNoContent()
+        );
+
+        // Verify the warehouse was deleted from the database
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses/6")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andExpect(
+                jsonPath("$").value("Warehouse not found: Warehouse not found with ID: 6")
+        );
+    }
+
 
 }

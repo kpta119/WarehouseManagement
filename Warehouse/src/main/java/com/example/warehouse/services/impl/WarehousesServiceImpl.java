@@ -105,4 +105,12 @@ public class WarehousesServiceImpl implements WarehousesService {
         }
         return warehouseRepository.save(existingWarehouse);
     }
+
+    @Override
+    public Warehouse deleteWarehouse(Integer warehouseId) {
+        Warehouse warehouse = warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
+        warehouseRepository.delete(warehouse);
+        return warehouse;
+    }
 }

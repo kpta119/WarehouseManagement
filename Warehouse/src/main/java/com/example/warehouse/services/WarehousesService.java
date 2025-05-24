@@ -15,4 +15,6 @@ public interface WarehousesService {
     Warehouse createWarehouse(WarehouseModifyDto warehouseDto);
 
     Warehouse updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId);
+
+    Warehouse deleteWarehouse(Integer warehouseId);
 }
