@@ -36,6 +36,14 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
                          @Param("p_ProductsJSON") String productsJson);
 
 
+    @Procedure(procedureName = "exchange_between_warehouses")
+    void exchangeBetweenWarehouses(@Param("p_Date") LocalDate date,
+                                    @Param("p_Description") String description,
+                                    @Param("p_EmployeeID") Integer employeeId,
+                                    @Param("p_FromWarehouseID") Integer fromWarehouseId,
+                                    @Param("p_ToWarehouseID") Integer toWarehouseId,
+                                    @Param("p_ProductsJSON") String productsJson);
+
     @Query("""
             SELECT t FROM Transaction t
             WHERE t.toWarehouse.id = :warehouseId OR t.fromWarehouse.id = :warehouseId

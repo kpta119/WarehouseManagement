@@ -5,6 +5,7 @@ import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.Warehouse;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.ReceiveDeliveryDto;
+import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenDto;
 import com.example.warehouse.repositories.EmployeeRepository;
 import com.example.warehouse.repositories.SupplierRepository;
 import com.example.warehouse.repositories.TransactionRepository;
@@ -69,5 +70,32 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
         return items.entrySet().stream()
                 .map(entry -> Map.of("ProductID", Integer.valueOf(entry.getKey()), "Quantity", entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Transaction transferBetweenWarehouses(TransferBetweenDto transferDto) throws Exception {
+        List<Map<String, Integer>> items = this.transformItems(transferDto.getItems());
+        String productsJson = objectMapper.writeValueAsString(items);
+        Employee employee = employeeRepository.findById(transferDto.getEmployeeId())
+                .orElseThrow(() -> new Exception("Employee not found with ID: " + transferDto.getEmployeeId()));
+        Warehouse fromWarehouse = warehouseRepository.findById(transferDto.getFromWarehouseId())
+                .orElseThrow(() -> new Exception("From Warehouse not found with ID: " + transferDto.getFromWarehouseId()));
+        Warehouse toWarehouse = warehouseRepository.findById(transferDto.getToWarehouseId())
+                .orElseThrow(() -> new Exception("To Warehouse not found with ID: " + transferDto.getToWarehouseId()));
+        String description = "Warehouse " + fromWarehouse.getName() + " supplied warehouse " +
+                toWarehouse.getName() + " by " + employee.getName() + " " + employee.getSurname();
+
+        transactionRepository.exchangeBetweenWarehouses(
+                LocalDate.now(),
+                description,
+                transferDto.getEmployeeId(),
+                transferDto.getFromWarehouseId(),
+                transferDto.getToWarehouseId(),
+                productsJson
+        );
+
+        return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getToWarehouseId(), PageRequest.of(0, 1))
+                .stream().findFirst().orElse(null);
+
     }
 }
