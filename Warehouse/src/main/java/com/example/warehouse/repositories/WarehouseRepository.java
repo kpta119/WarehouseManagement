@@ -14,13 +14,25 @@ import java.util.Optional;
 public interface WarehouseRepository extends CrudRepository<Warehouse, Integer>, JpaRepository<Warehouse, Integer> {
 
     @Query("""
-            SELECT w.id, w.name, w.capacity, w.occupiedCapacity, w.address.street, w.address.streetNumber ,w.address.city.name,
-                   COUNT(DISTINCT e.id) AS employeesCount,
-                   COUNT(DISTINCT p.id) AS productsCount,
-                   COUNT(DISTINCT t.id) AS transactionsCount
-            FROM Warehouse w LEFT JOIN Employee e on e.warehouse.id = w.id
-            LEFT JOIN ProductInventory p on p.warehouse.id = w.id
-            LEFT JOIN Transaction t on t.fromWarehouse.id = w.id OR t.toWarehouse.id = w.id
+            SELECT w.id, w.name, w.capacity, w.occupiedCapacity, a.street, a.streetNumber ,c.name,
+                   (
+                        SELECT COUNT(*)
+                        FROM Employee e
+                        WHERE e.warehouse.id  = w.id
+                   ) AS employeesCount,
+                   (
+                        SELECT COUNT(*)
+                        FROM ProductInventory p
+                        WHERE p.warehouse.id = w.id
+                   ) AS productsCount,
+                   (
+                       SELECT COUNT(*)
+                       FROM Transaction t
+                       WHERE t.fromWarehouse.id = w.id OR t.toWarehouse.id = w.id
+                   ) AS transactionsCount
+            FROM Warehouse w
+            LEFT JOIN w.address a
+            LEFT JOIN a.city c
             GROUP BY w.id
             
             """)

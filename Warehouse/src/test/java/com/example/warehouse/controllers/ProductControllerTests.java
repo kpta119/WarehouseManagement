@@ -147,21 +147,21 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.length()").value(2)
         ).andExpect(
-                jsonPath("$[0].name").value("T-Shirt")
+                jsonPath("$[1].name").value("T-Shirt")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(19.99)
+                jsonPath("$[1].unitPrice").value(19.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(6)
-        ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
-        ).andExpect(
-                jsonPath("$[1].name").value("Laptop")
-        ).andExpect(
-                jsonPath("$[1].unitPrice").value(999.99)
-        ).andExpect(
-                jsonPath("$[1].inventoryCount").value(3)
+                jsonPath("$[1].inventoryCount").value(6)
         ).andExpect(
                 jsonPath("$[1].transactionCount").value(1)
+        ).andExpect(
+                jsonPath("$[0].name").value("Laptop")
+        ).andExpect(
+                jsonPath("$[0].unitPrice").value(999.99)
+        ).andExpect(
+                jsonPath("$[0].inventoryCount").value(3)
+        ).andExpect(
+                jsonPath("$[0].transactionCount").value(1)
         );
     }
 

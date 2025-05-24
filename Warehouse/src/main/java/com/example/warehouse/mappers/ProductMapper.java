@@ -14,20 +14,18 @@ import java.util.Map;
 @Component
 public class ProductMapper {
 
-    public ProductSearchEndpointDto mapToDto(Product product, int inventoryCount, int transactionCount) {
+    public ProductSearchEndpointDto mapToDto(Object[] product) {
 
         ProductSearchEndpointDto dto = new ProductSearchEndpointDto();
 
-        dto.setProductId(product.getId());
-        dto.setName(product.getName());
-        dto.setDescription(product.getDescription());
-        dto.setUnitPrice(product.getUnitPrice());
-        dto.setUnitSize(product.getUnitSize());
-        dto.setInventoryCount(inventoryCount);
-        dto.setTransactionCount(transactionCount);
-        if (product.getCategory() != null) {
-            dto.setCategoryName(product.getCategory().getName());
-        }
+        dto.setProductId(((Number) product[0]).intValue());
+        dto.setName((String) product[1]);
+        dto.setDescription((String) product[2]);
+        dto.setUnitPrice((Double) product[3]);
+        dto.setUnitSize((Double) product[4]);
+        dto.setInventoryCount(((Number) product[5]).intValue());
+        dto.setTransactionCount(((Number) product[6]).intValue());
+        dto.setCategoryName((String) product[7]);
         return dto;
     }
 

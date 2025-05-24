@@ -47,12 +47,10 @@ public class ProductsController {
             @RequestParam(required = false) Integer warehouseId
     ) {
         try {
-            List<Product> products = productsService.getAllProducts(name, categoryId, minPrice, maxPrice, minSize, maxSize, warehouseId);
-            List<ProductSearchEndpointDto> dtos = products.stream()
-                    .map(p -> productMapper.mapToDto(p,
-                            productsService.getInventoryCount(p.getId(), warehouseId),
-                            productsService.getTransactionCount(p.getId(), warehouseId)))
-                    .toList();
+            List<Object[]> productsWithInventory = productsService.getAllProducts(name, categoryId, minPrice, maxPrice, minSize, maxSize, warehouseId);
+            List<ProductSearchEndpointDto> dtos = productsWithInventory.stream()
+                    .map(productMapper::mapToDto)
+                    .collect(Collectors.toList());
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
@@ -62,8 +60,8 @@ public class ProductsController {
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProduct(@PathVariable Integer productId) {
         try {
-            Product product = productsService.getProductById(productId);
-            Map<Integer, Integer> inventory = productsService.getInventoryMap(productId);
+            Product product = productsService.getProductByIdWithProductInventory(productId);
+            Map<Integer, Integer> inventory = productsService.getInventoryMap(product);
             List<ProductTransactionInfoDto> transactions = productsService.getTransactionsDto(productId);
             return ResponseEntity.ok(productMapper.mapToDto(product, inventory, transactions));
         } catch (NoSuchElementException e) {

@@ -11,15 +11,11 @@ import java.util.Map;
 
 public interface ProductsService {
 
-    List<Product> getAllProducts(String name, Integer categoryId, Double minPrice, Double maxPrice, Double minSize, Double maxSize, Integer warehouseId);
+    List<Object[]> getAllProducts(String name, Integer categoryId, Double minPrice, Double maxPrice, Double minSize, Double maxSize, Integer warehouseId);
 
-    Integer getInventoryCount(Integer productId, Integer warehouseId);
+    Product getProductByIdWithProductInventory(Integer productId);
 
-    Integer getTransactionCount(Integer productId, Integer warehouseId);
-
-    Product getProductById(Integer productId);
-
-    Map<Integer, Integer> getInventoryMap(Integer productId);
+    Map<Integer, Integer> getInventoryMap(Product product);
 
     List<ProductTransactionInfoDto> getTransactionsDto(Integer productId);
 
