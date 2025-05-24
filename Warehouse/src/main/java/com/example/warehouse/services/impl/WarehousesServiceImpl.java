@@ -5,6 +5,7 @@ import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.Warehouse;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
+import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
 import com.example.warehouse.mappers.WarehousesMapper;
 import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.repositories.WarehouseRepository;
@@ -21,7 +22,8 @@ public class WarehousesServiceImpl implements WarehousesService {
     private final WarehousesMapper warehousesMapper;
     private final TransactionRepository transactionRepository;
 
-    public WarehousesServiceImpl(WarehouseRepository warehouseRepository, WarehousesMapper warehousesMapper, TransactionRepository transactionRepository) {
+    public WarehousesServiceImpl(WarehouseRepository warehouseRepository, WarehousesMapper warehousesMapper,
+                                 TransactionRepository transactionRepository) {
         this.warehouseRepository = warehouseRepository;
         this.warehousesMapper = warehousesMapper;
         this.transactionRepository = transactionRepository;
@@ -40,5 +42,11 @@ public class WarehousesServiceImpl implements WarehousesService {
         List<Transaction> transactions = transactionRepository.findAllByWarehouseId(warehouseId);
         List<Employee> employees = warehouse.getEmployees();
         return warehousesMapper.mapToDto(warehouse, transactions, employees);
+    }
+
+    @Override
+    public Warehouse createWarehouse(WarehouseModifyDto warehouse) {
+        return new Warehouse();
+
     }
 }

@@ -21,6 +21,7 @@ public class Warehouse {
 
     private String name;
     private Double capacity;
+    @Column(name = "OccupiedCapacity", nullable = false, columnDefinition = "DOUBLE DEFAULT 0")
     private Double occupiedCapacity;
 
     @OneToOne(

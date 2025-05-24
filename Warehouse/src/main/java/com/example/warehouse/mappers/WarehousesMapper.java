@@ -7,6 +7,7 @@ import com.example.warehouse.domain.dto.dateDtos.OccupancyDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
 import com.example.warehouse.domain.dto.transactionDtos.WarehouseTransactionInfoDto;
 import com.example.warehouse.domain.dto.warehouseDto.ProductInWarehouseDto;
+import com.example.warehouse.domain.dto.warehouseDto.WarehouseDataBaseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import org.springframework.stereotype.Component;
@@ -84,6 +85,14 @@ public class WarehousesMapper {
             }
             return occupancyDto;
         }).toList());
+        return dto;
+    }
+
+    public WarehouseDataBaseDto mapToDto(Warehouse warehouse) {
+        WarehouseDataBaseDto dto = new WarehouseDataBaseDto();
+        dto.setName(warehouse.getName());
+        dto.setCapacity(warehouse.getCapacity());
+        dto.setAddressId(warehouse.getAddress().getId());
         return dto;
     }
 }

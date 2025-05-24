@@ -57,7 +57,7 @@ CREATE TABLE Warehouse
     WarehouseID      INT AUTO_INCREMENT PRIMARY KEY,
     Name             VARCHAR(100) NOT NULL,
     Capacity         INT          NOT NULL,
-    OccupiedCapacity INT          NOT NULL,
+    OccupiedCapacity INT          NOT NULL DEFAULT 0,
     AddressID        INT,
     FOREIGN KEY (AddressID) REFERENCES Address (AddressID)
 );
