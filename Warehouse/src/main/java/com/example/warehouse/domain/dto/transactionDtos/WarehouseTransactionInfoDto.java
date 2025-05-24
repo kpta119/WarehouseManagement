@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionDto {
-    private Integer id;
+public class WarehouseTransactionInfoDto {
+    private Integer transactionId;
     private String date;
+    private String description;
     private String type;
-    private Double price;
-    private Integer quantity;
+    private Double totalPrice;
+
 }

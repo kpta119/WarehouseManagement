@@ -9,20 +9,15 @@ import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.repositories.RegionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
 public class ClientControllerTests {
 
@@ -35,11 +30,11 @@ public class ClientControllerTests {
     @Autowired
     private CountryRepository countryRepository;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     @Test
-    public void testThatCreateClientReturnHttpStatus201Created() throws Exception{
+    public void testThatCreateClientReturnHttpStatus201Created() throws Exception {
         Region region = TestDataUtil.createRegion1();
         regionRepository.save(region);
         Country country = TestDataUtil.createCountry1(region);

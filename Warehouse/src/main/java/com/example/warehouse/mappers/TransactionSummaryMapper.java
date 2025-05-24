@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 @Component
 public class TransactionSummaryMapper {
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public TransactionSummaryDto mapToDto(Transaction transaction) {

@@ -9,14 +9,10 @@ import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -31,8 +27,8 @@ public class ClientController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllClients(){
-        try{
+    public ResponseEntity<?> getAllClients() {
+        try {
             List<ClientSummaryDto> allClients = clientService.getClientsWithTransactionCount();
             return ResponseEntity.status(HttpStatus.OK).body(allClients);
         } catch (Exception e) {
@@ -41,8 +37,8 @@ public class ClientController {
     }
 
     @GetMapping("/{clientId}")
-    public ResponseEntity<?> getClientWithHistory(@PathVariable("clientId") Integer clientId){
-        try{
+    public ResponseEntity<?> getClientWithHistory(@PathVariable("clientId") Integer clientId) {
+        try {
             ClientWithHistoryDto clientWithHistoryDto = clientService.getClientWithHistory(clientId);
             return ResponseEntity.status(HttpStatus.OK).body(clientWithHistoryDto);
         } catch (NoSuchElementException e) {
@@ -53,15 +49,7 @@ public class ClientController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createClient(@Valid @RequestBody BusinessEntityDto request, BindingResult result) {
-        if (result.hasErrors()) {
-            Map<String, String> errors = result.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            FieldError::getField,
-                            e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : "Invalid value"
-                    ));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
+    public ResponseEntity<?> createClient(@Valid @RequestBody BusinessEntityDto request) {
         try {
             Client savedClient = clientService.createClient(request);
             BusinessEntityDto responseDto = businessEntityMapper.mapToDto(savedClient);

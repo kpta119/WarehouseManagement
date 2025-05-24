@@ -19,11 +19,11 @@ public class AddressMapper {
 
             if (city.getCountry() != null) {
                 addressDto.setCountryId(city.getCountry().getId());
+                if (city.getCountry().getRegion() != null) {
+                    addressDto.setRegionId(city.getCountry().getRegion().getId());
+                }
             }
 
-            if (city.getCountry().getRegion() != null) {
-                addressDto.setRegionId(city.getCountry().getRegion().getId());
-            }
         }
         return addressDto;
     }

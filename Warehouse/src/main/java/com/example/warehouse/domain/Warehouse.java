@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +21,7 @@ public class Warehouse {
 
     private String name;
     private Double capacity;
+    @Column(name = "OccupiedCapacity", nullable = false, columnDefinition = "DOUBLE DEFAULT 0")
     private Double occupiedCapacity;
 
     @OneToOne(
@@ -25,4 +29,11 @@ public class Warehouse {
             cascade = CascadeType.ALL)
     @JoinColumn(name = "AddressID")
     private Address address;
+
+    @OneToMany(mappedBy = "warehouse")
+    private List<ProductInventory> productInventories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "warehouse")
+    private List<Employee> employees = new ArrayList<>();
+
 }

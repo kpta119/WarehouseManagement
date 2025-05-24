@@ -8,9 +8,9 @@ import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryD
 import java.util.List;
 
 public interface ClientService {
-    public Client createClient(BusinessEntityDto request);
+    Client createClient(BusinessEntityDto request);
 
-    public List<ClientSummaryDto> getClientsWithTransactionCount();
+    List<ClientSummaryDto> getClientsWithTransactionCount();
 
-    public ClientWithHistoryDto getClientWithHistory(Integer clientId);
+    ClientWithHistoryDto getClientWithHistory(Integer clientId);
 }

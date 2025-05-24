@@ -8,9 +8,9 @@ import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistor
 import java.util.List;
 
 public interface SupplierService {
-    public Supplier createSupplier(BusinessEntityDto request);
+    Supplier createSupplier(BusinessEntityDto request);
 
-    public List<SupplierSummaryDto> getSuppliersWithTransactionCount();
+    List<SupplierSummaryDto> getSuppliersWithTransactionCount();
 
-    public SupplierWithHistoryDto getSupplierWithHistory(Integer supplierId);
+    SupplierWithHistoryDto getSupplierWithHistory(Integer supplierId);
 }

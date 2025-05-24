@@ -10,7 +10,9 @@ import java.util.List;
 
 @Service
 public interface EmployeeService {
-    public List<EmployeeSummaryDto> getEmployeesWithTransactionCount(Integer warehouseId);
-    public Employee createEmployee(EmployeeDto request);
-    public EmployeeWithHistoryDto getEmployeeWithHistory(Integer employeeId);
+    List<EmployeeSummaryDto> getEmployeesWithTransactionCount(Integer warehouseId);
+
+    Employee createEmployee(EmployeeDto request);
+
+    EmployeeWithHistoryDto getEmployeeWithHistory(Integer employeeId);
 }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Component
 public class TransactionMapper {
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public TransactionWithProductsDto mapToDto(Transaction transaction) {

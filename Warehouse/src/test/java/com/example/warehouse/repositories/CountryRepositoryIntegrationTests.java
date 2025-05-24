@@ -40,7 +40,7 @@ public class CountryRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatMultipleCountriesCanBeCreated(){
+    public void testThatMultipleCountriesCanBeCreated() {
         Region region1 = TestDataUtil.createRegion1();
         regionRepository.save(region1);
         Country country1 = TestDataUtil.createCountry1(region1);
@@ -59,7 +59,7 @@ public class CountryRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatCountriesCanBeFoundFromGivenRegion(){
+    public void testThatCountriesCanBeFoundFromGivenRegion() {
         Region region = TestDataUtil.createRegion1();
         regionRepository.save(region);
         Country country1 = TestDataUtil.createCountry1(region);

@@ -19,7 +19,7 @@ public class RegionRepositoryIntegrationTests {
     private RegionRepository underTest;
 
     @Test
-    public void testThatRegionCanBeCreatedAndRecalled(){
+    public void testThatRegionCanBeCreatedAndRecalled() {
         Region region = TestDataUtil.createRegion1();
         underTest.save(region);
         Optional<Region> result = underTest.findById(region.getId());
@@ -41,7 +41,7 @@ public class RegionRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatRegionCanBeUpdated(){
+    public void testThatRegionCanBeUpdated() {
         Region region = TestDataUtil.createRegion1();
         underTest.save(region);
         region.setName("Updated");
@@ -52,7 +52,7 @@ public class RegionRepositoryIntegrationTests {
     }
 
     @Test
-    public void testThatRegionCanBeDeleted(){
+    public void testThatRegionCanBeDeleted() {
         Region region = TestDataUtil.createRegion1();
         underTest.save(region);
         Optional<Region> result = underTest.findById(region.getId());
