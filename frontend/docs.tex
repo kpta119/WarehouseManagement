@@ -1,0 +1,911 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{minted}
+\geometry{margin=1in}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyvrb}
+\begin{document}
+
+\begin{titlepage}
+  \centering
+
+  {\Huge\bfseries API Documentation\par}
+  \vspace{1.5cm}
+
+  {\Large\itshape BD2 Project Group 03\par}
+  \vspace{2cm}
+
+  {\large Version 1.0\par}
+  \vspace{1cm}
+
+  {\large \today\par}
+
+  \vfill
+
+  % na dole możesz dodać autorów, firmę itp.
+  {\small Prepared by: \\
+    Adrian Garbowski \\
+    Tobiasz Kownacki \\
+    Kacper Ptaszek \\
+    Adam Szostek \\
+    Jerzy Mossakowski
+  \par}
+\end{titlepage}
+
+\setcounter{tocdepth}{2}                  % głębokość: 1=section, 2=subsection itd.
+\tableofcontents
+\bigskip
+
+\section{Products}
+\label{sec:products}
+
+\subsection{Search and Filter Products}
+\label{sec:products-search}
+\begin{minted}[frame=lines]{text}
+GET /api/products/search
+\end{minted}
+\paragraph{Description}
+Search and filter products according to various criteria.
+\paragraph{Query Parameters (all optional)}
+\begin{itemize}
+  \item \texttt{name} (string)
+  \item \texttt{categoryId} (int)
+  \item \texttt{minPrice}, \texttt{maxPrice} (decimal)
+  \item \texttt{minSize}, \texttt{maxSize} (decimal)
+  \item \texttt{warehouseId} (int)
+\end{itemize}
+\paragraph{Response body}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  {
+    "productId": 1,
+    "name": "string",
+    "description": "string",
+    "unitPrice": 0.0,
+    "unitSize": 0.0,
+    "categoryName": "string",
+    "inventoryCount": 100,
+    "transactionsCount": 20
+  },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Get Single Product (with stock per warehouse)}
+\label{sec:products-single}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/products/{productId}
+\end{minted}
+\paragraph{Description:} Retrieve product details and current inventory in each warehouse.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{productId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "productId": 1,
+  "name": "string",
+  "description": "string",
+  "unitPrice": 0.0,
+  "unitSize": 0.0,
+  "categoryName": "string",
+  "inventory": {
+    "warehouseId1": 10,
+    "warehouseId2": 5
+  },
+  "transactions": [
+    {
+      "transactionId": 1,
+      "date": "2025-05-01",
+      "type": "SUPPLIER_TO_WAREHOUSE",
+      "price": 1500.00,
+      "quantity": 10
+    },
+    "..."
+  ]
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Low-Stock Products}
+\label{sec:products-low}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/products/low-stock
+\end{minted}
+\paragraph{Description:} List products whose quantity in a given warehouse is below 5.
+\paragraph{Query Parameters (optional):}
+\begin{itemize}
+  \item \texttt{warehouseId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[1, 2, 3]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Best-Selling Products}
+\label{sec:products-best}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/products/best-selling
+\end{minted}
+\paragraph{Description:} Top 3 best-selling products in a warehouse.
+\paragraph{Query Parameters:}
+\begin{itemize}
+  \item \texttt{warehouseId} (int) (optional)
+  \item \texttt{period} (enum: \texttt{week} | \texttt{month} | \texttt{year})
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[5, 2, 9]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Create Product}
+\label{sec:products-create}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/products
+\end{minted}
+\paragraph{Description:} Register a new product.
+\paragraph{Request Body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "description": "string",
+  "unitPrice": 0.0,
+  "unitSize": 0.0,
+  "categoryId": 1
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created product object
+
+\subsection{Update Product}
+\label{sec:products-update}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+PUT /api/products/{productId}
+\end{minted}
+\paragraph{Description:} Update one or more attributes of a product.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{productId} (int)
+\end{itemize}
+\paragraph{Request Body (any subset of):}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "description": "string",
+  "unitPrice": 0.0,
+  "unitSize": 0.0,
+  "categoryId": 2
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK} + updated product object
+
+\subsection{Delete Product}
+\label{sec:products-delete}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+DELETE /api/products/{productId}
+\end{minted}
+\paragraph{Description:} Remove a product permanently.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{productId} (int)
+\end{itemize}
+\paragraph{Response:} \texttt{204 No Content} + deleted product object
+
+% --- Categories ---
+\section{Categories}
+\label{sec:categories}
+
+\subsection{List Categories}
+\label{sec:categories-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/categories
+\end{minted}
+\paragraph{Description:} List all product categories.
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  { "categoryId": 1, "name": "string", "description": "string" },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Create Category}
+\label{sec:categories-create}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/categories
+\end{minted}
+\paragraph{Description:} Register a new product category.
+\paragraph{Request Body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{ "name": "string", "description": "string" }
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created category object
+
+\subsection{Update Category}
+\label{sec:categories-update}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+PUT /api/categories/{categoryId}
+\end{minted}
+\paragraph{Description:} Update one or more attributes of a category.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{categoryId} (int)
+\end{itemize}
+\paragraph{Request Body:} (any subset of)
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{ "name": "string", "description": "string" }
+\end{minted}
+\paragraph{Response:} \texttt{200 OK} + updated category object
+
+\subsection{Delete Category}
+\label{sec:categories-delete}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+DELETE /api/categories/{categoryId}
+\end{minted}
+\paragraph{Description:} Remove a category permanently.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{categoryId} (int)
+\end{itemize}
+\paragraph{Response:} \texttt{204 No Content} + deleted category object
+
+% --- Warehouses ---
+\section{Warehouses}
+\label{sec:warehouses}
+
+\subsection{List Warehouses}
+\label{sec:warehouses-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/warehouses
+\end{minted}
+\paragraph{Description:} List all warehouses.
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  {
+    "warehouseId": 1,
+    "name": "string",
+    "capacity": 1000,
+    "occupiedCapacity": 450,
+    "address": "Street 1, City",
+    "employeesCount": 5,
+    "productsCount": 100,
+    "transactionsCount": 20
+  },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Get Warehouse Details}
+\label{sec:warehouses-details}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/warehouses/{warehouseId}
+\end{minted}
+\paragraph{Description:} Retrieve detailed information about a specific warehouse.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{warehouseId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "warehouseId": 1,
+  "name": "string",
+  "capacity": 1000,
+  "occupiedCapacity": 450,
+  "address": "Street 1, City",
+  "employees": [
+    {
+      "employeeId": 1,
+      "name": "string",
+      "surname": "string",
+      "email": "string",
+      "phoneNumber": "string",
+      "position": "string"
+    },
+    "..."
+  ],
+  "products": [
+    {
+      "productId": 1,
+      "name": "string",
+      "quantity": 100,
+      "unitPrice": 0.0
+    },
+    "..."
+  ],
+  "transactions": [
+    {
+      "transactionId": 1,
+      "date": "2025-05-01",
+      "description": "string",
+      "type": "SUPPLIER_TO_WAREHOUSE",
+      "totalPrice": 1500.00
+    },
+    "..."
+  ],
+  "occupancyHistory": [
+    { "date": "2025-04-01", "occupiedCapacity": 400 },
+    "..."
+  ]
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Create Warehouse}
+\label{sec:warehouses-create}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/warehouses
+\end{minted}
+\paragraph{Description:} Register a new warehouse.
+\paragraph{Request Body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "capacity": 1000,
+  "regionId": 1,
+  "countryId": 1,
+  "city": "string",
+  "postalCode": "00-001",
+  "street": "string",
+  "streetNumber": "12A"
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created warehouse object
+
+\subsection{Update Warehouse}
+\label{sec:warehouses-update}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+PUT /api/warehouses/{warehouseId}
+\end{minted}
+\paragraph{Description:} Update one or more attributes of a warehouse.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{warehouseId} (int)
+\end{itemize}
+\paragraph{Request Body:} (any subset of)
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "capacity": 1000,
+  "regionId": 1,
+  "countryId": 1,
+  "city": "string",
+  "postalCode": "00-001",
+  "street": "string",
+  "streetNumber": "12A"
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK} + updated warehouse object
+
+\subsection{Delete Warehouse}
+\label{sec:warehouses-delete}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+DELETE /api/warehouses/{warehouseId}
+\end{minted}
+\paragraph{Description:} Remove a warehouse permanently.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{warehouseId} (int)
+\end{itemize}
+\paragraph{Response:} \texttt{204 No Content} + deleted warehouse object
+
+% --- Inventory Operations ---
+\section{Inventory Operations}
+\label{sec:inventory}
+
+\subsection{Receive from Supplier}
+\label{sec:inventory-receive}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/inventory/receive
+\end{minted}
+\paragraph{Description:} Receive products from a supplier into a warehouse.
+\paragraph{Request body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "warehouseId": 1,
+  "supplierId": 2,
+  "items": { "5": 10, "7": 20 }
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created transaction object
+
+\subsection{Transfer Between Warehouses}
+\label{sec:inventory-transfer}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/inventory/transfer
+\end{minted}
+\paragraph{Description:} Transfer products between warehouses.
+\paragraph{Request body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "fromWarehouseId": 1,
+  "toWarehouseId": 2,
+  "items": { "5": 5, "8": 3 }
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created transaction object
+
+\subsection{Deliver to Client}
+\label{sec:inventory-deliver}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/inventory/delivery
+\end{minted}
+\paragraph{Description:} Deliver products to a client from a warehouse.
+\paragraph{Request body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "warehouseId": 1,
+  "clientId": 3,
+  "items": { "2": 4, "9": 1 }
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created transaction object
+
+% --- Transactions ---
+\section{Transactions}
+\label{sec:transactions}
+
+\subsection{List Transactions}
+\label{sec:transactions-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/transactions
+\end{minted}
+\paragraph{Description:} List all transactions.
+\paragraph{Query Parameters (all optional):}
+\begin{itemize}
+  \item \texttt{fromDate} (date)
+  \item \texttt{toDate} (date)
+  \item \texttt{type} (enum: \texttt{SUPPLIER_TO_WAREHOUSE}, \texttt{WAREHOUSE_TO_CLIENT}, \texttt{WAREHOUSE_TO_WAREHOUSE})
+  \item \texttt{warehouseId} (int)
+  \item \texttt{clientId} (int)
+  \item \texttt{supplierId} (int)
+  \item \texttt{employeeId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  {
+    "transactionId": 1,
+    "date": "2025-05-01",
+    "description": "string",
+    "type": "SUPPLIER_TO_WAREHOUSE",
+    "employeeId": 4,
+    "fromWarehouseId": 1,
+    "toWarehouseId": 1,
+    "clientId": 1,
+    "supplierId": 2,
+    "totalPrice": 1500.00
+  },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Get Transaction Details}
+\label{sec:transactions-details}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/transactions/{transactionId}
+\end{minted}
+\paragraph{Description:} Retrieve detailed information about a specific transaction.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{transactionId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "transactionId": 1,
+  "date": "2025-05-01",
+  "description": "string",
+  "type": "WAREHOUSE_TO_CLIENT",
+  "employeeId": 4,
+  "fromWarehouseId": 1,
+  "toWarehouseId": 1,
+  "clientId": 3,
+  "products": [
+    {
+      "productId": 5,
+      "name": "string",
+      "quantity": 10,
+      "unitPrice": 150.00,
+      "categoryName": "string"
+    },
+    "..."
+  ]
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+% --- Clients ---
+\section{Clients}
+\label{sec:clients}
+
+\subsection{List Clients}
+\label{sec:clients-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/clients
+\end{minted}
+\paragraph{Description:} List all clients.
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  {
+    "clientId": 1,
+    "name": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "address": "string",
+    "transactionsCount": 5
+  },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Get Client Details (with history)}
+\label{sec:clients-details}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/clients/{clientId}
+\end{minted}
+\paragraph{Description:} Retrieve detailed information about a specific client.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{clientId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "clientId": 3,
+  "name": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "address": {
+    "street": "string",
+    "streetNumber": "12A",
+    "postalCode": "00-001",
+    "city": "string",
+    "country": "string",
+    "region": "string"
+  },
+  "history": [
+    {
+      "transactionId": 1,
+      "date": "2025-05-01",
+      "type": "WAREHOUSE_TO_CLIENT",
+      "description": "string",
+      "products": [
+        {
+          "productId": 5,
+          "name": "string",
+          "quantity": 10,
+          "unitPrice": 150.00,
+          "categoryName": "string"
+        },
+        "..."
+      ]
+    },
+    "..."
+  ]
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Create Client}
+\label{sec:clients-create}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/clients
+\end{minted}
+\paragraph{Description:} Register a new client.
+\paragraph{Request Body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "address": {
+    "street": "string",
+    "streetNumber": "12A",
+    "postalCode": "00-001",
+    "city": "string",
+    "countryId": 1,
+    "regionId": 1
+  }
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created client object
+
+% --- Suppliers ---
+\section{Suppliers}
+\label{sec:suppliers}
+
+\subsection{List Suppliers}
+\label{sec:suppliers-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/suppliers
+\end{minted}
+\paragraph{Description:} List all suppliers.
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  {
+    "supplierId": 1,
+    "name": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "address": "string",
+    "transactionsCount": 5
+  },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Get Supplier Details (with history)}
+\label{sec:suppliers-details}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/suppliers/{supplierId}
+\end{minted}
+\paragraph{Description:} Retrieve detailed information about a specific supplier.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{supplierId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "supplierId": 3,
+  "name": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "address": {
+    "street": "string",
+    "streetNumber": "12A",
+    "postalCode": "00-001",
+    "city": "string",
+    "country": "string",
+    "region": "string"
+  },
+  "history": [
+    {
+      "transactionId": 1,
+      "date": "2025-05-01",
+      "type": "SUPPLIER_TO_WAREHOUSE",
+      "description": "string",
+      "products": [
+        {
+          "productId": 5,
+          "name": "string",
+          "quantity": 10,
+          "unitPrice": 150.00,
+          "categoryName": "string"
+        },
+        "..."
+      ]
+    },
+    "..."
+  ]
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Create Supplier}
+\label{sec:suppliers-create}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/suppliers
+\end{minted}
+\paragraph{Description:} Register a new supplier.
+\paragraph{Request Body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "address": {
+    "street": "string",
+    "streetNumber": "12A",
+    "postalCode": "00-001",
+    "city": "string",
+    "countryId": 1,
+    "regionId": 1
+  }
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created}
+
+% --- Employees ---
+\section{Employees}
+\label{sec:employees}
+
+\subsection{List Employees}
+\label{sec:employees-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/employees
+\end{minted}
+\paragraph{Description:} List all employees.
+\paragraph{Query Parameters:}
+\begin{itemize}
+  \item \texttt{warehouseId} (int) (optional)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  {
+    "employeeId": 1,
+    "name": "string",
+    "surname": "string",
+    "email": "string",
+    "phoneNumber": "string",
+    "position": "string",
+    "warehouseName": "string",
+    "transactionsCount": 20
+  },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Get Employee Details}
+\label{sec:employees-details}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/employees/{employeeId}
+\end{minted}
+\paragraph{Description:} Retrieve detailed information about a specific employee.
+\paragraph{Path Parameters:}
+\begin{itemize}
+  \item \texttt{employeeId} (int)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "employeeId": 1,
+  "name": "string",
+  "surname": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "position": "string",
+  "warehouseId": 1,
+  "warehouseName": "string",
+  "transactionsCount": 20,
+  "history": [
+    {
+      "transactionId": 1,
+      "date": "2025-05-01",
+      "type": "SUPPLIER_TO_WAREHOUSE",
+      "description": "string",
+      "fromWarehouseId": 1,
+      "toWarehouseId": 1,
+      "clientId": 3,
+      "supplierId": 2,
+      "products": [
+        {
+          "productId": 5,
+          "name": "string",
+          "quantity": 10,
+          "unitPrice": 150.00,
+          "categoryName": "string"
+        },
+        "..."
+      ]
+    },
+    "..."
+  ]
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Create Employee}
+\label{sec:employees-create}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/employees
+\end{minted}
+\paragraph{Description:} Register a new employee.
+\paragraph{Request Body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "name": "string",
+  "surname": "string",
+  "email": "string",
+  "phoneNumber": "string",
+  "position": "string",
+  "warehouseId": 1
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created} + created employee object
+
+% --- Dashboard ---
+\section{Dashboard}
+\label{sec:dashboard}
+
+\subsection{Summary Tiles}
+\label{sec:dashboard-all}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/dashboard/summary
+\end{minted}
+\paragraph{Description:} Retrieve summary tiles for the dashboard.
+\paragraph{Query Parameters:}
+\begin{itemize}
+  \item \texttt{warehouseId} (int) (optional)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "productsCount": 528,
+  "categoriesCount": 12,
+  "monthlyReceipts": 45,
+  "monthlyDeliveries": 38,
+  "lowStockCount": 7,
+  "topProduct": "string",
+  "inventoryValue": 120000.0,
+  "turnoverLastWeek": 15000.0,
+  "lastReceiptDate": "date",
+  "lastDeliveryDate": "date"
+}
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+% --- Geography & Addresses ---
+\section{Geography \& Addresses}
+\label{sec:geography}
+
+\subsection{Regions}
+\label{sec:geography-regions}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/regions
+\end{minted}
+\paragraph{Description:} List all regions.
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  { "regionId": 1, "name": "string" },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Countries}
+\label{sec:geography-countries}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+GET /api/countries
+\end{minted}
+\paragraph{Description:} List all countries.
+\paragraph{Query Parameters:}
+\begin{itemize}
+  \item \texttt{regionId} (int) (optional)
+\end{itemize}
+\paragraph{Response body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+[
+  { "countryId": 1, "name": "string", "regionId": 1 },
+  "..."
+]
+\end{minted}
+\paragraph{Response:} \texttt{200 OK}
+
+\subsection{Addresses}
+\label{sec:geography-addresses}
+\begin{minted}[fontsize=\small,frame=lines]{text}
+POST /api/addresses
+\end{minted}
+\paragraph{Description:} Register a new address.
+\paragraph{Request body:}
+\begin{minted}[fontsize=\small,frame=lines]{json}
+{
+  "cityName": "string",
+  "postalCode": "00-001",
+  "countryId": 1,
+  "street": "string",
+  "streetNumber": "12A"
+}
+\end{minted}
+\paragraph{Response:} \texttt{201 Created}
+
+\end{document}
