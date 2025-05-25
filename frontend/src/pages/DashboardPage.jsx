@@ -11,6 +11,7 @@ const DashboardPage = () => {
   useEffect(() => {
     dispatch(fetchDashboardSummary(selectedWarehouse));
   }, [dispatch, selectedWarehouse]);
+  console.log(summary);
   if (status === "loading" || status === "idle") return <p>Ładowanie...</p>;
   if (status === "failed") return <p className="text-red-500">{error}</p>;
   return (
