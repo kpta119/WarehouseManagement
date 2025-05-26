@@ -5,11 +5,11 @@ import {
   fetchProductById,
   createProduct,
   updateProduct,
-} from "../features/products/productsSlice";
-import { fetchCategories } from "../features/categories/categoriesSlice";
+} from "../../features/products/productsSlice";
+import { fetchCategories } from "../../features/categories/categoriesSlice";
 import { FaChevronDown } from "react-icons/fa";
 
-const ProductFormPage = () => {
+const ProductForm = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const dispatch = useDispatch();
@@ -163,4 +163,4 @@ const ProductFormPage = () => {
   );
 };
 
-export default ProductFormPage;
+export default ProductForm;

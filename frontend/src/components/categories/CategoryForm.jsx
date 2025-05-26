@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   fetchCategories,
   createCategory,
   updateCategory,
-} from "../features/categories/categoriesSlice";
+} from "../../features/categories/categoriesSlice";
+import { FaChevronLeft } from "react-icons/fa";
 
-const CategoryFormPage = () => {
+const CategoryForm = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const dispatch = useDispatch();
@@ -53,6 +54,12 @@ const CategoryFormPage = () => {
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <Link
+        to="/categories"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+      >
+        <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii
+      </Link>
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Kategorię" : "Nowa Kategoria"}
       </h1>
@@ -93,4 +100,4 @@ const CategoryFormPage = () => {
   );
 };
 
-export default CategoryFormPage;
+export default CategoryForm;

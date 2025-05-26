@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import { fetchEmployeeById } from "../features/employees/employeesSlice";
+import { fetchEmployeeById } from "../../features/employees/employeesSlice";
 import { format } from "date-fns";
 import { FaChevronLeft, FaEye } from "react-icons/fa";
 
-const EmployeeDetailPage = () => {
+const EmployeeDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { current: employee } = useSelector((state) => state.employees);
@@ -55,41 +55,44 @@ const EmployeeDetailPage = () => {
             {warehouseName}
           </Link>
         </p>
-      </div>
-      <section>
-        <h2 className="text-2xl font-semibold mb-4">Historia Transakcji</h2>
-        {history.length === 0 ? (
-          <p>Brak historii transakcji.</p>
-        ) : (
-          <div className="bg-white rounded-lg shadow overflow-auto">
-            <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
-              <div>Data</div>
-              <div>Typ</div>
-              <div>Opis</div>
-              <div className="text-center">Szczegóły</div>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {history.map((tx) => (
-                <div
-                  key={tx.transactionId}
-                  className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
-                >
-                  <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                  <div>{tx.type.replace(/_/g, " ")}</div>
-                  <div>{tx.description}</div>
-                  <div className="flex justify-center text-gray-600">
-                    <Link to={`/transactions/${tx.transactionId}`}>
-                      <FaEye />
-                    </Link>
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Historia Transakcji</h2>
+          {history.length === 0 ? (
+            <p>Brak historii transakcji.</p>
+          ) : (
+            <div className="bg-white rounded-lg shadow overflow-auto">
+              <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+                <div>Data</div>
+                <div>Typ</div>
+                <div>Opis</div>
+                <div className="text-center">Szczegóły</div>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {history.map((tx) => (
+                  <div
+                    key={tx.transactionId}
+                    className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
+                  >
+                    <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                    <div>{tx.type.replace(/_/g, " ")}</div>
+                    <div>{tx.description}</div>
+                    <div className="flex justify-center text-gray-600">
+                      <Link
+                        to={`/transactions/${tx.transactionId}`}
+                        className="hover:text-pink-500 transition duration-200"
+                      >
+                        <FaEye />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </section>
+          )}
+        </section>
+      </div>
     </div>
   );
 };
 
-export default EmployeeDetailPage;
+export default EmployeeDetail;

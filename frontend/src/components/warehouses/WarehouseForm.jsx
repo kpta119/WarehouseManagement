@@ -5,11 +5,11 @@ import {
   createWarehouse,
   updateWarehouse,
   fetchWarehouseById,
-} from "../features/warehouses/warehousesSlice";
-import { listRegions, listCountries } from "../api/geography";
+} from "../../features/warehouses/warehousesSlice";
+import { listRegions, listCountries } from "../../api/geography";
 import { FaChevronDown } from "react-icons/fa";
 
-const WarehousesFormPage = () => {
+const WarehousesForm = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const dispatch = useDispatch();
@@ -136,7 +136,7 @@ const WarehousesFormPage = () => {
             >
               <option value="">Wybierz region</option>
               {regions.map((r) => (
-                <option key={r.regionId} value={r.regionId}>
+                <option key={r.id} value={r.id}>
                   {r.name}
                 </option>
               ))}
@@ -231,4 +231,4 @@ const WarehousesFormPage = () => {
   );
 };
 
-export default WarehousesFormPage;
+export default WarehousesForm;

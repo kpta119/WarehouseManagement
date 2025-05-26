@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
-import { createSupplier } from "../features/suppliers/suppliersSlice";
-import { listRegions, listCountries } from "../api/geography";
+import { createSupplier } from "../../features/suppliers/suppliersSlice";
+import { listRegions, listCountries } from "../../api/geography";
 
-const SupplierFormPage = () => {
+const SupplierForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [regions, setRegions] = useState([]);
@@ -135,7 +135,7 @@ const SupplierFormPage = () => {
             >
               <option value="">Wybierz region</option>
               {regions.map((r) => (
-                <option key={r.regionId} value={r.regionId}>
+                <option key={r.id} value={r.id}>
                   {r.name}
                 </option>
               ))}
@@ -249,4 +249,4 @@ const SupplierFormPage = () => {
   );
 };
 
-export default SupplierFormPage;
+export default SupplierForm;

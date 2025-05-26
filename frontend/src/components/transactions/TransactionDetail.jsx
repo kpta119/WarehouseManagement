@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import { fetchTransactionById } from "../features/transactions/transactionsSlice";
+import { fetchTransactionById } from "../../features/transactions/transactionsSlice";
 import { FaChevronLeft } from "react-icons/fa";
 import { format } from "date-fns";
+import { currencyFormatter } from "../../utils/helpers";
 
-const TransactionDetailPage = () => {
+const TransactionDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { current: tx } = useSelector((state) => state.transactions);
@@ -122,19 +123,20 @@ const TransactionDetailPage = () => {
                   </Link>
                 </div>
                 <div className="text-right">{p.quantity}</div>
-                <div className="text-right">${p.unitPrice.toFixed(2)}</div>
+                <div className="text-right">
+                  {currencyFormatter(p.unitPrice)}
+                </div>
                 <div className="text-right">{p.categoryName}</div>
                 <div className="text-right">
-                  ${(p.quantity * p.unitPrice).toFixed(2)}
+                  {currencyFormatter(p.quantity * p.unitPrice)}
                 </div>
               </div>
             ))}
           </div>
           <div className="text-right p-2 font-bold">
-            $
-            {products
-              .reduce((acc, p) => acc + p.quantity * p.unitPrice, 0)
-              .toFixed(2)}
+            {currencyFormatter(
+              products.reduce((acc, p) => acc + p.quantity * p.unitPrice, 0)
+            )}
           </div>
         </section>
       )}
@@ -142,4 +144,4 @@ const TransactionDetailPage = () => {
   );
 };
 
-export default TransactionDetailPage;
+export default TransactionDetail;

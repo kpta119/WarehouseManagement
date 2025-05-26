@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createClient } from "../features/clients/clientsSlice";
+import { createClient } from "../../features/clients/clientsSlice";
 import { FaChevronLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const ClientFormPage = () => {
+const ClientForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.clients);
@@ -115,4 +115,4 @@ const ClientFormPage = () => {
   );
 };
 
-export default ClientFormPage;
+export default ClientForm;

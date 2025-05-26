@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
-import { createEmployee } from "../features/employees/employeesSlice";
-import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
+import { createEmployee } from "../../features/employees/employeesSlice";
+import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
 
-const EmployeeFormPage = () => {
+const EmployeeForm = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -168,4 +168,4 @@ const EmployeeFormPage = () => {
   );
 };
 
-export default EmployeeFormPage;
+export default EmployeeForm;

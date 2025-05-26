@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import { fetchProductById } from "../features/products/productsSlice";
+import { fetchProductById } from "../../features/products/productsSlice";
 import { format } from "date-fns";
-import { FaEdit, FaChevronLeft } from "react-icons/fa";
+import { FaEdit, FaChevronLeft, FaEye } from "react-icons/fa";
+import { currencyFormatter } from "../../utils/helpers";
 
-const ProductDetailPage = () => {
+const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { current: product } = useSelector((state) => state.products);
@@ -38,15 +39,19 @@ const ProductDetailPage = () => {
         </Link>
       </div>
       <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
-      <p className="text-sm text-gray-500">Kategoria: {categoryName}</p>
-      <p className="text-lg font-medium">${unitPrice.toFixed(2)}</p>
-      <p className="text-sm text-gray-600">Rozmiar: {unitSize}</p>
-      {description && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Opis</h2>
-          <p className="text-gray-700 whitespace-pre-line">{description}</p>
-        </div>
-      )}
+      <p className="text-gray-700 whitespace-pre-line">{description}</p>
+      <p>
+        <strong>Kategoria: </strong>
+        {categoryName}
+      </p>
+      <p>
+        <strong>Jednostkowa Cena: </strong>
+        {currencyFormatter(unitPrice)}
+      </p>
+      <p>
+        <strong>Jednostkowy Rozmiar: </strong>
+        {unitSize}
+      </p>
       {inventory && Object.keys(inventory).length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-2">Zasoby na Magazyn</h2>
@@ -86,13 +91,13 @@ const ProductDetailPage = () => {
                 <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
                 <div>{tx.type.replace(/_/g, " ")}</div>
                 <div className="text-right">{tx.quantity}</div>
-                <div className="text-right">${tx.price.toFixed(2)}</div>
-                <div className="text-center">
+                <div className="text-right">{currencyFormatter(tx.price)}</div>
+                <div className="flex justify-center text-gray-600">
                   <Link
                     to={`/transactions/${tx.transactionId}`}
-                    className="text-pink-600 hover:underline"
+                    className="hover:text-pink-500 transition duration-200"
                   >
-                    Zobacz
+                    <FaEye />
                   </Link>
                 </div>
               </div>
@@ -104,4 +109,4 @@ const ProductDetailPage = () => {
   );
 };
 
-export default ProductDetailPage;
+export default ProductDetail;

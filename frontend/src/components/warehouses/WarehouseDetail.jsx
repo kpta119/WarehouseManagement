@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
-import { fetchWarehouseById } from "../features/warehouses/warehousesSlice";
+import { fetchWarehouseById } from "../../features/warehouses/warehousesSlice";
 import {
   ResponsiveContainer,
   LineChart,
@@ -11,9 +11,10 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { FaChevronLeft, FaEdit } from "react-icons/fa";
+import { FaChevronLeft, FaEdit, FaEye } from "react-icons/fa";
+import { currencyFormatter } from "../../utils/helpers";
 
-const WarehouseDetailPage = () => {
+const WarehouseDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { current: warehouse } = useSelector((state) => state.warehouses);
@@ -101,15 +102,15 @@ const WarehouseDetailPage = () => {
                   <div>
                     {emp.name} {emp.surname}
                   </div>
-                  <div className="text-right">{emp.email}</div>
+                  <div className="text-right truncate">{emp.email}</div>
                   <div className="text-right">{emp.phoneNumber}</div>
                   <div className="text-right">{emp.position}</div>
-                  <div className="text-right">
+                  <div className="flex justify-end text-gray-600">
                     <Link
                       to={`/employees/${emp.employeeId}`}
-                      className="text-pink-600 hover:underline"
+                      className="hover:text-pink-500 transition duration-200"
                     >
-                      Zobacz
+                      <FaEye />
                     </Link>
                   </div>
                 </div>
@@ -135,16 +136,18 @@ const WarehouseDetailPage = () => {
                 >
                   <div>{pr.name}</div>
                   <div className="text-right">{pr.quantity}</div>
-                  <div className="text-right">${pr.unitPrice.toFixed(2)}</div>
                   <div className="text-right">
-                    ${(pr.quantity * pr.unitPrice).toFixed(2)}
+                    {currencyFormatter(pr.unitPrice)}
                   </div>
                   <div className="text-right">
+                    {currencyFormatter(pr.quantity * pr.unitPrice)}
+                  </div>
+                  <div className="flex justify-end text-gray-600">
                     <Link
                       to={`/products/${pr.productId}`}
-                      className="text-pink-600 hover:underline"
+                      className="hover:text-pink-500 transition duration-200"
                     >
-                      Zobacz
+                      <FaEye />
                     </Link>
                   </div>
                 </div>
@@ -171,14 +174,16 @@ const WarehouseDetailPage = () => {
               >
                 <div>{new Date(tx.date).toLocaleDateString()}</div>
                 <div>{tx.type.replace(/_/g, " ")}</div>
-                <div className="text-right">${tx.totalPrice.toFixed(2)}</div>
-                <div className="text-right">{tx.employeeId}</div>
                 <div className="text-right">
+                  {currencyFormatter(tx.totalPrice)}
+                </div>
+                <div className="text-right">{tx.employeeId}</div>
+                <div className="flex justify-end text-gray-600">
                   <Link
                     to={`/transactions/${tx.transactionId}`}
-                    className="text-pink-600 hover:underline"
+                    className="hover:text-pink-500 transition duration-200"
                   >
-                    Zobacz
+                    <FaEye />
                   </Link>
                 </div>
               </div>
@@ -190,4 +195,4 @@ const WarehouseDetailPage = () => {
   );
 };
 
-export default WarehouseDetailPage;
+export default WarehouseDetail;

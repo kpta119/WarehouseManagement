@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
-import { deliverInventory } from "../features/inventory/deliverySlice";
-import { searchProducts } from "../api/products";
-import { fetchClients } from "../features/clients/clientsSlice";
+import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
+import { deliverInventory } from "../../features/inventory/deliverySlice";
+import { searchProducts } from "../../api/products";
+import { fetchClients } from "../../features/clients/clientsSlice";
 import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
 
-const InventoryDeliveryPage = () => {
+const DeliveryPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
   const { list: clients } = useSelector((s) => s.clients);
@@ -184,4 +184,4 @@ const InventoryDeliveryPage = () => {
   );
 };
 
-export default InventoryDeliveryPage;
+export default DeliveryPage;

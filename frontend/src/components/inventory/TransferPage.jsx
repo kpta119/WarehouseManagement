@@ -1,29 +1,24 @@
-// /pages/InventoryReceivePage.jsx
-
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
-import { fetchSuppliers } from "../features/suppliers/suppliersSlice";
-import { receiveInventory } from "../features/inventory/receiveSlice";
-import { searchProducts } from "../api/products";
-import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
+import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
+import { transferInventory } from "../../features/inventory/transferSlice";
+import { searchProducts } from "../../api/products";
+import { FaChevronDown, FaExchangeAlt, FaPlus, FaTrash } from "react-icons/fa";
 
-const InventoryReceivePage = () => {
+const TransferPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
-  const { list: suppliers } = useSelector((s) => s.suppliers);
   const { status, error, transaction } = useSelector(
-    (s) => s.inventory.receive
+    (s) => s.inventory.transfer
   );
   const [form, setForm] = useState({
-    warehouseId: "",
-    supplierId: "",
+    fromWarehouseId: "",
+    toWarehouseId: "",
     items: [{ productId: "", quantity: "" }],
   });
   const [products, setProducts] = useState([]);
   useEffect(() => {
     dispatch(fetchWarehouses());
-    dispatch(fetchSuppliers());
     searchProducts({}).then((res) => setProducts(res.data));
   }, [dispatch]);
   const handleAddRow = () =>
@@ -50,9 +45,9 @@ const InventoryReceivePage = () => {
       }
     });
     dispatch(
-      receiveInventory({
-        warehouseId: Number(form.warehouseId),
-        supplierId: Number(form.supplierId),
+      transferInventory({
+        fromWarehouseId: Number(form.fromWarehouseId),
+        toWarehouseId: Number(form.toWarehouseId),
         items: itemsPayload,
       })
     );
@@ -60,9 +55,9 @@ const InventoryReceivePage = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center space-x-2">
-        <FaTruck className="text-pink-500 w-6 h-6" />
+        <FaExchangeAlt className="text-pink-500 w-6 h-6" />
         <h1 className="text-2xl font-semibold text-gray-800">
-          Przyjęcie towaru
+          Przeniesienie towaru
         </h1>
       </div>
       <form
@@ -71,13 +66,13 @@ const InventoryReceivePage = () => {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Magazyn</label>
+            <label className="block text-sm font-medium mb-1">Z magazynu</label>
             <div className="relative">
               <select
                 required
-                value={form.warehouseId}
+                value={form.fromWarehouseId}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, warehouseId: e.target.value }))
+                  setForm((f) => ({ ...f, fromWarehouseId: e.target.value }))
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
@@ -92,20 +87,22 @@ const InventoryReceivePage = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Dostawca</label>
+            <label className="block text-sm font-medium mb-1">
+              Do magazynu
+            </label>
             <div className="relative">
               <select
                 required
-                value={form.supplierId}
+                value={form.toWarehouseId}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, supplierId: e.target.value }))
+                  setForm((f) => ({ ...f, toWarehouseId: e.target.value }))
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz dostawce</option>
-                {suppliers.map((s) => (
-                  <option key={s.supplierId} value={s.supplierId}>
-                    {s.name}
+                <option value="">Wybierz magazyn</option>
+                {warehouses.map((w) => (
+                  <option key={w.warehouseId} value={w.warehouseId}>
+                    {w.name}
                   </option>
                 ))}
               </select>
@@ -147,7 +144,7 @@ const InventoryReceivePage = () => {
                   onChange={(e) =>
                     handleItemChange(idx, "quantity", e.target.value)
                   }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
                 />
               </div>
               <button
@@ -171,7 +168,7 @@ const InventoryReceivePage = () => {
           {error && <p className="text-red-500 mb-2">Error: {error}</p>}
           {status === "succeeded" && (
             <p className="text-green-600 mb-2">
-              Received successfully! Transaction ID:{" "}
+              Transferred successfully! Transaction ID:{" "}
               {transaction?.transactionId}
             </p>
           )}
@@ -180,7 +177,7 @@ const InventoryReceivePage = () => {
             disabled={status === "loading"}
             className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
           >
-            Przyjmij towar
+            Przenieś towar
           </button>
         </div>
       </form>
@@ -188,4 +185,4 @@ const InventoryReceivePage = () => {
   );
 };
 
-export default InventoryReceivePage;
+export default TransferPage;
