@@ -12,6 +12,7 @@ import suppliersReducer from "../features/suppliers/suppliersSlice";
 import employeesReducer from "../features/employees/employeesSlice";
 import summaryReducer from "../features/dashboard/summarySlice";
 import selectedWarehouseReducer from "../features/selectedWarehouse/selectedWarehouseSlice";
+import geographyReducer from "../features/geography/geographySlice";
 
 export default combineReducers({
   auth: authReducer,
@@ -29,4 +30,5 @@ export default combineReducers({
   employees: employeesReducer,
   dashboard: summaryReducer,
   selectedWarehouse: selectedWarehouseReducer,
+  geography: geographyReducer,
 });

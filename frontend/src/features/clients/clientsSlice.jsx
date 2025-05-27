@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as clientsAPI from "../../api/clients";
 
-export const fetchClients = createAsyncThunk("clients/fetchAll", async () => {
-  const response = await clientsAPI.listClients();
-  return response.data;
-});
+export const fetchClients = createAsyncThunk(
+  "clients/fetchAll",
+  async (params) => {
+    const response = await clientsAPI.listClients(params);
+    return response.data;
+  }
+);
 export const fetchClientById = createAsyncThunk(
   "clients/fetchById",
   async (id) => {

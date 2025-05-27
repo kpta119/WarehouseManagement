@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import { createSupplier } from "../../features/suppliers/suppliersSlice";
-import { listRegions, listCountries } from "../../api/geography";
+import {
+  fetchRegions,
+  fetchCountries,
+} from "../../features/geography/geographySlice";
 
 const SupplierForm = () => {
   const dispatch = useDispatch();
+  const { regions, countries, status, error } = useSelector(
+    (state) => state.geography
+  );
   const navigate = useNavigate();
-  const [regions, setRegions] = useState([]);
-  const [countries, setCountries] = useState([]);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,17 +26,15 @@ const SupplierForm = () => {
     streetNumber: "",
   });
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
+    dispatch(fetchRegions());
+  }, [dispatch]);
   useEffect(() => {
     if (form.regionId) {
-      listCountries(Number(form.regionId)).then((res) =>
-        setCountries(res.data)
-      );
+      dispatch(fetchCountries(form.regionId));
     } else {
-      setCountries([]);
+      dispatch(fetchCountries(null));
     }
-  }, [form.regionId]);
+  }, [dispatch, form.regionId]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -162,7 +164,7 @@ const SupplierForm = () => {
             >
               <option value="">Wybierz region, a potem kraj</option>
               {countries.map((c) => (
-                <option key={c.countryId} value={c.countryId}>
+                <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}

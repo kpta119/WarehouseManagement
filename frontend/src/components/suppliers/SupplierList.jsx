@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchSuppliers } from "../../features/suppliers/suppliersSlice";
-import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
+import { FaEye, FaChevronDown } from "react-icons/fa";
+import TextInput from "../helper/TextInput";
+import SelectInput from "../helper/SelectInput";
+import NumberInput from "../helper/NumberInput";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import Pagination from "../helper/Pagination";
 
 const SupplierList = () => {
   const dispatch = useDispatch();
@@ -11,10 +16,41 @@ const SupplierList = () => {
     status,
     error,
   } = useSelector((state) => state.suppliers);
+  const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [minTransactions, setMinTransactions] = useState("");
+  const [maxTransactions, setMaxTransactions] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
+  const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
-    dispatch(fetchSuppliers());
+    dispatch(
+      fetchSuppliers({
+        name: searchTerm || undefined,
+        regionId: selectedRegion || undefined,
+        minTransactions: minTransactions
+          ? parseInt(minTransactions)
+          : undefined,
+        maxTransactions: maxTransactions
+          ? parseInt(maxTransactions)
+          : undefined,
+        warehouseId: selectedWarehouse || undefined,
+        page: page || 1,
+      })
+    );
+  }, [
+    dispatch,
+    searchTerm,
+    selectedRegion,
+    minTransactions,
+    maxTransactions,
+    selectedWarehouse,
+    page,
+  ]);
+  useEffect(() => {
+    dispatch(fetchRegions());
   }, [dispatch]);
   const filtered = suppliers
     .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -47,18 +83,39 @@ const SupplierList = () => {
   return (
     <>
       <form className="flex justify-between items-center space-x-4">
-        <div>
-          <label className="block text-sm font-medium">Nazwa</label>
-          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
-            <FaSearch className="text-gray-500 mr-2" />
-            <input
-              type="text"
-              placeholder="Search suppliers..."
-              className="w-full focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="flex justify-between items-center space-x-4">
+          <TextInput
+            label="Nazwa"
+            placeholder="Szukaj klientów..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
+          <SelectInput
+            label="Region"
+            value={selectedRegion}
+            setValue={setSelectedRegion}
+          >
+            <option value="">Wszystkie Regiony</option>
+            {regions.map((reg) => (
+              <option key={reg.id} value={reg.id}>
+                {reg.name}
+              </option>
+            ))}
+          </SelectInput>
+          <NumberInput
+            label="Transakcje (min)"
+            placeholder="Wybierz transakcje..."
+            isMinus={true}
+            value={minTransactions}
+            setValue={setMinTransactions}
+          />
+          <NumberInput
+            label="Transakcje (max)"
+            placeholder="Wybierz transakcje..."
+            isMinus={false}
+            value={maxTransactions}
+            setValue={setMaxTransactions}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium">Sortowanie</label>
@@ -91,51 +148,63 @@ const SupplierList = () => {
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Nazwa</div>
-            <div>E-mail</div>
-            <div>Nr. telefonu</div>
-            <div>Adres</div>
-            <div className="text-right">Liczba transakcji</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Nazwa</div>
+              <div>E-mail</div>
+              <div>Nr. telefonu</div>
+              <div>Adres</div>
+              <div className="text-right">Liczba transakcji</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((sup) => (
+                <div
+                  key={sup.supplierId}
+                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                >
+                  <div className="font-medium text-pink-600">
+                    <Link
+                      to={`/suppliers/${sup.supplierId}`}
+                      className="hover:underline"
+                    >
+                      {sup.name}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700">{sup.email}</div>
+                  <div className="text-sm text-gray-700">{sup.phoneNumber}</div>
+                  <div className="text-sm text-gray-700">
+                    {typeof sup.address === "string"
+                      ? sup.address
+                      : `${sup.address.street} ${sup.address.streetNumber}, ${sup.address.postalCode} ${sup.address.city}, ${sup.address.country}`}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {sup.transactionsCount}
+                  </div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link
+                      to={`/suppliers/${sup.supplierId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((sup) => (
-              <div
-                key={sup.supplierId}
-                className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div className="font-medium text-pink-600">
-                  <Link
-                    to={`/suppliers/${sup.supplierId}`}
-                    className="hover:underline"
-                  >
-                    {sup.name}
-                  </Link>
-                </div>
-                <div className="text-sm text-gray-700">{sup.email}</div>
-                <div className="text-sm text-gray-700">{sup.phoneNumber}</div>
-                <div className="text-sm text-gray-700">
-                  {typeof sup.address === "string"
-                    ? sup.address
-                    : `${sup.address.street} ${sup.address.streetNumber}, ${sup.address.postalCode} ${sup.address.city}, ${sup.address.country}`}
-                </div>
-                <div className="text-sm text-gray-700 text-right">
-                  {sup.transactionsCount}
-                </div>
-                <div className="flex justify-center text-gray-600">
-                  <Link
-                    to={`/suppliers/${sup.supplierId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );

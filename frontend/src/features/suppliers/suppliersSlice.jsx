@@ -3,8 +3,8 @@ import * as suppliersAPI from "../../api/suppliers";
 
 export const fetchSuppliers = createAsyncThunk(
   "suppliers/fetchAll",
-  async () => {
-    const response = await suppliersAPI.listSuppliers();
+  async (params) => {
+    const response = await suppliersAPI.listSuppliers(params);
     return response.data;
   }
 );

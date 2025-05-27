@@ -1,26 +1,35 @@
-import { useState, useEffect } from "react";
-import { listRegions } from "../../api/geography";
+import { useEffect } from "react";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const RegionList = ({ selectedRegion, onSelect }) => {
-  const [regions, setRegions] = useState([]);
+  const dispatch = useDispatch();
+  const { regions, status, error } = useSelector((state) => state.geography);
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
-  return (
+    dispatch(fetchRegions());
+  }, [dispatch]);
+  return status === "loading" || status === "idle" ? (
+    <p>Loading...</p>
+  ) : status === "failed" ? (
+    <p className="text-red-500">Error: {error}</p>
+  ) : (
     <div className="bg-white p-6 rounded-lg shadow">
       <h2 className="text-xl font-semibold mb-4">Regiony</h2>
       <ul className="space-y-2">
         {regions.map((r) => (
-          <li key={r.id}>
+          <li
+            key={r.id}
+            className={`px-4 py-2 border border-gray-200 rounded-lg transition cursor-pointer
+            ${
+              selectedRegion.id === r.id
+                ? "bg-pink-100 text-pink-800"
+                : "hover:bg-gray-100"
+            }`}
+            onClick={() => onSelect({ id: r.id, name: r.name })}
+          >
             <button
-              onClick={() => onSelect({ id: r.id, name: r.name })}
               className={`
-                w-full text-left px-4 py-2 rounded-lg transition
-                ${
-                  selectedRegion.id === r.id
-                    ? "bg-pink-100 text-pink-800"
-                    : "hover:bg-gray-100"
-                }
+                w-full text-left rounded-lg cursor-pointer
               `}
             >
               {r.name}

@@ -231,6 +231,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
 import { fetchProducts } from "../../features/products/productsSlice";
 import { FaChevronLeft, FaEdit } from "react-icons/fa";
+import { currencyFormatter } from "../../utils/helpers";
 
 const CategoryDetail = () => {
   const { id } = useParams();
@@ -282,7 +283,7 @@ const CategoryDetail = () => {
                 >
                   {p.name}
                 </Link>
-                <span className="ml-2">${p.unitPrice.toFixed(2)}</span>
+                <span className="ml-2">{currencyFormatter(p.unitPrice)}</span>
               </li>
             ))}
           </ul>
@@ -862,7 +863,7 @@ const ClientList = () => {
                     {c.name}
                   </Link>
                 </div>
-                <div className="text-sm text-gray-700">{c.email}</div>
+                <div className="text-sm text-gray-700 truncate">{c.email}</div>
                 <div className="text-sm text-gray-700">{c.phoneNumber}</div>
                 <div className="text-sm text-gray-700">{c.address}</div>
                 <div className="text-sm text-gray-700 text-right">
@@ -1491,7 +1492,9 @@ const EmployeeList = () => {
                     {emp.name} {emp.surname}
                   </Link>
                 </div>
-                <div className="text-sm text-gray-700">{emp.email}</div>
+                <div className="text-sm text-gray-700 truncate">
+                  {emp.email}
+                </div>
                 <div className="text-sm text-gray-700">{emp.phoneNumber}</div>
                 <div className="text-sm text-gray-700">{emp.position}</div>
                 <div className="text-sm text-gray-700">{emp.warehouseName}</div>
@@ -2429,6 +2432,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchProductById } from "../../features/products/productsSlice";
 import { format } from "date-fns";
 import { FaEdit, FaChevronLeft, FaEye } from "react-icons/fa";
+import { currencyFormatter } from "../../utils/helpers";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -2469,7 +2473,8 @@ const ProductDetail = () => {
         {categoryName}
       </p>
       <p>
-        <strong>Jednostkowa Cena: </strong>${unitPrice.toFixed(2)}
+        <strong>Jednostkowa Cena: </strong>
+        {currencyFormatter(unitPrice)}
       </p>
       <p>
         <strong>Jednostkowy Rozmiar: </strong>
@@ -2514,7 +2519,7 @@ const ProductDetail = () => {
                 <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
                 <div>{tx.type.replace(/_/g, " ")}</div>
                 <div className="text-right">{tx.quantity}</div>
-                <div className="text-right">${tx.price.toFixed(2)}</div>
+                <div className="text-right">{currencyFormatter(tx.price)}</div>
                 <div className="flex justify-center text-gray-600">
                   <Link
                     to={`/transactions/${tx.transactionId}`}
@@ -3519,6 +3524,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchTransactionById } from "../../features/transactions/transactionsSlice";
 import { FaChevronLeft } from "react-icons/fa";
 import { format } from "date-fns";
+import { currencyFormatter } from "../../utils/helpers";
 
 const TransactionDetail = () => {
   const { id } = useParams();
@@ -3637,19 +3643,20 @@ const TransactionDetail = () => {
                   </Link>
                 </div>
                 <div className="text-right">{p.quantity}</div>
-                <div className="text-right">${p.unitPrice.toFixed(2)}</div>
+                <div className="text-right">
+                  {currencyFormatter(p.unitPrice)}
+                </div>
                 <div className="text-right">{p.categoryName}</div>
                 <div className="text-right">
-                  ${(p.quantity * p.unitPrice).toFixed(2)}
+                  {currencyFormatter(p.quantity * p.unitPrice)}
                 </div>
               </div>
             ))}
           </div>
           <div className="text-right p-2 font-bold">
-            $
-            {products
-              .reduce((acc, p) => acc + p.quantity * p.unitPrice, 0)
-              .toFixed(2)}
+            {currencyFormatter(
+              products.reduce((acc, p) => acc + p.quantity * p.unitPrice, 0)
+            )}
           </div>
         </section>
       )}
@@ -3668,6 +3675,7 @@ import { Link } from "react-router-dom";
 import { fetchTransactions } from "../../features/transactions/transactionsSlice";
 import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
 import { format } from "date-fns";
+import { currencyFormatter } from "../../utils/helpers";
 
 const TransactionList = () => {
   const dispatch = useDispatch();
@@ -3841,7 +3849,9 @@ const TransactionList = () => {
                 <div>
                   {tx.toWarehouseId ?? tx.clientId ?? tx.supplierId ?? "-"}
                 </div>
-                <div className="text-right">${tx.totalPrice.toFixed(2)}</div>
+                <div className="text-right">
+                  {currencyFormatter(tx.totalPrice)}
+                </div>
                 <div className="text-gray-600 flex justify-center">
                   <Link
                     to={`/transactions/${tx.transactionId}`}
@@ -3878,6 +3888,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { FaChevronLeft, FaEdit, FaEye } from "react-icons/fa";
+import { currencyFormatter } from "../../utils/helpers";
 
 const WarehouseDetail = () => {
   const { id } = useParams();
@@ -3967,7 +3978,7 @@ const WarehouseDetail = () => {
                   <div>
                     {emp.name} {emp.surname}
                   </div>
-                  <div className="text-right">{emp.email}</div>
+                  <div className="text-right truncate">{emp.email}</div>
                   <div className="text-right">{emp.phoneNumber}</div>
                   <div className="text-right">{emp.position}</div>
                   <div className="flex justify-end text-gray-600">
@@ -4001,9 +4012,11 @@ const WarehouseDetail = () => {
                 >
                   <div>{pr.name}</div>
                   <div className="text-right">{pr.quantity}</div>
-                  <div className="text-right">${pr.unitPrice.toFixed(2)}</div>
                   <div className="text-right">
-                    ${(pr.quantity * pr.unitPrice).toFixed(2)}
+                    {currencyFormatter(pr.unitPrice)}
+                  </div>
+                  <div className="text-right">
+                    {currencyFormatter(pr.quantity * pr.unitPrice)}
                   </div>
                   <div className="flex justify-end text-gray-600">
                     <Link
@@ -4037,7 +4050,9 @@ const WarehouseDetail = () => {
               >
                 <div>{new Date(tx.date).toLocaleDateString()}</div>
                 <div>{tx.type.replace(/_/g, " ")}</div>
-                <div className="text-right">${tx.totalPrice.toFixed(2)}</div>
+                <div className="text-right">
+                  {currencyFormatter(tx.totalPrice)}
+                </div>
                 <div className="text-right">{tx.employeeId}</div>
                 <div className="flex justify-end text-gray-600">
                   <Link
@@ -5570,7 +5585,15 @@ const apiClient = axios.create({
 export default apiClient;
 
 
-// \utils\constants.jsx
+// \utils\helpers.jsx
 
+export const currencyFormatter = (price) =>
+  new Intl.NumberFormat("pl-PL", {
+    style: "currency",
+    currency: "USD",
+    currencyDisplay: "narrowSymbol",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(price);
 
 

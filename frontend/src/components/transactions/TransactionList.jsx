@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchTransactions } from "../../features/transactions/transactionsSlice";
-import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { format } from "date-fns";
 import { currencyFormatter } from "../../utils/helpers";
+import DateInput from "../helper/DateInput";
+import SelectInput from "../helper/SelectInput";
+import NumberInput from "../helper/NumberInput";
+import Pagination from "../helper/Pagination";
 
 const TransactionList = () => {
   const dispatch = useDispatch();
@@ -18,7 +22,13 @@ const TransactionList = () => {
     fromDate: "",
     toDate: "",
     type: "",
+    minTotalPrice: "",
+    maxTotalPrice: "",
+    minTotalSize: "",
+    maxTotalSize: "",
   });
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
   const [sortOption, setSortOption] = useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,19 +36,27 @@ const TransactionList = () => {
   };
   useEffect(() => {
     dispatch(
-      fetchTransactions({ warehouseId: selectedWarehouse || undefined })
-    );
-  }, [dispatch, selectedWarehouse]);
-  useEffect(() => {
-    dispatch(
       fetchTransactions({
         fromDate: filters.fromDate || undefined,
         toDate: filters.toDate || undefined,
         type: filters.type || undefined,
+        minTotalPrice: filters.minTotalPrice
+          ? parseFloat(filters.minTotalPrice)
+          : undefined,
+        maxTotalPrice: filters.maxTotalPrice
+          ? parseFloat(filters.maxTotalPrice)
+          : undefined,
+        minTotalSize: filters.minTotalSize
+          ? parseFloat(filters.minTotalSize)
+          : undefined,
+        maxTotalSize: filters.maxTotalSize
+          ? parseFloat(filters.maxTotalSize)
+          : undefined,
+        page: page || 1,
         warehouseId: selectedWarehouse || undefined,
       })
     );
-  }, [dispatch, filters, selectedWarehouse]);
+  }, [dispatch, filters, selectedWarehouse, page]);
   const filtered = [...transactions].sort((a, b) => {
     switch (sortOption) {
       case "date":
@@ -75,6 +93,10 @@ const TransactionList = () => {
         return a.totalPrice - b.totalPrice;
       case "total-reverse":
         return b.totalPrice - a.totalPrice;
+      case "size":
+        return a.totalSize - b.totalSize;
+      case "size-reverse":
+        return b.totalSize - a.totalSize;
       default:
         return 0;
     }
@@ -83,116 +105,134 @@ const TransactionList = () => {
     <>
       <form className="flex justify-between items-center space-x-4">
         <div className="flex flex-wrap gap-4 items-end">
-          <div>
-            <label className="block text-sm font-medium">Od dnia</label>
-            <input
-              type="date"
-              name="fromDate"
-              value={filters.fromDate}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Do dnia</label>
-            <input
-              type="date"
-              name="toDate"
-              value={filters.toDate}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Typ transakcji</label>
-            <select
-              name="type"
-              value={filters.type}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            >
-              <option value="">Wszystkie</option>
-              <option value="SUPPLIER_TO_WAREHOUSE">
-                Supplier to Warehouse
-              </option>
-              <option value="WAREHOUSE_TO_CUSTOMER">
-                Warehouse to Customer
-              </option>
-              <option value="WAREHOUSE_TO_WAREHOUSE">
-                Warehouse to Warehouse
-              </option>
-            </select>
-          </div>
+          <DateInput
+            label="Od dnia"
+            value={filters.fromDate}
+            setValue={handleChange}
+          />
+          <DateInput
+            label="Do dnia"
+            value={filters.toDate}
+            setValue={handleChange}
+          />
+          <SelectInput
+            label="Typ transakcji"
+            value={filters.type}
+            onChange={handleChange}
+          >
+            <option value="">Wszystkie</option>
+            <option value="SUPPLIER_TO_WAREHOUSE">Supplier to Warehouse</option>
+            <option value="WAREHOUSE_TO_CUSTOMER">Warehouse to Customer</option>
+            <option value="WAREHOUSE_TO_WAREHOUSE">
+              Warehouse to Warehouse
+            </option>
+          </SelectInput>
+          <NumberInput
+            label="Łączna kwota (min)"
+            isMinus={true}
+            placeholder="Wpisz kwotę..."
+            value={filters.minTotalPrice}
+            setValue={handleChange}
+          />
+          <NumberInput
+            label="Łączna kwota (max)"
+            isMinus={false}
+            placeholder="Wpisz kwotę..."
+            value={filters.maxTotalPrice}
+            setValue={handleChange}
+          />
+          <NumberInput
+            label="Łączny rozmiar (min)"
+            isMinus={true}
+            placeholder="Wpisz kwotę..."
+            value={filters.minTotalSize}
+            setValue={handleChange}
+          />
+          <NumberInput
+            label="Łączny rozmiar (max)"
+            isMinus={false}
+            placeholder="Wpisz kwotę..."
+            value={filters.maxTotalSize}
+            setValue={handleChange}
+          />
         </div>
-        <div>
-          <label className="block text-sm font-medium">Sortowanie</label>
-          <div className="relative">
-            <select
-              className="border appearance-none border-gray-300 rounded-lg px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="">Sortuj przez</option>
-              <option value="date">Data (od najstarszej)</option>
-              <option value="date-reverse">Data (od najmłodszej)</option>
-              <option value="description">Opis (od A do Z)</option>
-              <option value="description-reverse">Opis (od Z do A)</option>
-              <option value="type">Typ (od A do Z)</option>
-              <option value="type-reverse">Typ (od Z do A)</option>
-              <option value="from">Z Miejsca (od A do Z)</option>
-              <option value="from-reverse">Z Miejsca (od Z do A)</option>
-              <option value="to">Do Miejsca (od A do Z)</option>
-              <option value="to-reverse">Do Miejsca (od Z do A)</option>
-              <option value="total">Łącznie (rosnąco)</option>
-              <option value="total-reverse">Łącznie (malejąco)</option>
-            </select>
-            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
-        </div>
+        <SelectInput
+          label="Sortowanie"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="">Sortuj przez</option>
+          <option value="date">Data (od najstarszej)</option>
+          <option value="date-reverse">Data (od najmłodszej)</option>
+          <option value="description">Opis (od A do Z)</option>
+          <option value="description-reverse">Opis (od Z do A)</option>
+          <option value="type">Typ (od A do Z)</option>
+          <option value="type-reverse">Typ (od Z do A)</option>
+          <option value="from">Z Miejsca (od A do Z)</option>
+          <option value="from-reverse">Z Miejsca (od Z do A)</option>
+          <option value="to">Do Miejsca (od A do Z)</option>
+          <option value="to-reverse">Do Miejsca (od Z do A)</option>
+          <option value="total">Łącznie (rosnąco)</option>
+          <option value="total-reverse">Łącznie (malejąco)</option>
+        </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
         <p>Ładowanie...</p>
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-7 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Data</div>
-            <div>Opis</div>
-            <div>Typ</div>
-            <div>Od miejsca</div>
-            <div>Do miejsca</div>
-            <div className="text-right">Łącznie</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-9 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Data</div>
+              <div>Opis</div>
+              <div>Typ</div>
+              <div>Pracownik</div>
+              <div>Od miejsca</div>
+              <div>Do miejsca</div>
+              <div className="text-right">Łączna kwota</div>
+              <div className="text-right">Łączny rozmiar</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-1 sm:grid-cols-9 gap-4 p-4 hover:bg-pink-50 transition-colors"
+                >
+                  <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                  <div>{tx.description}</div>
+                  <div>{tx.type.replace(/_/g, " ")}</div>
+                  <div>{tx.employeeId}</div>
+                  <div>{tx.fromWarehouseId ?? tx.supplierId ?? "-"}</div>
+                  <div>{tx.toWarehouseId ?? tx.clientId ?? "-"}</div>
+                  <div className="text-right">
+                    {currencyFormatter(tx.totalPrice)}
+                  </div>
+                  <div className="text-right">{tx.totalSize}</div>
+                  <div className="text-gray-600 flex justify-center">
+                    <Link
+                      to={`/transactions/${tx.transactionId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((tx) => (
-              <div
-                key={tx.transactionId}
-                className="grid grid-cols-1 sm:grid-cols-7 gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                <div>{tx.description}</div>
-                <div>{tx.type.replace(/_/g, " ")}</div>
-                <div>{tx.fromWarehouseId ?? "-"}</div>
-                <div>
-                  {tx.toWarehouseId ?? tx.clientId ?? tx.supplierId ?? "-"}
-                </div>
-                <div className="text-right">
-                  {currencyFormatter(tx.totalPrice)}
-                </div>
-                <div className="text-gray-600 flex justify-center">
-                  <Link
-                    to={`/transactions/${tx.transactionId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );

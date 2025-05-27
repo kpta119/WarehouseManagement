@@ -3,8 +3,8 @@ import * as categoriesAPI from "../../api/categories";
 
 export const fetchCategories = createAsyncThunk(
   "categories/fetchAll",
-  async () => {
-    const response = await categoriesAPI.listCategories();
+  async (params) => {
+    const response = await categoriesAPI.listCategories(params);
     return response.data;
   }
 );

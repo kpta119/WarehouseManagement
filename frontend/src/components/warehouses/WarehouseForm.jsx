@@ -6,7 +6,10 @@ import {
   updateWarehouse,
   fetchWarehouseById,
 } from "../../features/warehouses/warehousesSlice";
-import { listRegions, listCountries } from "../../api/geography";
+import {
+  fetchRegions,
+  fetchCountries,
+} from "../../features/geography/geographySlice";
 import { FaChevronDown } from "react-icons/fa";
 
 const WarehousesForm = () => {
@@ -19,8 +22,12 @@ const WarehousesForm = () => {
     status,
     error,
   } = useSelector((state) => state.warehouses);
-  const [regions, setRegions] = useState([]);
-  const [countries, setCountries] = useState([]);
+  const {
+    regions,
+    countries,
+    status: geographyStatus,
+    error: geographyError,
+  } = useSelector((state) => state.geography);
   const [form, setForm] = useState({
     name: "",
     capacity: "",
@@ -32,17 +39,15 @@ const WarehousesForm = () => {
     streetNumber: "",
   });
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
+    dispatch(fetchRegions());
+  }, [dispatch]);
   useEffect(() => {
     if (form.regionId) {
-      listCountries(Number(form.regionId)).then((res) =>
-        setCountries(res.data)
-      );
+      dispatch(fetchCountries(form.regionId));
     } else {
-      setCountries([]);
+      dispatch(fetchCountries(null));
     }
-  }, [form.regionId]);
+  }, [dispatch, form.regionId]);
   useEffect(() => {
     if (isEdit) dispatch(fetchWarehouseById(id));
   }, [dispatch, id, isEdit]);
@@ -160,7 +165,7 @@ const WarehousesForm = () => {
             >
               <option value="">Wybierz region, a potem kraj</option>
               {countries.map((c) => (
-                <option key={c.countryId} value={c.countryId}>
+                <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}

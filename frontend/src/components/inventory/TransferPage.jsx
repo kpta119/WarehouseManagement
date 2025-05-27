@@ -2,25 +2,37 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
 import { transferInventory } from "../../features/inventory/transferSlice";
-import { searchProducts } from "../../api/products";
+import { fetchProducts } from "../../features/products/productsSlice";
+import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaExchangeAlt, FaPlus, FaTrash } from "react-icons/fa";
 
 const TransferPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
+  const { list: products } = useSelector((s) => s.products);
+  const { list: employees } = useSelector((s) => s.employees);
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.transfer
   );
   const [form, setForm] = useState({
     fromWarehouseId: "",
     toWarehouseId: "",
+    employeeId: "",
     items: [{ productId: "", quantity: "" }],
   });
-  const [products, setProducts] = useState([]);
   useEffect(() => {
     dispatch(fetchWarehouses());
-    searchProducts({}).then((res) => setProducts(res.data));
+    dispatch(fetchProducts());
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(
+      fetchEmployees({
+        warehouseId: form.toWarehouseId
+          ? Number(form.toWarehouseId)
+          : undefined,
+      })
+    );
+  }, [dispatch, form.toWarehouseId]);
   const handleAddRow = () =>
     setForm((f) => ({
       ...f,
@@ -103,6 +115,27 @@ const TransferPage = () => {
                 {warehouses.map((w) => (
                   <option key={w.warehouseId} value={w.warehouseId}>
                     {w.name}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <div className="relative">
+              <select
+                required
+                value={form.employeeId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, employeeId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz pracownika</option>
+                {employees.map((e) => (
+                  <option key={e.employeeId} value={e.employeeId}>
+                    {e.name} {e.surname}
                   </option>
                 ))}
               </select>
