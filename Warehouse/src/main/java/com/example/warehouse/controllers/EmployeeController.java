@@ -7,11 +7,12 @@ import com.example.warehouse.domain.dto.employeeDtos.EmployeeWithHistoryDto;
 import com.example.warehouse.mappers.EmployeeMapper;
 import com.example.warehouse.services.EmployeeService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -28,11 +29,13 @@ public class EmployeeController {
 
     @GetMapping()
     public ResponseEntity<?> getAllEmployees(
-            @RequestParam(required = false) Integer warehouseId
+            @RequestParam(required = false) Integer warehouseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size
     ) {
         try {
-            List<EmployeeSummaryDto> allEmployees = employeeService.getEmployeesWithTransactionCount(warehouseId);
-            return ResponseEntity.status(HttpStatus.OK).body(allEmployees);
+            Page<EmployeeSummaryDto> response = employeeService.getEmployeesWithTransactionCount(warehouseId, PageRequest.of(page, size));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

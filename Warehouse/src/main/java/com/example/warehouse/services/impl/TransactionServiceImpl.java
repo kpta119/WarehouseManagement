@@ -9,10 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 
 @Service
@@ -36,10 +33,10 @@ public class TransactionServiceImpl implements TransactionService {
             List<Predicate> predicates = new ArrayList<>();
 
             if (fromDate != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), startOfDay(fromDate)));
             }
             if (toDate != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
+                predicates.add(cb.lessThanOrEqualTo(root.get("date"), fromDate));
             }
             if (type != null) {
                 predicates.add(cb.equal(root.get("transactionType"), type));
@@ -51,5 +48,15 @@ public class TransactionServiceImpl implements TransactionService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         return transactionRepository.findAll(spec, pageable);
+    }
+
+    private Date startOfDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 }
