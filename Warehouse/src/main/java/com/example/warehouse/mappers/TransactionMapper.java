@@ -14,7 +14,6 @@ public class TransactionMapper {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
     public TransactionWithProductsDto mapToDto(Transaction transaction) {
         TransactionWithProductsDto dto = new TransactionWithProductsDto();
 
@@ -29,18 +28,22 @@ public class TransactionMapper {
 
         if (transaction.getFromWarehouse() != null) {
             dto.setFromWarehouseId(transaction.getFromWarehouse().getId());
+            dto.setFromWarehouseName(transaction.getFromWarehouse().getName());
         }
 
         if (transaction.getToWarehouse() != null) {
             dto.setToWarehouseId(transaction.getToWarehouse().getId());
+            dto.setToWarehouseName(transaction.getToWarehouse().getName());
         }
 
         if (transaction.getClient() != null) {
             dto.setClientId(transaction.getClient().getId());
+            dto.setClientName(transaction.getClient().getName());
         }
 
         if (transaction.getSupplier() != null) {
             dto.setSupplierId(transaction.getSupplier().getId());
+            dto.setSupplierName(transaction.getSupplier().getName());
         }
 
         List<ProductInfoDto> productDtos = transaction.getProducts().stream()

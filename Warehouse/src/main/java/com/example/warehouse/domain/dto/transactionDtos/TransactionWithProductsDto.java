@@ -17,8 +17,12 @@ public class TransactionWithProductsDto {
     private String description;
     private Integer employeeId;
     private Integer fromWarehouseId;
+    private String fromWarehouseName;
     private Integer toWarehouseId;
+    private String toWarehouseName;
     private Integer clientId;
+    private String clientName;
     private Integer supplierId;
+    private String supplierName;
     private List<ProductInfoDto> products;
 }
