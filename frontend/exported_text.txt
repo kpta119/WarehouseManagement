@@ -187,6 +187,7 @@ import suppliersReducer from "../features/suppliers/suppliersSlice";
 import employeesReducer from "../features/employees/employeesSlice";
 import summaryReducer from "../features/dashboard/summarySlice";
 import selectedWarehouseReducer from "../features/selectedWarehouse/selectedWarehouseSlice";
+import geographyReducer from "../features/geography/geographySlice";
 
 export default combineReducers({
   auth: authReducer,
@@ -204,6 +205,7 @@ export default combineReducers({
   employees: employeesReducer,
   dashboard: summaryReducer,
   selectedWarehouse: selectedWarehouseReducer,
+  geography: geographyReducer,
 });
 
 
@@ -225,7 +227,7 @@ export default store;
 
 // \components\categories\CategoryDetail.jsx
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
@@ -238,6 +240,7 @@ const CategoryDetail = () => {
   const dispatch = useDispatch();
   const { list: categories, status } = useSelector((s) => s.categories);
   const { list: products, status: prodStatus } = useSelector((s) => s.products);
+  const [productsShown, setProductsShown] = useState(25);
   useEffect(() => {
     if (status === "idle") dispatch(fetchCategories());
     dispatch(fetchProducts({ categoryId: id }));
@@ -248,12 +251,15 @@ const CategoryDetail = () => {
   return (
     <div className="space-y-6 max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <div className="flex items-center justify-between">
-        <Link to="/products" className="text-gray-600 hover:text-pink-500">
+        <Link
+          to="/products"
+          className="text-gray-600 hover:text-pink-500 transition duration-200"
+        >
           <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii
         </Link>
         <Link
           to={`/categories/${cat.categoryId}/edit`}
-          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition duration-200"
         >
           <FaEdit className="mr-2" /> Edytuj Produkt
         </Link>
@@ -271,22 +277,32 @@ const CategoryDetail = () => {
         ) : products.length === 0 ? (
           <p>Brak produktów w tej kategorii.</p>
         ) : (
-          <ul className="divide-y divide-gray-200">
-            {products.map((p) => (
-              <li
-                key={p.productId}
-                className="p-2 hover:bg-gray-50 flex items-center justify-between"
-              >
-                <Link
-                  to={`/products/${p.productId}`}
-                  className="text-pink-600 hover:underline"
+          <>
+            <ul className="divide-y divide-gray-200">
+              {products.slice(0, productsShown).map((p) => (
+                <li
+                  key={p.productId}
+                  className="p-2 hover:bg-gray-50 flex items-center justify-between transition duration-200"
                 >
-                  {p.name}
-                </Link>
-                <span className="ml-2">{currencyFormatter(p.unitPrice)}</span>
-              </li>
-            ))}
-          </ul>
+                  <Link
+                    to={`/products/${p.productId}`}
+                    className="text-pink-600 hover:underline"
+                  >
+                    {p.name}
+                  </Link>
+                  <span className="ml-2">{currencyFormatter(p.unitPrice)}</span>
+                </li>
+              ))}
+            </ul>
+            {products.length > productsShown && (
+              <button
+                onClick={() => setProductsShown((prev) => prev + 25)}
+                className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block duration-200"
+              >
+                Pokaż więcej
+              </button>
+            )}
+          </>
         )}
       </section>
     </div>
@@ -356,7 +372,7 @@ const CategoryForm = () => {
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <Link
         to="/categories"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii
       </Link>
@@ -391,7 +407,7 @@ const CategoryForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           {isEdit ? "Zapisz" : "Utwórz"}
         </button>
@@ -412,21 +428,25 @@ import {
   fetchCategories,
   deleteCategory,
 } from "../../features/categories/categoriesSlice";
-import {
-  FaSearch,
-  FaTrash,
-  FaEdit,
-  FaChevronDown,
-  FaEye,
-} from "react-icons/fa";
+import { FaTrash, FaEdit, FaEye } from "react-icons/fa";
+import Pagination from "../helper/Pagination";
+import TextInput from "../helper/TextInput";
+import SelectInput from "../helper/SelectInput";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
   const { list: categories, status, error } = useSelector((s) => s.categories);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
   useEffect(() => {
-    dispatch(fetchCategories());
+    dispatch(
+      fetchCategories({
+        searchTerm: searchTerm || undefined,
+        page: page || 1,
+      })
+    );
   }, [dispatch]);
   const filtered = categories
     .filter((cat) => cat.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -453,88 +473,91 @@ const CategoryList = () => {
   if (status === "failed") return <p className="text-red-500">Błąd: {error}</p>;
   return (
     <>
-      <div className="flex items-center space-x-2 justify-between">
-        <div>
-          <label className="block text-sm font-medium">Nazwa</label>
-          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-            <FaSearch className="text-gray-500 mr-2" />
-            <input
-              type="text"
-              placeholder="Szukaj kategorii..."
-              className="w-full focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+      <form className="flex items-center space-x-2 justify-between">
+        <div className="flex flex-wrap gap-4 items-end">
+          <TextInput
+            label="Nazwa"
+            placeholder="Szukaj kategorii..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
         </div>
-        <div>
-          <label className="block text-sm font-medium">Sortowanie</label>
-          <div className="relative">
-            <select
-              className="border appearance-none border-gray-300 rounded-lg px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="">Sortuj przez</option>
-              <option value="name">Nazwa (od A do Z)</option>
-              <option value="name-reverse">Nazwa (od Z do A)</option>
-              <option value="description">Opis (od A do Z)</option>
-              <option value="description-reverse">Opis (od Z do A)</option>
-            </select>
-            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
-        </div>
-      </div>
+        <SelectInput
+          label="Sortowanie"
+          value={sortOption}
+          setValue={setSortOption}
+        >
+          <option value="">Sortuj przez</option>
+          <option value="name">Nazwa (od A do Z)</option>
+          <option value="name-reverse">Nazwa (od Z do A)</option>
+          <option value="description">Opis (od A do Z)</option>
+          <option value="description-reverse">Opis (od Z do A)</option>
+        </SelectInput>
+      </form>
       {status === "loading" ? (
         <p>Ładowanie...</p>
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-3 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Nazwa</div>
-            <div>Opis</div>
-            <div className="text-center">Akcje</div>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((cat) => (
-              <div
-                key={cat.categoryId}
-                className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div className="font-medium text-pink-600">
-                  <Link
-                    to={`/categories/${cat.categoryId}`}
-                    className="hover:underline"
-                  >
-                    {cat.name}
-                  </Link>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-3 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Nazwa</div>
+              <div>Opis</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((cat) => (
+                <div
+                  key={cat.categoryId}
+                  className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div className="font-medium text-pink-600">
+                    <Link
+                      to={`/categories/${cat.categoryId}`}
+                      className="hover:underline"
+                    >
+                      {cat.name}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700 truncate">
+                    {cat.description}
+                  </div>
+                  <div className="flex justify-center space-x-4 text-gray-600">
+                    <Link
+                      to={`/categories/${cat.categoryId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                    <Link
+                      to={`/categories/${cat.categoryId}/edit`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEdit />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(cat.categoryId)}
+                      className="hover:text-pink-500 transition duration-200 cursor-pointer"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-700">{cat.description}</div>
-                <div className="flex justify-center space-x-4 text-gray-600">
-                  <Link
-                    to={`/categories/${cat.categoryId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                  <Link
-                    to={`/categories/${cat.categoryId}/edit`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEdit />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(cat.categoryId)}
-                    className="hover:text-pink-500 transition duration-200 cursor-pointer"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -545,17 +568,22 @@ export default CategoryList;
 
 // \components\clients\ClientDetail.jsx
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchClientById } from "../../features/clients/clientsSlice";
-import { format } from "date-fns";
 import { FaChevronLeft, FaEye } from "react-icons/fa";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const ClientDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { current: client } = useSelector((s) => s.clients);
+  const [transactionsShown, setTransactionsShown] = useState(25);
   useEffect(() => {
     dispatch(fetchClientById(id));
   }, [dispatch, id]);
@@ -570,7 +598,10 @@ const ClientDetail = () => {
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow space-y-4">
         <div>
-          <Link to="/clients" className="text-gray-600 hover:text-pink-500">
+          <Link
+            to="/clients"
+            className="text-gray-600 hover:text-pink-500 transition duration-200"
+          >
             <FaChevronLeft className="inline-block mr-2" /> Powrót do Klientów
           </Link>
         </div>
@@ -589,34 +620,60 @@ const ClientDetail = () => {
           {history.length === 0 ? (
             <p>Brak historii transakcji.</p>
           ) : (
-            <div className="bg-white rounded-lg shadow overflow-auto">
-              <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
-                <div>Data</div>
-                <div>Typ</div>
-                <div>Opis</div>
-                <div className="text-center">Detale</div>
-              </div>
-              <div className="divide-y divide-gray-200">
-                {history.map((tx) => (
-                  <div
-                    key={tx.transactionId}
-                    className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
-                  >
-                    <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                    <div>{tx.type.replace(/_/g, " ")}</div>
-                    <div>{tx.description}</div>
-                    <div className="flex justify-center text-gray-600">
-                      <Link
-                        to={`/transactions/${tx.transactionId}`}
-                        className="hover:text-pink-500 transition duration-200"
+            <>
+              <div className="bg-white rounded-lg shadow overflow-auto">
+                <div className="grid grid-cols-6 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+                  <div>Data</div>
+                  <div>Typ</div>
+                  <div>Opis</div>
+                  <div className="text-right">Ilość przedmiotów</div>
+                  <div className="text-right">Łączna kwota</div>
+                  <div className="text-center">Detale</div>
+                </div>
+                <div className="divide-y divide-gray-200">
+                  {[...history]
+                    .reverse()
+                    .slice(0, transactionsShown)
+                    .map((tx) => (
+                      <div
+                        key={tx.transactionId}
+                        className="grid grid-cols-6 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors duration-200"
                       >
-                        <FaEye />
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                        <div>{dateFormatter(tx.date)}</div>
+                        <div>
+                          {tx.type
+                            .toLowerCase()
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                        </div>
+                        <div className="truncate">{tx.description}</div>
+                        <div className="text-right">
+                          {numberFormatter(tx.itemsCount)}
+                        </div>
+                        <div className="text-right">
+                          {currencyFormatter(tx.totalPrice)}
+                        </div>
+                        <div className="flex justify-center text-gray-600">
+                          <Link
+                            to={`/transactions/${tx.transactionId}`}
+                            className="hover:text-pink-500 transition duration-200"
+                          >
+                            <FaEye />
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
-            </div>
+              {history.length > transactionsShown && (
+                <button
+                  onClick={() => setTransactionsShown((prev) => prev + 25)}
+                  className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
+                >
+                  Pokaż więcej
+                </button>
+              )}
+            </>
           )}
         </section>
       </div>
@@ -661,7 +718,7 @@ const ClientForm = () => {
     <div className="max-w-xl mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">
       <Link
         to="/clients"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="inline mr-2" /> Powrót do Klientów
       </Link>
@@ -737,7 +794,7 @@ const ClientForm = () => {
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition disabled:opacity-50"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           Stwórz Klienta
         </button>
@@ -755,15 +812,52 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchClients } from "../../features/clients/clientsSlice";
-import { FaChevronDown, FaEye, FaSearch } from "react-icons/fa";
+import { FaChevronDown, FaEye } from "react-icons/fa";
+import TextInput from "../helper/TextInput";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import SelectInput from "../helper/SelectInput";
+import NumberInput from "../helper/NumberInput";
+import Pagination from "../helper/Pagination";
+import { numberFormatter } from "../../utils/helpers";
 
 const ClientList = () => {
   const dispatch = useDispatch();
   const { list: clients, status, error } = useSelector((s) => s.clients);
+  const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [minTransactions, setMinTransactions] = useState("");
+  const [maxTransactions, setMaxTransactions] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
+  const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
-    dispatch(fetchClients());
+    dispatch(
+      fetchClients({
+        name: searchTerm || undefined,
+        regionId: selectedRegion || undefined,
+        minTransactions: minTransactions
+          ? parseInt(minTransactions)
+          : undefined,
+        maxTransactions: maxTransactions
+          ? parseInt(maxTransactions)
+          : undefined,
+        warehouseId: selectedWarehouse || undefined,
+        page: page || 1,
+      })
+    );
+  }, [
+    dispatch,
+    searchTerm,
+    selectedRegion,
+    minTransactions,
+    maxTransactions,
+    selectedWarehouse,
+    page,
+  ]);
+  useEffect(() => {
+    dispatch(fetchRegions());
   }, [dispatch]);
   const filtered = clients
     .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -796,18 +890,39 @@ const ClientList = () => {
   return (
     <>
       <form className="flex justify-between items-center space-x-4">
-        <div>
-          <label className="block text-sm font-medium">Nazwa</label>
-          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-            <FaSearch className="text-gray-500 mr-2" />
-            <input
-              type="text"
-              placeholder="Szukaj klientów..."
-              className="w-full focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="flex justify-between items-center space-x-4">
+          <TextInput
+            label="Nazwa"
+            placeholder="Szukaj klientów..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
+          <SelectInput
+            label="Region"
+            value={selectedRegion}
+            setValue={setSelectedRegion}
+          >
+            <option value="">Wszystkie Regiony</option>
+            {regions.map((reg) => (
+              <option key={reg.id} value={reg.id}>
+                {reg.name}
+              </option>
+            ))}
+          </SelectInput>
+          <NumberInput
+            label="Transakcje (min)"
+            placeholder="Wybierz transakcje..."
+            isMinus={true}
+            value={minTransactions}
+            setValue={setMinTransactions}
+          />
+          <NumberInput
+            label="Transakcje (max)"
+            placeholder="Wybierz transakcje..."
+            isMinus={false}
+            value={maxTransactions}
+            setValue={setMaxTransactions}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium">Sortowanie</label>
@@ -840,47 +955,61 @@ const ClientList = () => {
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Nazwa</div>
-            <div>E-mail</div>
-            <div>Nr. telefonu</div>
-            <div>Adres</div>
-            <div className="text-right">Liczba transakcji</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Nazwa</div>
+              <div>E-mail</div>
+              <div>Nr. telefonu</div>
+              <div>Adres</div>
+              <div className="text-right">Liczba transakcji</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((c) => (
+                <div
+                  key={c.clientId}
+                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div className="font-medium text-pink-600">
+                    <Link
+                      to={`/clients/${c.clientId}`}
+                      className="hover:underline"
+                    >
+                      {c.name}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700 truncate">
+                    {c.email}
+                  </div>
+                  <div className="text-sm text-gray-700">{c.phoneNumber}</div>
+                  <div className="text-sm text-gray-700">{c.address}</div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(c.transactionsCount)}
+                  </div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link
+                      to={`/clients/${c.clientId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((c) => (
-              <div
-                key={c.clientId}
-                className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div className="font-medium text-pink-600">
-                  <Link
-                    to={`/clients/${c.clientId}`}
-                    className="hover:underline"
-                  >
-                    {c.name}
-                  </Link>
-                </div>
-                <div className="text-sm text-gray-700 truncate">{c.email}</div>
-                <div className="text-sm text-gray-700">{c.phoneNumber}</div>
-                <div className="text-sm text-gray-700">{c.address}</div>
-                <div className="text-sm text-gray-700 text-right">
-                  {c.transactionsCount}
-                </div>
-                <div className="flex justify-center text-gray-600">
-                  <Link
-                    to={`/clients/${c.clientId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -974,6 +1103,11 @@ import {
   FaCalendarCheck,
   FaCalendarDay,
 } from "react-icons/fa";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const SummaryTiles = ({ summary }) => {
   const {
@@ -991,36 +1125,35 @@ const SummaryTiles = ({ summary }) => {
     lastDeliveryId,
     topProductId,
   } = summary;
-
   const tiles = [
     {
       icon: <FaBox className="text-pink-400 w-6 h-6" />,
       label: "Produkty",
-      value: productsCount,
+      value: numberFormatter(productsCount),
       to: "/products",
     },
     {
       icon: <FaTags className="text-pink-400 w-6 h-6" />,
       label: "Kategorie",
-      value: categoriesCount,
+      value: numberFormatter(categoriesCount),
       to: "/categories",
     },
     {
       icon: <FaTruckLoading className="text-pink-400 w-6 h-6" />,
       label: "Przyjęcia (mies.)",
-      value: monthlyReceipts,
+      value: numberFormatter(monthlyReceipts),
       to: "/inventory/receive",
     },
     {
       icon: <FaTruckPickup className="text-pink-400 w-6 h-6" />,
       label: "Wydania (mies.)",
-      value: monthlyDeliveries,
+      value: numberFormatter(monthlyDeliveries),
       to: "/inventory/delivery",
     },
     {
       icon: <FaExclamationTriangle className="text-pink-400 w-6 h-6" />,
       label: "Niski stan",
-      value: lowStockCount,
+      value: numberFormatter(lowStockCount),
       to: "/products?filter=low-stock",
     },
     {
@@ -1032,37 +1165,28 @@ const SummaryTiles = ({ summary }) => {
     {
       icon: <FaDollarSign className="text-pink-400 w-6 h-6" />,
       label: "Wartość zapasów",
-      value: inventoryValue?.toLocaleString(undefined, {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      }),
+      value: currencyFormatter(inventoryValue),
       to: "/warehouses",
     },
     {
       icon: <FaSyncAlt className="text-pink-400 w-6 h-6" />,
       label: "Obrót (ost. tydz.)",
-      value: turnoverLastWeek?.toLocaleString(undefined, {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      }),
+      value: currencyFormatter(turnoverLastWeek),
       to: "/transactions?period=last-week",
     },
     {
       icon: <FaCalendarCheck className="text-pink-400 w-6 h-6" />,
       label: "Ostatnie przyjęcie",
-      value: new Date(lastReceiptDate).toLocaleDateString(),
+      value: dateFormatter(lastReceiptDate),
       to: lastReceiptId ? `/transactions/${lastReceiptId}` : "/transactions",
     },
     {
       icon: <FaCalendarDay className="text-pink-400 w-6 h-6" />,
       label: "Ostatnie wydanie",
-      value: new Date(lastDeliveryDate).toLocaleDateString(),
+      value: dateFormatter(lastDeliveryDate),
       to: lastDeliveryId ? `/transactions/${lastDeliveryId}` : "/transactions",
     },
   ];
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 cursor-pointer">
       {tiles.map(({ icon, label, value, to }) => {
@@ -1092,16 +1216,21 @@ export default SummaryTiles;
 
 // \components\employees\EmployeeDetail.jsx
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchEmployeeById } from "../../features/employees/employeesSlice";
-import { format } from "date-fns";
 import { FaChevronLeft, FaEye } from "react-icons/fa";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const EmployeeDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const [transactionsShown, setTransactionsShown] = useState(25);
   const { current: employee } = useSelector((state) => state.employees);
   useEffect(() => {
     dispatch(fetchEmployeeById(id));
@@ -1123,7 +1252,10 @@ const EmployeeDetail = () => {
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow space-y-2">
         <div>
-          <Link to="/employees" className="text-gray-600 hover:text-pink-500">
+          <Link
+            to="/employees"
+            className="text-gray-600 hover:text-pink-500 transition duration-200"
+          >
             <FaChevronLeft className="inline-block mr-2" /> Powrót do
             Pracowników
           </Link>
@@ -1154,34 +1286,60 @@ const EmployeeDetail = () => {
           {history.length === 0 ? (
             <p>Brak historii transakcji.</p>
           ) : (
-            <div className="bg-white rounded-lg shadow overflow-auto">
-              <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
-                <div>Data</div>
-                <div>Typ</div>
-                <div>Opis</div>
-                <div className="text-center">Szczegóły</div>
-              </div>
-              <div className="divide-y divide-gray-200">
-                {history.map((tx) => (
-                  <div
-                    key={tx.transactionId}
-                    className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
-                  >
-                    <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                    <div>{tx.type.replace(/_/g, " ")}</div>
-                    <div>{tx.description}</div>
-                    <div className="flex justify-center text-gray-600">
-                      <Link
-                        to={`/transactions/${tx.transactionId}`}
-                        className="hover:text-pink-500 transition duration-200"
+            <>
+              <div className="bg-white rounded-lg shadow overflow-auto">
+                <div className="grid grid-cols-6 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+                  <div>Data</div>
+                  <div>Typ</div>
+                  <div>Opis</div>
+                  <div className="text-right">Ilość przedmiotów</div>
+                  <div className="text-right">Łączna kwota</div>
+                  <div className="text-center">Szczegóły</div>
+                </div>
+                <div className="divide-y divide-gray-200">
+                  {[...history]
+                    .reverse()
+                    .slice(0, transactionsShown)
+                    .map((tx) => (
+                      <div
+                        key={tx.transactionId}
+                        className="grid grid-cols-6 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors duration-200"
                       >
-                        <FaEye />
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                        <div>{dateFormatter(tx.date)}</div>
+                        <div>
+                          {tx.type
+                            .toLowerCase()
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                        </div>
+                        <div className="truncate">{tx.description}</div>
+                        <div className="text-right">
+                          {numberFormatter(tx.itemsCount)}
+                        </div>
+                        <div className="text-right">
+                          {currencyFormatter(tx.totalPrice)}
+                        </div>
+                        <div className="flex justify-center text-gray-600">
+                          <Link
+                            to={`/transactions/${tx.transactionId}`}
+                            className="hover:text-pink-500 transition duration-200"
+                          >
+                            <FaEye />
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
-            </div>
+              {history.length > transactionsShown && (
+                <button
+                  onClick={() => setTransactionsShown((prev) => prev + 25)}
+                  className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
+                >
+                  Pokaż więcej
+                </button>
+              )}
+            </>
           )}
         </section>
       </div>
@@ -1237,7 +1395,7 @@ const EmployeeForm = () => {
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
       <Link
         to="/employees"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="mr-2" /> Powrót do Pracowników
       </Link>
@@ -1355,7 +1513,7 @@ const EmployeeForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           Utwórz Pracownika
         </button>
@@ -1374,6 +1532,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
 import { fetchEmployees } from "../../features/employees/employeesSlice";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import TextInput from "../helper/TextInput";
+import SelectInput from "../helper/SelectInput";
+import NumberInput from "../helper/NumberInput";
+import Pagination from "../helper/Pagination";
+import { numberFormatter } from "../../utils/helpers";
 
 const EmployeeList = () => {
   const dispatch = useDispatch();
@@ -1382,10 +1546,41 @@ const EmployeeList = () => {
     status,
     error,
   } = useSelector((state) => state.employees);
+  const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [minTransactions, setMinTransactions] = useState("");
+  const [maxTransactions, setMaxTransactions] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
+  const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
-    dispatch(fetchEmployees());
+    dispatch(
+      fetchEmployees({
+        name: searchTerm || undefined,
+        regionId: selectedRegion || undefined,
+        minTransactions: minTransactions
+          ? parseInt(minTransactions)
+          : undefined,
+        maxTransactions: maxTransactions
+          ? parseInt(maxTransactions)
+          : undefined,
+        warehouseId: selectedWarehouse || undefined,
+        page: page || 1,
+      })
+    );
+  }, [
+    dispatch,
+    searchTerm,
+    selectedRegion,
+    minTransactions,
+    maxTransactions,
+    selectedWarehouse,
+    page,
+  ]);
+  useEffect(() => {
+    dispatch(fetchRegions());
   }, [dispatch]);
   const filtered = employees
     .filter((emp) =>
@@ -1426,18 +1621,39 @@ const EmployeeList = () => {
   return (
     <>
       <form className="flex justify-between items-center space-x-4">
-        <div>
-          <label className="block text-sm font-medium">Imię i Nazwisko</label>
-          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-            <FaSearch className="text-gray-500 mr-2" />
-            <input
-              type="text"
-              placeholder="Search employees..."
-              className="w-full focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="flex justify-between items-center space-x-4">
+          <TextInput
+            label="Nazwa"
+            placeholder="Szukaj klientów..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
+          <SelectInput
+            label="Region"
+            value={selectedRegion}
+            setValue={setSelectedRegion}
+          >
+            <option value="">Wszystkie Regiony</option>
+            {regions.map((reg) => (
+              <option key={reg.id} value={reg.id}>
+                {reg.name}
+              </option>
+            ))}
+          </SelectInput>
+          <NumberInput
+            label="Transakcje (min)"
+            placeholder="Wybierz transakcje..."
+            isMinus={true}
+            value={minTransactions}
+            setValue={setMinTransactions}
+          />
+          <NumberInput
+            label="Transakcje (max)"
+            placeholder="Wybierz transakcje..."
+            isMinus={false}
+            value={maxTransactions}
+            setValue={setMaxTransactions}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium">Sortowanie</label>
@@ -1468,51 +1684,65 @@ const EmployeeList = () => {
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-7 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Imię i Nazwisko</div>
-            <div>E-mail</div>
-            <div>Nr. telefonu</div>
-            <div>Stanowisko</div>
-            <div>Magazyn</div>
-            <div className="text-right">Liczba transakcji</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-7 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Imię i Nazwisko</div>
+              <div>E-mail</div>
+              <div>Nr. telefonu</div>
+              <div>Stanowisko</div>
+              <div>Magazyn</div>
+              <div className="text-right">Liczba transakcji</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((emp) => (
+                <div
+                  key={emp.employeeId}
+                  className="grid grid-cols-1 sm:grid-cols-7 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div className="font-medium text-pink-600">
+                    <Link
+                      to={`/employees/${emp.employeeId}`}
+                      className="hover:underline"
+                    >
+                      {emp.name} {emp.surname}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700 truncate">
+                    {emp.email}
+                  </div>
+                  <div className="text-sm text-gray-700">{emp.phoneNumber}</div>
+                  <div className="text-sm text-gray-700">{emp.position}</div>
+                  <div className="text-sm text-gray-700">
+                    {emp.warehouseName}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(emp.transactionsCount)}
+                  </div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link
+                      to={`/employees/${emp.employeeId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((emp) => (
-              <div
-                key={emp.employeeId}
-                className="grid grid-cols-1 sm:grid-cols-7 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div className="font-medium text-pink-600">
-                  <Link
-                    to={`/employees/${emp.employeeId}`}
-                    className="hover:underline"
-                  >
-                    {emp.name} {emp.surname}
-                  </Link>
-                </div>
-                <div className="text-sm text-gray-700 truncate">
-                  {emp.email}
-                </div>
-                <div className="text-sm text-gray-700">{emp.phoneNumber}</div>
-                <div className="text-sm text-gray-700">{emp.position}</div>
-                <div className="text-sm text-gray-700">{emp.warehouseName}</div>
-                <div className="text-sm text-gray-700 text-right">
-                  {emp.transactionsCount}
-                </div>
-                <div className="flex justify-center text-gray-600">
-                  <Link
-                    to={`/employees/${emp.employeeId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -1523,19 +1753,23 @@ export default EmployeeList;
 
 // \components\geography\CountryList.jsx
 
-import { useState, useEffect } from "react";
-import { listCountries } from "../../api/geography";
+import { useEffect } from "react";
+import { fetchCountries } from "../../features/geography/geographySlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const CountryList = ({ regionId, regionName }) => {
-  const [countries, setCountries] = useState([]);
+  const dispatch = useDispatch();
+  const { countries, status, error } = useSelector((state) => state.geography);
   useEffect(() => {
     if (regionId) {
-      listCountries(regionId).then((res) => setCountries(res.data));
-    } else {
-      setCountries([]);
+      dispatch(fetchCountries(regionId));
     }
-  }, [regionId]);
-  return (
+  }, [dispatch, regionId]);
+  return status === "loading" || status === "idle" ? (
+    <p>Loading...</p>
+  ) : status === "failed" ? (
+    <p className="text-red-500">Error: {error}</p>
+  ) : (
     <div className="bg-white p-6 rounded-lg shadow">
       <h2 className="text-xl font-semibold mb-4">
         Kraje {regionId ? `— wybrano region ${regionName}` : ""}
@@ -1546,8 +1780,8 @@ const CountryList = ({ regionId, regionName }) => {
         <ul className="space-y-2">
           {countries.map((c) => (
             <li
-              key={c.countryId}
-              className="px-4 py-2 border border-gray-200 rounded-lg"
+              key={c.id}
+              className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-100 transition duration-200"
             >
               {c.name}
             </li>
@@ -1565,29 +1799,38 @@ export default CountryList;
 
 // \components\geography\RegionList.jsx
 
-import { useState, useEffect } from "react";
-import { listRegions } from "../../api/geography";
+import { useEffect } from "react";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const RegionList = ({ selectedRegion, onSelect }) => {
-  const [regions, setRegions] = useState([]);
+  const dispatch = useDispatch();
+  const { regions, status, error } = useSelector((state) => state.geography);
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
-  return (
+    dispatch(fetchRegions());
+  }, [dispatch]);
+  return status === "loading" || status === "idle" ? (
+    <p>Loading...</p>
+  ) : status === "failed" ? (
+    <p className="text-red-500">Error: {error}</p>
+  ) : (
     <div className="bg-white p-6 rounded-lg shadow">
       <h2 className="text-xl font-semibold mb-4">Regiony</h2>
       <ul className="space-y-2">
         {regions.map((r) => (
-          <li key={r.id}>
+          <li
+            key={r.id}
+            className={`px-4 py-2 border border-gray-200 rounded-lg transition cursor-pointer
+            ${
+              selectedRegion.id === r.id
+                ? "bg-pink-100 text-pink-800"
+                : "hover:bg-gray-100 transition duration-200"
+            }`}
+            onClick={() => onSelect({ id: r.id, name: r.name })}
+          >
             <button
-              onClick={() => onSelect({ id: r.id, name: r.name })}
               className={`
-                w-full text-left px-4 py-2 rounded-lg transition
-                ${
-                  selectedRegion.id === r.id
-                    ? "bg-pink-100 text-pink-800"
-                    : "hover:bg-gray-100"
-                }
+                w-full text-left rounded-lg cursor-pointer
               `}
             >
               {r.name}
@@ -1602,34 +1845,165 @@ const RegionList = ({ selectedRegion, onSelect }) => {
 export default RegionList;
 
 
+// \components\helper\DateInput.jsx
+
+const DateInput = ({ label, value, setValue }) => (
+  <div>
+    <label className="block text-sm font-medium">{label}</label>
+    <input
+      type="date"
+      name="fromDate"
+      value={value}
+      onChange={setValue}
+      className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+    />
+  </div>
+);
+
+export default DateInput;
+
+
+// \components\helper\NumberInput.jsx
+
+import { FaMinus, FaPlus } from "react-icons/fa";
+
+const NumberInput = ({ label, placeholder, isMinus, value, setValue }) => (
+  <div>
+    <label className="block text-sm font-medium">{label}</label>
+    <div className="flex border border-gray-300 rounded-lg items-center px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
+      {isMinus ? (
+        <FaMinus className="text-gray-500 mr-2" />
+      ) : (
+        <FaPlus className="text-gray-500 mr-2" />
+      )}
+      <input
+        type="number"
+        min="0"
+        placeholder={placeholder}
+        className="w-full focus:outline-none"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+    </div>
+  </div>
+);
+
+export default NumberInput;
+
+
+// \components\helper\Pagination.jsx
+
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  return totalPages > 1 ? (
+    <div className="flex justify-left gap-8 items-center mt-4">
+      <button
+        onClick={() => onPageChange((p) => Math.max(p - 1, 1))}
+        disabled={currentPage === 1}
+        className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+      >
+        Poprzednia
+      </button>
+      <span>
+        Strona {currentPage} z {totalPages}
+      </span>
+      <button
+        onClick={() => onPageChange((p) => p + 1)}
+        disabled={currentPage >= totalPages}
+        className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+      >
+        Następna
+      </button>
+    </div>
+  ) : null;
+};
+
+export default Pagination;
+
+
+// \components\helper\SelectInput.jsx
+
+import { FaChevronDown } from "react-icons/fa";
+
+const SelectInput = ({ children, label, value, setValue }) => (
+  <div>
+    <label className="block text-sm font-medium">{label}</label>
+    <div className="relative">
+      <select
+        className="border border-gray-300 rounded-lg px-3 py-2 pr-12 appearance-none focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      >
+        {children}
+      </select>
+      <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+    </div>
+  </div>
+);
+
+export default SelectInput;
+
+
+// \components\helper\TextInput.jsx
+
+import { FaSearch } from "react-icons/fa";
+
+const TextInput = ({ label, placeholder, value, setValue }) => (
+  <div>
+    <label className="block text-sm font-medium">{label}</label>
+    <div className="flex border-gray-300 items-center border rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
+      <FaSearch className="text-gray-500 mr-2" />
+      <input
+        type="text"
+        placeholder={placeholder}
+        className="focus:outline-none"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+    </div>
+  </div>
+);
+
+export default TextInput;
+
+
 // \components\inventory\DeliveryPage.jsx
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
 import { deliverInventory } from "../../features/inventory/deliverySlice";
-import { searchProducts } from "../../api/products";
+import { fetchProducts } from "../../features/products/productsSlice";
 import { fetchClients } from "../../features/clients/clientsSlice";
+import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
 
 const DeliveryPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
   const { list: clients } = useSelector((s) => s.clients);
+  const { list: products } = useSelector((s) => s.products);
+  const { list: employees } = useSelector((s) => s.employees);
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.delivery
   );
   const [form, setForm] = useState({
     warehouseId: "",
     clientId: "",
+    employeeId: "",
     items: [{ productId: "", quantity: "" }],
   });
-  const [products, setProducts] = useState([]);
   useEffect(() => {
     dispatch(fetchWarehouses());
     dispatch(fetchClients());
-    searchProducts({}).then((res) => setProducts(res.data));
+    dispatch(fetchProducts());
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(
+      fetchEmployees({
+        warehouseId: form.warehouseId ? Number(form.warehouseId) : undefined,
+      })
+    );
+  }, [dispatch, form.warehouseId]);
   const handleAddRow = () =>
     setForm((f) => ({
       ...f,
@@ -1673,7 +2047,7 @@ const DeliveryPage = () => {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Magzyn</label>
+            <label className="block text-sm font-medium mb-1">Magazyn</label>
             <div className="relative">
               <select
                 required
@@ -1708,6 +2082,27 @@ const DeliveryPage = () => {
                 {clients.map((c) => (
                   <option key={c.clientId} value={c.clientId}>
                     {c.name}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <div className="relative">
+              <select
+                required
+                value={form.employeeId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, employeeId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz pracownika</option>
+                {employees.map((e) => (
+                  <option key={e.employeeId} value={e.employeeId}>
+                    {e.name} {e.surname}
                   </option>
                 ))}
               </select>
@@ -1755,7 +2150,7 @@ const DeliveryPage = () => {
               <button
                 type="button"
                 onClick={() => handleRemoveRow(idx)}
-                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer"
+                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer transition duration-200"
               >
                 <FaTrash />
               </button>
@@ -1764,7 +2159,7 @@ const DeliveryPage = () => {
           <button
             type="button"
             onClick={handleAddRow}
-            className="flex items-center text-pink-600 hover:text-pink-800 mt-4"
+            className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transition duration-200"
           >
             <FaPlus className="mr-1" /> Dodaj następny produkt
           </button>
@@ -1780,7 +2175,7 @@ const DeliveryPage = () => {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
             Wydaj produkt
           </button>
@@ -1800,27 +2195,37 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
 import { fetchSuppliers } from "../../features/suppliers/suppliersSlice";
 import { receiveInventory } from "../../features/inventory/receiveSlice";
-import { searchProducts } from "../../api/products";
+import { fetchProducts } from "../../features/products/productsSlice";
+import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
 
 const ReceivePage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
   const { list: suppliers } = useSelector((s) => s.suppliers);
+  const { list: products } = useSelector((s) => s.products);
+  const { list: employees } = useSelector((s) => s.employees);
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.receive
   );
   const [form, setForm] = useState({
     warehouseId: "",
     supplierId: "",
+    employeeId: "",
     items: [{ productId: "", quantity: "" }],
   });
-  const [products, setProducts] = useState([]);
   useEffect(() => {
     dispatch(fetchWarehouses());
     dispatch(fetchSuppliers());
-    searchProducts({}).then((res) => setProducts(res.data));
+    dispatch(fetchProducts());
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(
+      fetchEmployees({
+        warehouseId: form.warehouseId ? Number(form.warehouseId) : undefined,
+      })
+    );
+  }, [dispatch, form.warehouseId]);
   const handleAddRow = () =>
     setForm((f) => ({
       ...f,
@@ -1907,6 +2312,27 @@ const ReceivePage = () => {
               <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <div className="relative">
+              <select
+                required
+                value={form.employeeId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, employeeId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz pracownika</option>
+                {employees.map((e) => (
+                  <option key={e.employeeId} value={e.employeeId}>
+                    {e.name} {e.surname}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
         </div>
         <div className="space-y-3">
           <label className="text-sm font-medium">Produkty oraz ich ilość</label>
@@ -1948,7 +2374,7 @@ const ReceivePage = () => {
               <button
                 type="button"
                 onClick={() => handleRemoveRow(idx)}
-                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer"
+                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer transition duration-200"
               >
                 <FaTrash />
               </button>
@@ -1957,7 +2383,7 @@ const ReceivePage = () => {
           <button
             type="button"
             onClick={handleAddRow}
-            className="flex items-center text-pink-600 hover:text-pink-800 mt-4"
+            className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transtion duration-200"
           >
             <FaPlus className="mr-1" /> Dodaj następny produkt
           </button>
@@ -1973,7 +2399,7 @@ const ReceivePage = () => {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
             Przyjmij towar
           </button>
@@ -1992,25 +2418,37 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
 import { transferInventory } from "../../features/inventory/transferSlice";
-import { searchProducts } from "../../api/products";
+import { fetchProducts } from "../../features/products/productsSlice";
+import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaExchangeAlt, FaPlus, FaTrash } from "react-icons/fa";
 
 const TransferPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
+  const { list: products } = useSelector((s) => s.products);
+  const { list: employees } = useSelector((s) => s.employees);
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.transfer
   );
   const [form, setForm] = useState({
     fromWarehouseId: "",
     toWarehouseId: "",
+    employeeId: "",
     items: [{ productId: "", quantity: "" }],
   });
-  const [products, setProducts] = useState([]);
   useEffect(() => {
     dispatch(fetchWarehouses());
-    searchProducts({}).then((res) => setProducts(res.data));
+    dispatch(fetchProducts());
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(
+      fetchEmployees({
+        warehouseId: form.toWarehouseId
+          ? Number(form.toWarehouseId)
+          : undefined,
+      })
+    );
+  }, [dispatch, form.toWarehouseId]);
   const handleAddRow = () =>
     setForm((f) => ({
       ...f,
@@ -2099,6 +2537,27 @@ const TransferPage = () => {
               <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <div className="relative">
+              <select
+                required
+                value={form.employeeId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, employeeId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz pracownika</option>
+                {employees.map((e) => (
+                  <option key={e.employeeId} value={e.employeeId}>
+                    {e.name} {e.surname}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
         </div>
         <div className="space-y-3">
           <label className="text-sm font-medium">Produkty oraz ich ilość</label>
@@ -2140,7 +2599,7 @@ const TransferPage = () => {
               <button
                 type="button"
                 onClick={() => handleRemoveRow(idx)}
-                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer"
+                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer transition duration-200"
               >
                 <FaTrash />
               </button>
@@ -2149,7 +2608,7 @@ const TransferPage = () => {
           <button
             type="button"
             onClick={handleAddRow}
-            className="flex items-center text-pink-600 hover:text-pink-800 mt-4"
+            className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transition duration-200"
           >
             <FaPlus className="mr-1" /> Dodaj następny produkt
           </button>
@@ -2165,7 +2624,7 @@ const TransferPage = () => {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
             Przenieś towar
           </button>
@@ -2271,7 +2730,6 @@ export default function Navbar() {
       {[
         "/products",
         "/",
-        "/warehouses",
         "/transactions",
         "/employees",
         "/suppliers",
@@ -2426,18 +2884,23 @@ export default SidebarLink;
 
 // \components\products\ProductDetail.jsx
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchProductById } from "../../features/products/productsSlice";
 import { format } from "date-fns";
 import { FaEdit, FaChevronLeft, FaEye } from "react-icons/fa";
-import { currencyFormatter } from "../../utils/helpers";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { current: product } = useSelector((state) => state.products);
+  const [transactionsShown, setTransactionsShown] = useState(25);
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
@@ -2450,18 +2913,22 @@ const ProductDetail = () => {
     unitPrice,
     unitSize,
     categoryName,
+    categoryId,
     inventory,
     transactions,
   } = product;
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
       <div className="flex items-center justify-between">
-        <Link to="/products" className="text-gray-600 hover:text-pink-500">
+        <Link
+          to="/products"
+          className="text-gray-600 hover:text-pink-500 transition duration-200"
+        >
           <FaChevronLeft className="inline mr-2" /> Powrót do Produktów
         </Link>
         <Link
           to={`/products/${id}/edit`}
-          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition duration-200"
         >
           <FaEdit className="mr-2" /> Edytuj Produkt
         </Link>
@@ -2470,7 +2937,12 @@ const ProductDetail = () => {
       <p className="text-gray-700 whitespace-pre-line">{description}</p>
       <p>
         <strong>Kategoria: </strong>
-        {categoryName}
+        <Link
+          className="hover:underline text-pink-500"
+          to={`/categories/${categoryId}`}
+        >
+          {categoryName}
+        </Link>
       </p>
       <p>
         <strong>Jednostkowa Cena: </strong>
@@ -2478,7 +2950,7 @@ const ProductDetail = () => {
       </p>
       <p>
         <strong>Jednostkowy Rozmiar: </strong>
-        {unitSize}
+        {numberFormatter(unitSize)}
       </p>
       {inventory && Object.keys(inventory).length > 0 && (
         <div>
@@ -2493,8 +2965,15 @@ const ProductDetail = () => {
                 key={warehouseId}
                 className="grid grid-cols-2 p-2 text-sm text-gray-700"
               >
-                <div>{warehouseId}</div>
-                <div className="text-right">{qty}</div>
+                <div className="text-pink-600">
+                  <Link
+                    to={`/warehouses/${warehouseId}`}
+                    className="hover:underline"
+                  >
+                    {warehouseId}
+                  </Link>
+                </div>
+                <div className="text-right">{numberFormatter(qty)}</div>
               </div>
             ))}
           </div>
@@ -2503,34 +2982,65 @@ const ProductDetail = () => {
       {transactions && transactions.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold mb-2">Ostatnie Transakcje</h2>
-          <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
+          <div className="grid grid-cols-7 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
             <div>Data</div>
+            <div>Przez pracownika</div>
             <div>Typ</div>
             <div className="text-right">Ilość</div>
-            <div className="text-right">Cena</div>
+            <div className="text-right">Cena (szt.)</div>
+            <div className="text-right">Łącznie</div>
             <div className="text-center">Detale</div>
           </div>
           <div className="divide-y divide-gray-200">
-            {transactions.map((tx) => (
-              <div
-                key={tx.transactionId}
-                className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
-              >
-                <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                <div>{tx.type.replace(/_/g, " ")}</div>
-                <div className="text-right">{tx.quantity}</div>
-                <div className="text-right">{currencyFormatter(tx.price)}</div>
-                <div className="flex justify-center text-gray-600">
+            {[...transactions]
+              .reverse()
+              .slice(0, transactionsShown)
+              .map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-7 items-center p-2 text-sm text-gray-700"
+                >
+                  <div>{dateFormatter(tx.date)}</div>
                   <Link
-                    to={`/transactions/${tx.transactionId}`}
-                    className="hover:text-pink-500 transition duration-200"
+                    to={`/employees/${tx.employeeId}`}
+                    className="text-pink-500 hover:underline"
                   >
-                    <FaEye />
+                    {tx.employeeName}
                   </Link>
+                  <div>
+                    {tx.type
+                      .toLowerCase()
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </div>
+                  <div className="text-right">
+                    {numberFormatter(tx.quantity)}
+                  </div>
+                  <div className="text-right">
+                    {currencyFormatter(tx.price)}
+                  </div>
+                  <div className="text-right">
+                    {currencyFormatter(tx.price * tx.quantity)}
+                  </div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link
+                      to={`/transactions/${tx.transactionId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
+          {transactions.length > transactionsShown && (
+            <button
+              onClick={() => setTransactionsShown((prev) => prev + 25)}
+              className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block duration-200"
+            >
+              Pokaż więcej
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -2544,14 +3054,14 @@ export default ProductDetail;
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   fetchProductById,
   createProduct,
   updateProduct,
 } from "../../features/products/productsSlice";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -2611,6 +3121,12 @@ const ProductForm = () => {
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <Link
+        to="/products"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
+      >
+        <FaChevronLeft className="inline mr-2" /> Powrót do Produktów
+      </Link>
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Produkt" : "Nowy Produkt"}
       </h1>
@@ -2698,7 +3214,7 @@ const ProductForm = () => {
         {prodError && <p className="text-red-500">{prodError}</p>}
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           {isEdit ? "Aktualizuj Produkt" : "Stwórz Produkt"}
         </button>
@@ -2720,15 +3236,12 @@ import {
   deleteProduct,
 } from "../../features/products/productsSlice";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
-import {
-  FaSearch,
-  FaPlus,
-  FaEye,
-  FaTrash,
-  FaEdit,
-  FaMinus,
-  FaChevronDown,
-} from "react-icons/fa";
+import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
+import { currencyFormatter, numberFormatter } from "../../utils/helpers";
+import Pagination from "../helper/Pagination";
+import NumberInput from "../helper/NumberInput";
+import TextInput from "../helper/TextInput";
+import SelectInput from "../helper/SelectInput";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -2745,6 +3258,11 @@ const ProductList = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [minSize, setMinSize] = useState("");
   const [maxSize, setMaxSize] = useState("");
+  const [minInventory, setMinInventory] = useState("");
+  const [maxInventory, setMaxInventory] = useState("");
+  const [minTransactions, setMinTransactions] = useState("");
+  const [maxTransactions, setMaxTransactions] = useState("");
+  const [page, setPage] = useState(1);
   const [sortOption, setSortOption] = useState("");
   useEffect(() => {
     dispatch(fetchCategories());
@@ -2759,6 +3277,15 @@ const ProductList = () => {
         minSize: minSize ? parseFloat(minSize) : undefined,
         maxSize: maxSize ? parseFloat(maxSize) : undefined,
         warehouseId: selectedWarehouse || undefined,
+        minInventory: minInventory ? parseInt(minInventory) : undefined,
+        maxInventory: maxInventory ? parseInt(maxInventory) : undefined,
+        minTransactions: minTransactions
+          ? parseInt(minTransactions)
+          : undefined,
+        maxTransactions: maxTransactions
+          ? parseInt(maxTransactions)
+          : undefined,
+        page: page || 1,
       })
     );
   }, [
@@ -2770,6 +3297,11 @@ const ProductList = () => {
     maxPrice,
     minSize,
     maxSize,
+    minInventory,
+    maxInventory,
+    minTransactions,
+    maxTransactions,
+    page,
   ]);
   const filtered = products
     .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -2812,214 +3344,203 @@ const ProductList = () => {
       dispatch(deleteProduct(id));
     }
   };
+  const totalPages = 10;
   return (
     <>
       <form className="flex space-x-4 justify-between">
         <div className="flex flex-wrap gap-4 items-end">
-          <div>
-            <label className="block text-sm font-medium">Nazwa</label>
-            <div className="flex border-gray-300 items-center border rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-              <FaSearch className="text-gray-500 mr-2" />
-              <input
-                type="text"
-                placeholder="Wyszukaj po nazwie..."
-                className="focus:outline-none"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Kategoria</label>
-            <div className="relative">
-              <select
-                className="border border-gray-300 rounded-lg px-3 py-2 pr-12 appearance-none focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              >
-                <option value="">Wszystkie Kategorie</option>
-                {categories.map((cat) => (
-                  <option key={cat.categoryId} value={cat.categoryId}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Minimalna Cena</label>
-            <div className="flex border border-gray-300 rounded-lg items-center px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-              <FaMinus className="text-gray-500 mr-2" />
-              <input
-                type="number"
-                min="0"
-                placeholder="Wybierz cenę..."
-                className="w-full focus:outline-none"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Maksymalna Cena</label>
-            <div className="flex border border-gray-300 rounded-lg items-center px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-              <FaPlus className="text-gray-500 mr-2" />
-              <input
-                type="number"
-                min="0"
-                placeholder="Wybierz cenę..."
-                className="w-full focus:outline-none"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">
-              Minimalna Wielkość
-            </label>
-            <div className="flex border border-gray-300 rounded-lg items-center px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-              <FaPlus className="text-gray-500 mr-2" />
-              <input
-                type="number"
-                min="0"
-                placeholder="Wybierz wielkość..."
-                className="w-full focus:outline-none"
-                value={minSize}
-                onChange={(e) => setMinSize(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">
-              Maksymalna Wielkość
-            </label>
-            <div className="flex border border-gray-300 rounded-lg items-center px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-              <FaPlus className="text-gray-500 mr-2" />
-              <input
-                type="number"
-                min="0"
-                placeholder="Wybierz wielkość..."
-                className="w-full focus:outline-none"
-                value={maxSize}
-                onChange={(e) => setMaxSize(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Sortowanie</label>
-          <div className="relative">
-            <select
-              className="border appearance-none border-gray-300 rounded-lg px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="">Sortuj przez</option>
-              <option value="name">Nazwa (od A do Z)</option>
-              <option value="name-reverse">Nazwa (od Z do A)</option>
-              <option value="description">Opis (od A do Z)</option>
-              <option value="description-reverse">Opis (od Z do A)</option>
-              <option value="category">Kategoria (od A do Z)</option>
-              <option value="category-reverse">Kategoria (od Z do A)</option>
-              <option value="price">Cena (rosnąco)</option>
-              <option value="price-reverse">Cena (malejąco)</option>
-              <option value="size">Wielkość (rosnąco)</option>
-              <option value="size-reverse">Wielkość (malejąco)</option>
-              <option value="inventory">Stan (rosnąco)</option>
-              <option value="inventory-reverse">Stan (malejąco)</option>
-              <option value="transactions">Transakcje (rosnąco)</option>
-              <option value="transactions-reverse">
-                Transakcje (malejąco)
+          <TextInput
+            label="Nazwa"
+            placeholder="Wyszukaj po nazwie..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
+          <SelectInput
+            label="Kategoria"
+            value={categoryFilter}
+            setValue={setCategoryFilter}
+          >
+            <option value="">Wszystkie Kategorie</option>
+            {categories.map((cat) => (
+              <option key={cat.categoryId} value={cat.categoryId}>
+                {cat.name}
               </option>
-            </select>
-            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
+            ))}
+          </SelectInput>
+
+          <NumberInput
+            label="Cena (min)"
+            placeholder="Wybierz cenę..."
+            isMinus={true}
+            value={minPrice}
+            setValue={setMinPrice}
+          />
+          <NumberInput
+            label="Cena (max)"
+            placeholder="Wybierz cenę..."
+            isMinus={false}
+            value={maxPrice}
+            setValue={setMaxPrice}
+          />
+          <NumberInput
+            label="Wielkość (min)"
+            placeholder="Wybierz wielkość..."
+            isMinus={true}
+            value={minSize}
+            setValue={setMinSize}
+          />
+          <NumberInput
+            label="Wielkość (max)"
+            placeholder="Wybierz wielkość..."
+            isMinus={false}
+            value={maxSize}
+            setValue={setMaxSize}
+          />
+          <NumberInput
+            label="Stan (min)"
+            placeholder="Wybierz stan..."
+            isMinus={true}
+            value={minInventory}
+            setValue={setMinInventory}
+          />
+          <NumberInput
+            label="Stan (max)"
+            placeholder="Wybierz stan..."
+            isMinus={false}
+            value={maxInventory}
+            setValue={setMaxInventory}
+          />
+          <NumberInput
+            label="Transakcje (min)"
+            placeholder="Wybierz transakcje..."
+            isMinus={true}
+            value={minTransactions}
+            setValue={setMinTransactions}
+          />
+          <NumberInput
+            label="Transakcje (max)"
+            placeholder="Wybierz transakcje..."
+            isMinus={false}
+            value={maxTransactions}
+            setValue={setMaxTransactions}
+          />
         </div>
+        <SelectInput
+          label="Sortowanie"
+          value={sortOption}
+          setValue={setSortOption}
+        >
+          <option value="">Sortuj przez</option>
+          <option value="name">Nazwa (od A do Z)</option>
+          <option value="name-reverse">Nazwa (od Z do A)</option>
+          <option value="capacity">Pojemność (rosnąco)</option>
+          <option value="capacity-reverse">Pojemność (malejąco)</option>
+          <option value="occupied">Zajęte (rosnąco)</option>
+          <option value="occupied-reverse">Zajęte (malejąco)</option>
+          <option value="address">Adres (od A do Z)</option>
+          <option value="address-reverse">Adres (od Z do A)</option>
+          <option value="employees">Pracownicy (rosnąco)</option>
+          <option value="employees-reverse">Pracownicy (malejąco)</option>
+          <option value="products">Produkty (rosnąco)</option>
+          <option value="products-reverse">Produkty (malejąco)</option>
+          <option value="transactions">Transakcje (rosnąco)</option>
+          <option value="transactions-reverse">Transakcje (malejąco)</option>
+        </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
         <p>Loading...</p>
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-8 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Nazwa</div>
-            <div>Opis</div>
-            <div>Kategoria</div>
-            <div className="text-right">Cena</div>
-            <div className="text-right">Wielkość</div>
-            <div className="text-right">Stan</div>
-            <div className="text-right">Transakcje</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-8 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Nazwa</div>
+              <div>Opis</div>
+              <div>Kategoria</div>
+              <div className="text-right">Cena</div>
+              <div className="text-right">Wielkość</div>
+              <div className="text-right">Stan</div>
+              <div className="text-right">Transakcje</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((product) => (
+                <div
+                  key={product.productId}
+                  className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div>
+                    <Link
+                      to={`/products/${product.productId}`}
+                      className="text-pink-600 hover:underline font-medium"
+                    >
+                      {product.name}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700 truncate">
+                    {product.description}
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    {product.categoryName}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {currencyFormatter(product.unitPrice)}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(product.unitSize)}
+                  </div>
+                  <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
+                    {product.inventoryCount < 5 && (
+                      <div className="bg-orange-500 px-4 rounded text-white">
+                        Niski Stan!
+                      </div>
+                    )}
+                    {numberFormatter(product.inventoryCount)}
+                  </div>
+                  <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
+                    {product.productId < 3 && (
+                      <div className="bg-green-500 px-4 rounded text-white">
+                        Bestseller!
+                      </div>
+                    )}
+                    {numberFormatter(product.transactionCount)}
+                  </div>
+                  <div className="flex justify-center space-x-4 text-gray-600">
+                    <Link
+                      to={`/products/${product.productId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                    <Link
+                      to={`/products/${product.productId}/edit`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEdit />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(product.productId)}
+                      className="hover:text-pink-500 transition duration-200 cursor-pointer"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((product) => (
-              <div
-                key={product.productId}
-                className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div>
-                  <Link
-                    to={`/products/${product.productId}`}
-                    className="text-pink-600 hover:underline font-medium"
-                  >
-                    {product.name}
-                  </Link>
-                </div>
-                <div className="text-sm text-gray-700">
-                  {product.description}
-                </div>
-                <div className="text-sm text-gray-700">
-                  {product.categoryName}
-                </div>
-                <div className="text-sm text-gray-700 text-right">
-                  ${product.unitPrice.toFixed(2)}
-                </div>
-                <div className="text-sm text-gray-700 text-right">
-                  {product.unitSize}
-                </div>
-                <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
-                  {product.inventoryCount < 5 && (
-                    <div className="bg-orange-500 px-4 rounded text-white">
-                      Niski Stan!
-                    </div>
-                  )}
-                  {product.inventoryCount}
-                </div>
-                <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
-                  {product.productId < 3 && (
-                    <div className="bg-green-500 px-4 rounded text-white">
-                      Bestseller!
-                    </div>
-                  )}
-                  {product.transactionCount}
-                </div>
-                <div className="flex justify-center space-x-4 text-gray-600">
-                  <Link
-                    to={`/products/${product.productId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                  <Link
-                    to={`/products/${product.productId}/edit`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEdit />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(product.productId)}
-                    className="hover:text-pink-500 transition duration-200 cursor-pointer"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -3030,16 +3551,21 @@ export default ProductList;
 
 // \components\suppliers\SupplierDetail.jsx
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchSupplierById } from "../../features/suppliers/suppliersSlice";
-import { format } from "date-fns";
 import { FaChevronLeft, FaEye } from "react-icons/fa";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const SupplierDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const [transactionsShown, setTransactionsShown] = useState(25);
   const { current: supplier } = useSelector((state) => state.suppliers);
   useEffect(() => {
     dispatch(fetchSupplierById(id));
@@ -3055,7 +3581,10 @@ const SupplierDetail = () => {
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow space-y-4">
         <div>
-          <Link to="/suppliers" className="text-gray-600 hover:text-pink-500">
+          <Link
+            to="/suppliers"
+            className="text-gray-600 hover:text-pink-500 transition duration-200"
+          >
             <FaChevronLeft className="inline-block mr-2" /> Wróć do Dostawców
           </Link>
         </div>
@@ -3074,34 +3603,60 @@ const SupplierDetail = () => {
           {history.length === 0 ? (
             <p>Brak historii transakcji.</p>
           ) : (
-            <div className="bg-white rounded-lg shadow overflow-auto">
-              <div className="grid grid-cols-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
-                <div>Data</div>
-                <div>Typ</div>
-                <div>Opis</div>
-                <div className="text-center">Szczegóły</div>
-              </div>
-              <div className="divide-y divide-gray-200">
-                {history.map((tx) => (
-                  <div
-                    key={tx.transactionId}
-                    className="grid grid-cols-4 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors"
-                  >
-                    <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                    <div>{tx.type.replace(/_/g, " ")}</div>
-                    <div>{tx.description}</div>
-                    <div className="flex justify-center text-gray-600">
-                      <Link
-                        to={`/transactions/${tx.transactionId}`}
-                        className="hover:text-pink-500 transition duration-200"
+            <>
+              <div className="bg-white rounded-lg shadow overflow-auto">
+                <div className="grid grid-cols-6 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
+                  <div>Data</div>
+                  <div>Typ</div>
+                  <div>Opis</div>
+                  <div className="text-right">Ilość przedmiotów</div>
+                  <div className="text-right">Łączna kwota</div>
+                  <div className="text-center">Szczegóły</div>
+                </div>
+                <div className="divide-y divide-gray-200">
+                  {[...history]
+                    .reverse()
+                    .slice(0, transactionsShown)
+                    .map((tx) => (
+                      <div
+                        key={tx.transactionId}
+                        className="grid grid-cols-6 items-center p-2 text-sm text-gray-700 hover:bg-pink-50 transition-colors duration-200"
                       >
-                        <FaEye />
-                      </Link>
-                    </div>
-                  </div>
-                ))}
+                        <div>{dateFormatter(tx.date)}</div>
+                        <div>
+                          {tx.type
+                            .toLowerCase()
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                        </div>
+                        <div className="truncate">{tx.description}</div>
+                        <div className="text-right">
+                          {numberFormatter(tx.itemsCount)}
+                        </div>
+                        <div className="text-right">
+                          {currencyFormatter(tx.totalPrice)}
+                        </div>
+                        <div className="flex justify-center text-gray-600">
+                          <Link
+                            to={`/transactions/${tx.transactionId}`}
+                            className="hover:text-pink-500 transition duration-200"
+                          >
+                            <FaEye />
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
-            </div>
+              {history.length > transactionsShown && (
+                <button
+                  onClick={() => setTransactionsShown((prev) => prev + 25)}
+                  className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
+                >
+                  Pokaż więcej
+                </button>
+              )}
+            </>
           )}
         </section>
       </div>
@@ -3115,17 +3670,19 @@ export default SupplierDetail;
 // \components\suppliers\SupplierForm.jsx
 
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import { createSupplier } from "../../features/suppliers/suppliersSlice";
-import { listRegions, listCountries } from "../../api/geography";
+import {
+  fetchRegions,
+  fetchCountries,
+} from "../../features/geography/geographySlice";
 
 const SupplierForm = () => {
   const dispatch = useDispatch();
+  const { regions, countries } = useSelector((state) => state.geography);
   const navigate = useNavigate();
-  const [regions, setRegions] = useState([]);
-  const [countries, setCountries] = useState([]);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -3138,17 +3695,15 @@ const SupplierForm = () => {
     streetNumber: "",
   });
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
+    dispatch(fetchRegions());
+  }, [dispatch]);
   useEffect(() => {
     if (form.regionId) {
-      listCountries(Number(form.regionId)).then((res) =>
-        setCountries(res.data)
-      );
+      dispatch(fetchCountries(form.regionId));
     } else {
-      setCountries([]);
+      dispatch(fetchCountries(null));
     }
-  }, [form.regionId]);
+  }, [dispatch, form.regionId]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -3174,7 +3729,7 @@ const SupplierForm = () => {
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
       <Link
         to="/suppliers"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="inline mr-2" /> Powrót do Dostawców
       </Link>
@@ -3278,7 +3833,7 @@ const SupplierForm = () => {
             >
               <option value="">Wybierz region, a potem kraj</option>
               {countries.map((c) => (
-                <option key={c.countryId} value={c.countryId}>
+                <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
@@ -3356,7 +3911,7 @@ const SupplierForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition cursor-pointer"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           Stwórz dostawcę
         </button>
@@ -3374,7 +3929,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchSuppliers } from "../../features/suppliers/suppliersSlice";
-import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
+import { FaEye, FaChevronDown } from "react-icons/fa";
+import TextInput from "../helper/TextInput";
+import SelectInput from "../helper/SelectInput";
+import NumberInput from "../helper/NumberInput";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import Pagination from "../helper/Pagination";
+import { numberFormatter } from "../../utils/helpers";
 
 const SupplierList = () => {
   const dispatch = useDispatch();
@@ -3383,10 +3944,41 @@ const SupplierList = () => {
     status,
     error,
   } = useSelector((state) => state.suppliers);
+  const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [minTransactions, setMinTransactions] = useState("");
+  const [maxTransactions, setMaxTransactions] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
+  const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
-    dispatch(fetchSuppliers());
+    dispatch(
+      fetchSuppliers({
+        name: searchTerm || undefined,
+        regionId: selectedRegion || undefined,
+        minTransactions: minTransactions
+          ? parseInt(minTransactions)
+          : undefined,
+        maxTransactions: maxTransactions
+          ? parseInt(maxTransactions)
+          : undefined,
+        warehouseId: selectedWarehouse || undefined,
+        page: page || 1,
+      })
+    );
+  }, [
+    dispatch,
+    searchTerm,
+    selectedRegion,
+    minTransactions,
+    maxTransactions,
+    selectedWarehouse,
+    page,
+  ]);
+  useEffect(() => {
+    dispatch(fetchRegions());
   }, [dispatch]);
   const filtered = suppliers
     .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -3419,18 +4011,39 @@ const SupplierList = () => {
   return (
     <>
       <form className="flex justify-between items-center space-x-4">
-        <div>
-          <label className="block text-sm font-medium">Nazwa</label>
-          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
-            <FaSearch className="text-gray-500 mr-2" />
-            <input
-              type="text"
-              placeholder="Search suppliers..."
-              className="w-full focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="flex justify-between items-center space-x-4">
+          <TextInput
+            label="Nazwa"
+            placeholder="Szukaj klientów..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
+          <SelectInput
+            label="Region"
+            value={selectedRegion}
+            setValue={setSelectedRegion}
+          >
+            <option value="">Wszystkie Regiony</option>
+            {regions.map((reg) => (
+              <option key={reg.id} value={reg.id}>
+                {reg.name}
+              </option>
+            ))}
+          </SelectInput>
+          <NumberInput
+            label="Transakcje (min)"
+            placeholder="Wybierz transakcje..."
+            isMinus={true}
+            value={minTransactions}
+            setValue={setMinTransactions}
+          />
+          <NumberInput
+            label="Transakcje (max)"
+            placeholder="Wybierz transakcje..."
+            isMinus={false}
+            value={maxTransactions}
+            setValue={setMaxTransactions}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium">Sortowanie</label>
@@ -3463,51 +4076,63 @@ const SupplierList = () => {
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Nazwa</div>
-            <div>E-mail</div>
-            <div>Nr. telefonu</div>
-            <div>Adres</div>
-            <div className="text-right">Liczba transakcji</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Nazwa</div>
+              <div>E-mail</div>
+              <div>Nr. telefonu</div>
+              <div>Adres</div>
+              <div className="text-right">Liczba transakcji</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((sup) => (
+                <div
+                  key={sup.supplierId}
+                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div className="font-medium text-pink-600">
+                    <Link
+                      to={`/suppliers/${sup.supplierId}`}
+                      className="hover:underline"
+                    >
+                      {sup.name}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700">{sup.email}</div>
+                  <div className="text-sm text-gray-700">{sup.phoneNumber}</div>
+                  <div className="text-sm text-gray-700">
+                    {typeof sup.address === "string"
+                      ? sup.address
+                      : `${sup.address.street} ${sup.address.streetNumber}, ${sup.address.postalCode} ${sup.address.city}, ${sup.address.country}`}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(sup.transactionsCount)}
+                  </div>
+                  <div className="flex justify-center text-gray-600">
+                    <Link
+                      to={`/suppliers/${sup.supplierId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((sup) => (
-              <div
-                key={sup.supplierId}
-                className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div className="font-medium text-pink-600">
-                  <Link
-                    to={`/suppliers/${sup.supplierId}`}
-                    className="hover:underline"
-                  >
-                    {sup.name}
-                  </Link>
-                </div>
-                <div className="text-sm text-gray-700">{sup.email}</div>
-                <div className="text-sm text-gray-700">{sup.phoneNumber}</div>
-                <div className="text-sm text-gray-700">
-                  {typeof sup.address === "string"
-                    ? sup.address
-                    : `${sup.address.street} ${sup.address.streetNumber}, ${sup.address.postalCode} ${sup.address.city}, ${sup.address.country}`}
-                </div>
-                <div className="text-sm text-gray-700 text-right">
-                  {sup.transactionsCount}
-                </div>
-                <div className="flex justify-center text-gray-600">
-                  <Link
-                    to={`/suppliers/${sup.supplierId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -3524,7 +4149,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchTransactionById } from "../../features/transactions/transactionsSlice";
 import { FaChevronLeft } from "react-icons/fa";
 import { format } from "date-fns";
-import { currencyFormatter } from "../../utils/helpers";
+import { currencyFormatter, numberFormatter } from "../../utils/helpers";
 
 const TransactionDetail = () => {
   const { id } = useParams();
@@ -3545,10 +4170,18 @@ const TransactionDetail = () => {
     clientId,
     supplierId,
     products,
+    supplierName,
+    fromWarehouseName,
+    toWarehouseName,
+    employeeName,
+    clientName,
   } = tx;
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
-      <Link to="/transactions" className="text-gray-600 hover:text-pink-500">
+      <Link
+        to="/transactions"
+        className="text-gray-600 hover:text-pink-500 transition duration-200"
+      >
         <FaChevronLeft className="inline-block mr-2" /> Powrót do Transakcji
       </Link>
       <h1 className="text-3xl font-semibold mt-4">
@@ -3559,7 +4192,11 @@ const TransactionDetail = () => {
           <strong>Data:</strong> {format(new Date(date), "yyyy-MM-dd")}
         </div>
         <div>
-          <strong>Typ:</strong> {type.replace(/_/g, " ")}
+          <strong>Typ:</strong>{" "}
+          {tx.type
+            .toLowerCase()
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (c) => c.toUpperCase())}
         </div>
         <div>
           <strong>Opis:</strong> {description}
@@ -3570,7 +4207,7 @@ const TransactionDetail = () => {
             to={`/employees/${employeeId}`}
             className="text-pink-600 hover:underline"
           >
-            Pracownik {employeeId}
+            {employeeName}
           </Link>
         </div>
         {supplierId && (
@@ -3580,7 +4217,7 @@ const TransactionDetail = () => {
               to={`/suppliers/${supplierId}`}
               className="text-pink-600 hover:underline"
             >
-              Dostawca {supplierId}
+              {supplierName}
             </Link>
           </div>
         )}
@@ -3591,7 +4228,7 @@ const TransactionDetail = () => {
               to={`/clients/${clientId}`}
               className="text-pink-600 hover:underline"
             >
-              Klient {clientId}
+              {clientName}
             </Link>
           </div>
         )}
@@ -3602,7 +4239,7 @@ const TransactionDetail = () => {
               to={`/warehouses/${fromWarehouseId}`}
               className="text-pink-600 hover:underline"
             >
-              Magazyn {fromWarehouseId}
+              {fromWarehouseName}
             </Link>
           </div>
         )}
@@ -3613,7 +4250,7 @@ const TransactionDetail = () => {
               to={`/warehouses/${toWarehouseId}`}
               className="text-pink-600 hover:underline"
             >
-              Magazyn {toWarehouseId}
+              {toWarehouseName}
             </Link>
           </div>
         )}
@@ -3642,7 +4279,7 @@ const TransactionDetail = () => {
                     {p.name}
                   </Link>
                 </div>
-                <div className="text-right">{p.quantity}</div>
+                <div className="text-right">{numberFormatter(p.quantity)}</div>
                 <div className="text-right">
                   {currencyFormatter(p.unitPrice)}
                 </div>
@@ -3673,9 +4310,13 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fetchTransactions } from "../../features/transactions/transactionsSlice";
-import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { format } from "date-fns";
-import { currencyFormatter } from "../../utils/helpers";
+import { currencyFormatter, numberFormatter } from "../../utils/helpers";
+import DateInput from "../helper/DateInput";
+import SelectInput from "../helper/SelectInput";
+import NumberInput from "../helper/NumberInput";
+import Pagination from "../helper/Pagination";
 
 const TransactionList = () => {
   const dispatch = useDispatch();
@@ -3689,7 +4330,13 @@ const TransactionList = () => {
     fromDate: "",
     toDate: "",
     type: "",
+    minTotalPrice: "",
+    maxTotalPrice: "",
+    minTotalSize: "",
+    maxTotalSize: "",
   });
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
   const [sortOption, setSortOption] = useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -3697,19 +4344,27 @@ const TransactionList = () => {
   };
   useEffect(() => {
     dispatch(
-      fetchTransactions({ warehouseId: selectedWarehouse || undefined })
-    );
-  }, [dispatch, selectedWarehouse]);
-  useEffect(() => {
-    dispatch(
       fetchTransactions({
         fromDate: filters.fromDate || undefined,
         toDate: filters.toDate || undefined,
         type: filters.type || undefined,
+        minTotalPrice: filters.minTotalPrice
+          ? parseFloat(filters.minTotalPrice)
+          : undefined,
+        maxTotalPrice: filters.maxTotalPrice
+          ? parseFloat(filters.maxTotalPrice)
+          : undefined,
+        minTotalSize: filters.minTotalSize
+          ? parseFloat(filters.minTotalSize)
+          : undefined,
+        maxTotalSize: filters.maxTotalSize
+          ? parseFloat(filters.maxTotalSize)
+          : undefined,
+        page: page || 1,
         warehouseId: selectedWarehouse || undefined,
       })
     );
-  }, [dispatch, filters, selectedWarehouse]);
+  }, [dispatch, filters, selectedWarehouse, page]);
   const filtered = [...transactions].sort((a, b) => {
     switch (sortOption) {
       case "date":
@@ -3746,124 +4401,153 @@ const TransactionList = () => {
         return a.totalPrice - b.totalPrice;
       case "total-reverse":
         return b.totalPrice - a.totalPrice;
+      case "size":
+        return a.totalSize - b.totalSize;
+      case "size-reverse":
+        return b.totalSize - a.totalSize;
       default:
         return 0;
     }
   });
   return (
     <>
-      <form className="flex justify-between items-center space-x-4">
+      <form className="flex justify-between space-x-4">
         <div className="flex flex-wrap gap-4 items-end">
-          <div>
-            <label className="block text-sm font-medium">Od dnia</label>
-            <input
-              type="date"
-              name="fromDate"
-              value={filters.fromDate}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Do dnia</label>
-            <input
-              type="date"
-              name="toDate"
-              value={filters.toDate}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Typ transakcji</label>
-            <select
-              name="type"
-              value={filters.type}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-            >
-              <option value="">Wszystkie</option>
-              <option value="SUPPLIER_TO_WAREHOUSE">
-                Supplier to Warehouse
-              </option>
-              <option value="WAREHOUSE_TO_CUSTOMER">
-                Warehouse to Customer
-              </option>
-              <option value="WAREHOUSE_TO_WAREHOUSE">
-                Warehouse to Warehouse
-              </option>
-            </select>
-          </div>
+          <DateInput
+            label="Od dnia"
+            value={filters.fromDate}
+            setValue={handleChange}
+          />
+          <DateInput
+            label="Do dnia"
+            value={filters.toDate}
+            setValue={handleChange}
+          />
+          <SelectInput
+            label="Typ transakcji"
+            value={filters.type}
+            onChange={handleChange}
+          >
+            <option value="">Wszystkie</option>
+            <option value="SUPPLIER_TO_WAREHOUSE">Supplier to Warehouse</option>
+            <option value="WAREHOUSE_TO_CUSTOMER">Warehouse to Customer</option>
+            <option value="WAREHOUSE_TO_WAREHOUSE">
+              Warehouse to Warehouse
+            </option>
+          </SelectInput>
+          <NumberInput
+            label="Łączna kwota (min)"
+            isMinus={true}
+            placeholder="Wpisz kwotę..."
+            value={filters.minTotalPrice}
+            setValue={handleChange}
+          />
+          <NumberInput
+            label="Łączna kwota (max)"
+            isMinus={false}
+            placeholder="Wpisz kwotę..."
+            value={filters.maxTotalPrice}
+            setValue={handleChange}
+          />
+          <NumberInput
+            label="Łączny rozmiar (min)"
+            isMinus={true}
+            placeholder="Wpisz kwotę..."
+            value={filters.minTotalSize}
+            setValue={handleChange}
+          />
+          <NumberInput
+            label="Łączny rozmiar (max)"
+            isMinus={false}
+            placeholder="Wpisz kwotę..."
+            value={filters.maxTotalSize}
+            setValue={handleChange}
+          />
         </div>
-        <div>
-          <label className="block text-sm font-medium">Sortowanie</label>
-          <div className="relative">
-            <select
-              className="border appearance-none border-gray-300 rounded-lg px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="">Sortuj przez</option>
-              <option value="date">Data (od najstarszej)</option>
-              <option value="date-reverse">Data (od najmłodszej)</option>
-              <option value="description">Opis (od A do Z)</option>
-              <option value="description-reverse">Opis (od Z do A)</option>
-              <option value="type">Typ (od A do Z)</option>
-              <option value="type-reverse">Typ (od Z do A)</option>
-              <option value="from">Z Miejsca (od A do Z)</option>
-              <option value="from-reverse">Z Miejsca (od Z do A)</option>
-              <option value="to">Do Miejsca (od A do Z)</option>
-              <option value="to-reverse">Do Miejsca (od Z do A)</option>
-              <option value="total">Łącznie (rosnąco)</option>
-              <option value="total-reverse">Łącznie (malejąco)</option>
-            </select>
-            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
-        </div>
+        <SelectInput
+          label="Sortowanie"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="">Sortuj przez</option>
+          <option value="date">Data (od najstarszej)</option>
+          <option value="date-reverse">Data (od najmłodszej)</option>
+          <option value="description">Opis (od A do Z)</option>
+          <option value="description-reverse">Opis (od Z do A)</option>
+          <option value="type">Typ (od A do Z)</option>
+          <option value="type-reverse">Typ (od Z do A)</option>
+          <option value="from">Z Miejsca (od A do Z)</option>
+          <option value="from-reverse">Z Miejsca (od Z do A)</option>
+          <option value="to">Do Miejsca (od A do Z)</option>
+          <option value="to-reverse">Do Miejsca (od Z do A)</option>
+          <option value="total">Łącznie (rosnąco)</option>
+          <option value="total-reverse">Łącznie (malejąco)</option>
+        </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
         <p>Ładowanie...</p>
       ) : status === "failed" ? (
         <p className="text-red-500">Error: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-7 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Data</div>
-            <div>Opis</div>
-            <div>Typ</div>
-            <div>Od miejsca</div>
-            <div>Do miejsca</div>
-            <div className="text-right">Łącznie</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-9 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Data</div>
+              <div>Opis</div>
+              <div>Typ</div>
+              <div>Pracownik</div>
+              <div>Od miejsca</div>
+              <div>Do miejsca</div>
+              <div className="text-right">Łączna kwota</div>
+              <div className="text-right">Łączny rozmiar</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-1 sm:grid-cols-9 gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
+                  <div className="truncate">{tx.description}</div>
+                  <div>
+                    {tx.type
+                      .toLowerCase()
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </div>
+                  <div>{tx.employeeId}</div>
+                  <div>{tx.fromWarehouseId ?? tx.supplierId ?? "-"}</div>
+                  <div>{tx.toWarehouseId ?? tx.clientId ?? "-"}</div>
+                  <div className="text-right">
+                    {currencyFormatter(tx.totalPrice)}
+                  </div>
+                  <div className="text-right">
+                    {numberFormatter(tx.totalSize)}
+                  </div>
+                  <div className="text-gray-600 flex justify-center">
+                    <Link
+                      to={`/transactions/${tx.transactionId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((tx) => (
-              <div
-                key={tx.transactionId}
-                className="grid grid-cols-1 sm:grid-cols-7 gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                <div>{tx.description}</div>
-                <div>{tx.type.replace(/_/g, " ")}</div>
-                <div>{tx.fromWarehouseId ?? "-"}</div>
-                <div>
-                  {tx.toWarehouseId ?? tx.clientId ?? tx.supplierId ?? "-"}
-                </div>
-                <div className="text-right">
-                  {currencyFormatter(tx.totalPrice)}
-                </div>
-                <div className="text-gray-600 flex justify-center">
-                  <Link
-                    to={`/transactions/${tx.transactionId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -3874,7 +4558,7 @@ export default TransactionList;
 
 // \components\warehouses\WarehouseDetail.jsx
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchWarehouseById } from "../../features/warehouses/warehousesSlice";
@@ -3888,11 +4572,18 @@ import {
   CartesianGrid,
 } from "recharts";
 import { FaChevronLeft, FaEdit, FaEye } from "react-icons/fa";
-import { currencyFormatter } from "../../utils/helpers";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const WarehouseDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const [employeesShown, setEmployeesShown] = useState(25);
+  const [productsShown, setProductsShown] = useState(25);
+  const [transactionsShown, setTransactionsShown] = useState(25);
   const { current: warehouse } = useSelector((state) => state.warehouses);
   useEffect(() => {
     dispatch(fetchWarehouseById(id));
@@ -3907,16 +4598,21 @@ const WarehouseDetail = () => {
     products,
     transactions,
     occupancyHistory,
+    totalItems,
+    totalValue,
   } = warehouse;
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
-        <Link to="/warehouses" className="text-gray-600 hover:text-pink-500">
+        <Link
+          to="/warehouses"
+          className="text-gray-600 hover:text-pink-500 transition duration-200"
+        >
           <FaChevronLeft className="inline mr-2" /> Powrót do Magazynów
         </Link>
         <Link
           to={`/warehouses/${id}/edit`}
-          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
+          className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition duration-200"
         >
           <FaEdit className="mr-2" /> Edytuj Magazyn
         </Link>
@@ -3934,9 +4630,17 @@ const WarehouseDetail = () => {
           <h2 className="text-lg font-semibold mb-2">Zajęte</h2>
           <p className="text-gray-800">{occupiedCapacity}</p>
         </div>
-        <div className="md:col-span-3">
+        <div>
           <h2 className="text-lg font-semibold mb-2">Adres</h2>
           <p className="text-gray-800">{address}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Ilość przedmiotów</h2>
+          <p className="text-gray-800">{numberFormatter(totalItems)}</p>
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Łączna wartość</h2>
+          <p className="text-gray-800">{currencyFormatter(totalValue)}</p>
         </div>
       </div>
       <section>
@@ -3970,14 +4674,17 @@ const WarehouseDetail = () => {
               <div className="text-right">Detale</div>
             </div>
             <div className="divide-y divide-gray-200">
-              {employees.map((emp) => (
+              {employees.slice(0, employeesShown).map((emp) => (
                 <div
                   key={emp.employeeId}
                   className="grid grid-cols-5 p-2 text-sm text-gray-700"
                 >
-                  <div>
+                  <Link
+                    to={`/employees/${emp.employeeId}`}
+                    className="text-pink-500 hover:underline"
+                  >
                     {emp.name} {emp.surname}
-                  </div>
+                  </Link>
                   <div className="text-right truncate">{emp.email}</div>
                   <div className="text-right">{emp.phoneNumber}</div>
                   <div className="text-right">{emp.position}</div>
@@ -3993,6 +4700,14 @@ const WarehouseDetail = () => {
               ))}
             </div>
           </div>
+          {employees.length > employeesShown && (
+            <button
+              onClick={() => setEmployeesShown((prev) => prev + 25)}
+              className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
+            >
+              Pokaż więcej
+            </button>
+          )}
         </div>
         <div>
           <h3 className="text-2xl font-semibold mb-4">Produkty</h3>
@@ -4005,13 +4720,20 @@ const WarehouseDetail = () => {
               <div className="text-right">Detale</div>
             </div>
             <div className="divide-y divide-gray-200">
-              {products.map((pr) => (
+              {products.slice(0, productsShown).map((pr) => (
                 <div
                   key={pr.productId}
                   className="grid grid-cols-5 p-2 text-sm text-gray-700"
                 >
-                  <div>{pr.name}</div>
-                  <div className="text-right">{pr.quantity}</div>
+                  <Link
+                    to={`/products/${pr.productId}`}
+                    className="text-pink-500 hover:underline"
+                  >
+                    {pr.name}
+                  </Link>
+                  <div className="text-right">
+                    {numberFormatter(pr.quantity)}
+                  </div>
                   <div className="text-right">
                     {currencyFormatter(pr.unitPrice)}
                   </div>
@@ -4030,6 +4752,14 @@ const WarehouseDetail = () => {
               ))}
             </div>
           </div>
+          {products.length > productsShown && (
+            <button
+              onClick={() => setProductsShown((prev) => prev + 25)}
+              className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
+            >
+              Pokaż więcej
+            </button>
+          )}
         </div>
       </section>
       <section>
@@ -4043,29 +4773,50 @@ const WarehouseDetail = () => {
             <div className="text-right">Detale</div>
           </div>
           <div className="divide-y divide-gray-200">
-            {transactions.map((tx) => (
-              <div
-                key={tx.transactionId}
-                className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
-              >
-                <div>{new Date(tx.date).toLocaleDateString()}</div>
-                <div>{tx.type.replace(/_/g, " ")}</div>
-                <div className="text-right">
-                  {currencyFormatter(tx.totalPrice)}
-                </div>
-                <div className="text-right">{tx.employeeId}</div>
-                <div className="flex justify-end text-gray-600">
+            {[...transactions]
+              .reverse()
+              .slice(0, transactionsShown)
+              .map((tx) => (
+                <div
+                  key={tx.transactionId}
+                  className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
+                >
+                  <div>{dateFormatter(tx.date)}</div>
+                  <div>
+                    {tx.type
+                      .toLowerCase()
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </div>
+                  <div className="text-right">
+                    {currencyFormatter(tx.totalPrice)}
+                  </div>
                   <Link
-                    to={`/transactions/${tx.transactionId}`}
-                    className="hover:text-pink-500 transition duration-200"
+                    className="text-right text-pink-500 hover:underline"
+                    to={`/employees/${tx.employeeId}`}
                   >
-                    <FaEye />
+                    {tx.employeeName}
                   </Link>
+                  <div className="flex justify-end text-gray-600">
+                    <Link
+                      to={`/transactions/${tx.transactionId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
+        {transactions.length > transactionsShown && (
+          <button
+            onClick={() => setTransactionsShown((prev) => prev + 25)}
+            className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
+          >
+            Pokaż więcej
+          </button>
+        )}
       </section>
     </div>
   );
@@ -4078,14 +4829,17 @@ export default WarehouseDetail;
 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   createWarehouse,
   updateWarehouse,
   fetchWarehouseById,
 } from "../../features/warehouses/warehousesSlice";
-import { listRegions, listCountries } from "../../api/geography";
-import { FaChevronDown } from "react-icons/fa";
+import {
+  fetchRegions,
+  fetchCountries,
+} from "../../features/geography/geographySlice";
+import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 
 const WarehousesForm = () => {
   const { id } = useParams();
@@ -4097,8 +4851,12 @@ const WarehousesForm = () => {
     status,
     error,
   } = useSelector((state) => state.warehouses);
-  const [regions, setRegions] = useState([]);
-  const [countries, setCountries] = useState([]);
+  const {
+    regions,
+    countries,
+    status: geographyStatus,
+    error: geographyError,
+  } = useSelector((state) => state.geography);
   const [form, setForm] = useState({
     name: "",
     capacity: "",
@@ -4110,17 +4868,15 @@ const WarehousesForm = () => {
     streetNumber: "",
   });
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
+    dispatch(fetchRegions());
+  }, [dispatch]);
   useEffect(() => {
     if (form.regionId) {
-      listCountries(Number(form.regionId)).then((res) =>
-        setCountries(res.data)
-      );
+      dispatch(fetchCountries(form.regionId));
     } else {
-      setCountries([]);
+      dispatch(fetchCountries(null));
     }
-  }, [form.regionId]);
+  }, [dispatch, form.regionId]);
   useEffect(() => {
     if (isEdit) dispatch(fetchWarehouseById(id));
   }, [dispatch, id, isEdit]);
@@ -4167,6 +4923,12 @@ const WarehousesForm = () => {
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <Link
+        to="/warehouses"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
+      >
+        <FaChevronLeft className="inline mr-2" /> Powrót do Magazynów
+      </Link>
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Magazyn" : "Nowy Magazyn"}
       </h1>
@@ -4238,7 +5000,7 @@ const WarehousesForm = () => {
             >
               <option value="">Wybierz region, a potem kraj</option>
               {countries.map((c) => (
-                <option key={c.countryId} value={c.countryId}>
+                <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
@@ -4300,7 +5062,7 @@ const WarehousesForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           {isEdit ? "Zaktualizuj Magazyn" : "Stwórz Magazyn"}
         </button>
@@ -4321,7 +5083,13 @@ import {
   fetchWarehouses,
   deleteWarehouse,
 } from "../../features/warehouses/warehousesSlice";
-import { FaEye, FaTrash, FaChevronDown, FaEdit } from "react-icons/fa";
+import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
+import { fetchRegions } from "../../features/geography/geographySlice";
+import Pagination from "../helper/Pagination";
+import SelectInput from "../helper/SelectInput";
+import TextInput from "../helper/TextInput";
+import NumberInput from "../helper/NumberInput";
+import { numberFormatter } from "../../utils/helpers";
 
 const WarehouseList = () => {
   const dispatch = useDispatch();
@@ -4330,10 +5098,25 @@ const WarehouseList = () => {
     status,
     error,
   } = useSelector((state) => state.warehouses);
+  const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
+  const [regionFilter, setRegionFilter] = useState("");
+  const [minCapacity, setMinCapacity] = useState("");
+  const [maxCapacity, setMaxCapacity] = useState("");
+  const [minOccupied, setMinOccupied] = useState("");
+  const [maxOccupied, setMaxOccupied] = useState("");
+  const [minEmployees, setMinEmployees] = useState("");
+  const [maxEmployees, setMaxEmployees] = useState("");
+  const [minProducts, setMinProducts] = useState("");
+  const [maxProducts, setMaxProducts] = useState("");
+  const [minTransactions, setMinTransactions] = useState("");
+  const [maxTransactions, setMaxTransactions] = useState("");
   const [sortOption, setSortOption] = useState("");
+  const [page, setPage] = useState(1);
+  const totalPages = 10;
   useEffect(() => {
     dispatch(fetchWarehouses());
+    dispatch(fetchRegions());
   }, [dispatch]);
   const filtered = warehouses
     .filter((wh) => wh.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -4378,117 +5161,201 @@ const WarehouseList = () => {
   };
   return (
     <>
-      <div className="flex justify-between items-center space-x-4">
-        <div>
-          <label className="block text-sm font-medium">Nazwa</label>
-          <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-pink-500 focus-within:border-pink-500 transition-colors duration-300">
-            <input
-              type="text"
-              placeholder="Szukaj magazynu..."
-              className="w-full focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Sortowanie</label>
-          <div className="relative">
-            <select
-              className="border appearance-none border-gray-300 rounded-lg px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="">Sortuj przez</option>
-              <option value="name">Nazwa (od A do Z)</option>
-              <option value="name-reverse">Nazwa (od Z do A)</option>
-              <option value="capacity">Pojemność (rosnąco)</option>
-              <option value="capacity-reverse">Pojemność (malejąco)</option>
-              <option value="occupied">Zajęte (rosnąco)</option>
-              <option value="occupied-reverse">Zajęte (malejąco)</option>
-              <option value="address">Adres (od A do Z)</option>
-              <option value="address-reverse">Adres (od Z do A)</option>
-              <option value="employees">Pracownicy (rosnąco)</option>
-              <option value="employees-reverse">Pracownicy (malejąco)</option>
-              <option value="products">Produkty (rosnąco)</option>
-              <option value="products-reverse">Produkty (malejąco)</option>
-              <option value="transactions">Transakcje (rosnąco)</option>
-              <option value="transactions-reverse">
-                Transakcje (malejąco)
+      <div className="flex justify-between space-x-4">
+        <div className="flex flex-wrap gap-4 items-end">
+          <TextInput
+            label="Nazwa"
+            placeholder="Szukaj magazynu..."
+            value={searchTerm}
+            setValue={setSearchTerm}
+          />
+          <SelectInput
+            label="Region"
+            value={regionFilter}
+            setValue={setRegionFilter}
+          >
+            <option value="">Wszystkie Regiony</option>
+            {regions.map((reg) => (
+              <option key={reg.id} value={reg.id}>
+                {reg.name}
               </option>
-            </select>
-            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
+            ))}
+          </SelectInput>
+          <NumberInput
+            label="Pojemność (min)"
+            placeholder="Wybierz pojemność..."
+            isMinus={true}
+            value={minCapacity}
+            setValue={setMinCapacity}
+          />
+          <NumberInput
+            label="Pojemność (max)"
+            placeholder="Wybierz pojemność..."
+            isMinus={false}
+            value={maxCapacity}
+            setValue={setMaxCapacity}
+          />
+          <NumberInput
+            label="Zajęte (min)"
+            placeholder="Wybierz zajętość..."
+            isMinus={true}
+            value={minOccupied}
+            setValue={setMinOccupied}
+          />
+          <NumberInput
+            label="Zajęte (max)"
+            placeholder="Wybierz zajętość..."
+            isMinus={false}
+            value={maxOccupied}
+            setValue={setMaxOccupied}
+          />
+          <NumberInput
+            label="Pracownicy (min)"
+            placeholder="Wybierz pracowników..."
+            isMinus={true}
+            value={minEmployees}
+            setValue={setMinEmployees}
+          />
+          <NumberInput
+            label="Pracownicy (max)"
+            placeholder="Wybierz pracowników..."
+            isMinus={false}
+            value={maxEmployees}
+            setValue={setMaxEmployees}
+          />
+          <NumberInput
+            label="Produkty (min)"
+            placeholder="Wybierz produkty..."
+            isMinus={true}
+            value={minProducts}
+            setValue={setMinProducts}
+          />
+          <NumberInput
+            label="Produkty (max)"
+            placeholder="Wybierz produkty..."
+            isMinus={false}
+            value={maxProducts}
+            setValue={setMaxProducts}
+          />
+          <NumberInput
+            label="Transakcje (min)"
+            placeholder="Wybierz transakcje..."
+            isMinus={true}
+            value={minTransactions}
+            setValue={setMinTransactions}
+          />
+          <NumberInput
+            label="Transakcje (max)"
+            placeholder="Wybierz transakcje..."
+            isMinus={false}
+            value={maxTransactions}
+            setValue={setMaxTransactions}
+          />
         </div>
+        <SelectInput
+          label="Sortowanie"
+          value={sortOption}
+          setValue={setSortOption}
+        >
+          <option value="">Sortuj przez</option>
+          <option value="name">Nazwa (od A do Z)</option>
+          <option value="name-reverse">Nazwa (od Z do A)</option>
+          <option value="capacity">Pojemność (rosnąco)</option>
+          <option value="capacity-reverse">Pojemność (malejąco)</option>
+          <option value="occupied">Zajęte (rosnąco)</option>
+          <option value="occupied-reverse">Zajęte (malejąco)</option>
+          <option value="address">Adres (od A do Z)</option>
+          <option value="address-reverse">Adres (od Z do A)</option>
+          <option value="employees">Pracownicy (rosnąco)</option>
+          <option value="employees-reverse">Pracownicy (malejąco)</option>
+          <option value="products">Produkty (rosnąco)</option>
+          <option value="products-reverse">Produkty (malejąco)</option>
+          <option value="transactions">Transakcje (rosnąco)</option>
+          <option value="transactions-reverse">Transakcje (malejąco)</option>
+        </SelectInput>
       </div>
       {status === "loading" ? (
         <p>Ładowanie...</p>
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="hidden sm:grid grid-cols-8 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <div>Nazwa</div>
-            <div>Pojemność</div>
-            <div>Zajęte</div>
-            <div>Adres</div>
-            <div className="text-right">Pracownicy</div>
-            <div className="text-right">Produkty</div>
-            <div className="text-right">Liczba transakcji</div>
-            <div className="text-center">Akcje</div>
+        <>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="hidden sm:grid grid-cols-8 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <div>Nazwa</div>
+              <div>Pojemność</div>
+              <div>Zajęte</div>
+              <div>Adres</div>
+              <div className="text-right">Pracownicy</div>
+              <div className="text-right">Produkty</div>
+              <div className="text-right">Liczba transakcji</div>
+              <div className="text-center">Akcje</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {filtered.map((wh) => (
+                <div
+                  key={wh.warehouseId}
+                  className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
+                >
+                  <div>
+                    <Link
+                      to={`/warehouses/${wh.warehouseId}`}
+                      className="text-pink-600 hover:underline font-medium"
+                    >
+                      {wh.name}
+                    </Link>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    {numberFormatter(wh.capacity)}
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    {numberFormatter(wh.occupiedCapacity)}
+                  </div>
+                  <div className="text-sm text-gray-700">{wh.address}</div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(wh.employeesCount)}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(wh.productsCount)}
+                  </div>
+                  <div className="text-sm text-gray-700 text-right">
+                    {numberFormatter(wh.transactionsCount)}
+                  </div>
+                  <div className="flex justify-center space-x-4 text-gray-600">
+                    <Link
+                      to={`/warehouses/${wh.warehouseId}`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEye />
+                    </Link>
+                    <Link
+                      to={`/warehouses/${wh.warehouseId}/edit`}
+                      className="hover:text-pink-500 transition duration-200"
+                    >
+                      <FaEdit />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(wh.warehouseId)}
+                      className="hover:text-pink-500 transition duration-200 cursor-pointer"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-gray-200">
-            {filtered.map((wh) => (
-              <div
-                key={wh.warehouseId}
-                className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
-              >
-                <div>
-                  <Link
-                    to={`/warehouses/${wh.warehouseId}`}
-                    className="text-pink-600 hover:underline font-medium"
-                  >
-                    {wh.name}
-                  </Link>
-                </div>
-                <div className="text-sm text-gray-700">{wh.capacity}</div>
-                <div className="text-sm text-gray-700">
-                  {wh.occupiedCapacity}
-                </div>
-                <div className="text-sm text-gray-700">{wh.address}</div>
-                <div className="text-sm text-gray-700 text-right">
-                  {wh.employeesCount}
-                </div>
-                <div className="text-sm text-gray-700 text-right">
-                  {wh.productsCount}
-                </div>
-                <div className="text-sm text-gray-700 text-right">
-                  {wh.transactionsCount}
-                </div>
-                <div className="flex justify-center space-x-4 text-gray-600">
-                  <Link
-                    to={`/warehouses/${wh.warehouseId}`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEye />
-                  </Link>
-                  <Link
-                    to={`/warehouses/${wh.warehouseId}/edit`}
-                    className="hover:text-pink-500 transition duration-200"
-                  >
-                    <FaEdit />
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(wh.warehouseId)}
-                    className="hover:text-pink-500 transition duration-200 cursor-pointer"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </>
   );
@@ -4538,8 +5405,8 @@ import * as categoriesAPI from "../../api/categories";
 
 export const fetchCategories = createAsyncThunk(
   "categories/fetchAll",
-  async () => {
-    const response = await categoriesAPI.listCategories();
+  async (params) => {
+    const response = await categoriesAPI.listCategories(params);
     return response.data;
   }
 );
@@ -4605,10 +5472,13 @@ export default categoriesSlice.reducer;
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as clientsAPI from "../../api/clients";
 
-export const fetchClients = createAsyncThunk("clients/fetchAll", async () => {
-  const response = await clientsAPI.listClients();
-  return response.data;
-});
+export const fetchClients = createAsyncThunk(
+  "clients/fetchAll",
+  async (params) => {
+    const response = await clientsAPI.listClients(params);
+    return response.data;
+  }
+);
 export const fetchClientById = createAsyncThunk(
   "clients/fetchById",
   async (id) => {
@@ -4740,6 +5610,77 @@ const employeesSlice = createSlice({
 });
 
 export default employeesSlice.reducer;
+
+
+// \features\geography\geographySlice.jsx
+
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import * as geographyAPI from "../../api/geography";
+
+export const fetchRegions = createAsyncThunk(
+  "geography/fetchRegions",
+  async () => {
+    const response = await geographyAPI.listRegions();
+    return response.data;
+  }
+);
+
+export const fetchCountries = createAsyncThunk(
+  "geography/fetchCountries",
+  async (regionId) => {
+    const response = await geographyAPI.listCountries(regionId);
+    return response.data;
+  }
+);
+
+export const createAddress = createAsyncThunk(
+  "geography/createAddress",
+  async (data) => {
+    const response = await geographyAPI.createAddress(data);
+    return response.data;
+  }
+);
+
+const geographySlice = createSlice({
+  name: "geography",
+  initialState: {
+    regions: [],
+    countries: [],
+    status: "idle",
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchRegions.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchRegions.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.regions = action.payload;
+      })
+      .addCase(fetchRegions.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(fetchCountries.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCountries.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.countries = action.payload;
+      })
+      .addCase(fetchCountries.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(createAddress.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      });
+  },
+});
+
+export default geographySlice.reducer;
 
 
 // \features\inventory\deliverySlice.jsx
@@ -4949,8 +5890,8 @@ import * as suppliersAPI from "../../api/suppliers";
 
 export const fetchSuppliers = createAsyncThunk(
   "suppliers/fetchAll",
-  async () => {
-    const response = await suppliersAPI.listSuppliers();
+  async (params) => {
+    const response = await suppliersAPI.listSuppliers(params);
     return response.data;
   }
 );
@@ -5051,8 +5992,8 @@ import * as warehousesAPI from "../../api/warehouses";
 
 export const fetchWarehouses = createAsyncThunk(
   "warehouses/fetchAll",
-  async () => {
-    const response = await warehousesAPI.listWarehouses();
+  async (params) => {
+    const response = await warehousesAPI.listWarehouses(params);
     return response.data;
   }
 );
@@ -5595,5 +6536,19 @@ export const currencyFormatter = (price) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(price);
+
+export const numberFormatter = (number) =>
+  new Intl.NumberFormat("pl-PL", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(number);
+
+export const dateFormatter = (date) => {
+  return new Intl.DateTimeFormat("pl-PL", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  }).format(new Date(date));
+};
 
 

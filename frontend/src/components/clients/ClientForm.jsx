@@ -30,7 +30,7 @@ const ClientForm = () => {
     <div className="max-w-xl mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">
       <Link
         to="/clients"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="inline mr-2" /> Powrót do Klientów
       </Link>
@@ -102,11 +102,11 @@ const ClientForm = () => {
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
           />
         </div>
-        {error && <p className="text-red-500 text-sm">Error: {error}</p>}
+        {error && <p className="text-red-500">Error: {error}</p>}
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition disabled:opacity-50"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           Stwórz Klienta
         </button>

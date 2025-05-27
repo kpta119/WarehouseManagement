@@ -8,6 +8,8 @@ import { fetchRegions } from "../../features/geography/geographySlice";
 import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
+import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const ClientList = () => {
   const dispatch = useDispatch();
@@ -140,9 +142,11 @@ const ClientList = () => {
         </div>
       </form>
       {status === "loading" ? (
-        <p>Ładowanie...</p>
+        <Spinner />
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono klientów</p>
       ) : (
         <>
           <Pagination
@@ -163,7 +167,7 @@ const ClientList = () => {
               {filtered.map((c) => (
                 <div
                   key={c.clientId}
-                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div className="font-medium text-pink-600">
                     <Link
@@ -179,7 +183,7 @@ const ClientList = () => {
                   <div className="text-sm text-gray-700">{c.phoneNumber}</div>
                   <div className="text-sm text-gray-700">{c.address}</div>
                   <div className="text-sm text-gray-700 text-right">
-                    {c.transactionsCount}
+                    {numberFormatter(c.transactionsCount)}
                   </div>
                   <div className="flex justify-center text-gray-600">
                     <Link

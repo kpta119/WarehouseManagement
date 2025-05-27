@@ -180,7 +180,7 @@ const DeliveryPage = () => {
               <button
                 type="button"
                 onClick={() => handleRemoveRow(idx)}
-                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer"
+                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer transition duration-200"
               >
                 <FaTrash />
               </button>
@@ -189,7 +189,7 @@ const DeliveryPage = () => {
           <button
             type="button"
             onClick={handleAddRow}
-            className="flex items-center text-pink-600 hover:text-pink-800 mt-4"
+            className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transition duration-200"
           >
             <FaPlus className="mr-1" /> Dodaj następny produkt
           </button>
@@ -205,7 +205,7 @@ const DeliveryPage = () => {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
             Wydaj produkt
           </button>

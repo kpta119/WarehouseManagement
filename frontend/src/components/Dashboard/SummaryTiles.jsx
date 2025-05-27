@@ -11,6 +11,11 @@ import {
   FaCalendarCheck,
   FaCalendarDay,
 } from "react-icons/fa";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 
 const SummaryTiles = ({ summary }) => {
   const {
@@ -28,36 +33,35 @@ const SummaryTiles = ({ summary }) => {
     lastDeliveryId,
     topProductId,
   } = summary;
-
   const tiles = [
     {
       icon: <FaBox className="text-pink-400 w-6 h-6" />,
       label: "Produkty",
-      value: productsCount,
+      value: numberFormatter(productsCount),
       to: "/products",
     },
     {
       icon: <FaTags className="text-pink-400 w-6 h-6" />,
       label: "Kategorie",
-      value: categoriesCount,
+      value: numberFormatter(categoriesCount),
       to: "/categories",
     },
     {
       icon: <FaTruckLoading className="text-pink-400 w-6 h-6" />,
       label: "Przyjęcia (mies.)",
-      value: monthlyReceipts,
+      value: numberFormatter(monthlyReceipts),
       to: "/inventory/receive",
     },
     {
       icon: <FaTruckPickup className="text-pink-400 w-6 h-6" />,
       label: "Wydania (mies.)",
-      value: monthlyDeliveries,
+      value: numberFormatter(monthlyDeliveries),
       to: "/inventory/delivery",
     },
     {
       icon: <FaExclamationTriangle className="text-pink-400 w-6 h-6" />,
       label: "Niski stan",
-      value: lowStockCount,
+      value: numberFormatter(lowStockCount),
       to: "/products?filter=low-stock",
     },
     {
@@ -69,37 +73,28 @@ const SummaryTiles = ({ summary }) => {
     {
       icon: <FaDollarSign className="text-pink-400 w-6 h-6" />,
       label: "Wartość zapasów",
-      value: inventoryValue?.toLocaleString(undefined, {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      }),
+      value: currencyFormatter(inventoryValue),
       to: "/warehouses",
     },
     {
       icon: <FaSyncAlt className="text-pink-400 w-6 h-6" />,
       label: "Obrót (ost. tydz.)",
-      value: turnoverLastWeek?.toLocaleString(undefined, {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      }),
+      value: currencyFormatter(turnoverLastWeek),
       to: "/transactions?period=last-week",
     },
     {
       icon: <FaCalendarCheck className="text-pink-400 w-6 h-6" />,
       label: "Ostatnie przyjęcie",
-      value: new Date(lastReceiptDate).toLocaleDateString(),
+      value: dateFormatter(lastReceiptDate),
       to: lastReceiptId ? `/transactions/${lastReceiptId}` : "/transactions",
     },
     {
       icon: <FaCalendarDay className="text-pink-400 w-6 h-6" />,
       label: "Ostatnie wydanie",
-      value: new Date(lastDeliveryDate).toLocaleDateString(),
+      value: dateFormatter(lastDeliveryDate),
       to: lastDeliveryId ? `/transactions/${lastDeliveryId}` : "/transactions",
     },
   ];
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 cursor-pointer">
       {tiles.map(({ icon, label, value, to }) => {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { fetchCountries } from "../../features/geography/geographySlice";
 import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../helper/Spinner";
 
 const CountryList = ({ regionId, regionName }) => {
   const dispatch = useDispatch();
@@ -11,7 +12,7 @@ const CountryList = ({ regionId, regionName }) => {
     }
   }, [dispatch, regionId]);
   return status === "loading" || status === "idle" ? (
-    <p>Loading...</p>
+    <Spinner />
   ) : status === "failed" ? (
     <p className="text-red-500">Error: {error}</p>
   ) : (
@@ -26,14 +27,14 @@ const CountryList = ({ regionId, regionName }) => {
           {countries.map((c) => (
             <li
               key={c.id}
-              className="px-4 py-2 border border-gray-200 rounded-lg"
+              className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-100 transition duration-200"
             >
               {c.name}
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-gray-500">Brak krajów w tym regionie.</p>
+        <p className="text-red-500">Brak krajów w tym regionie.</p>
       )}
     </div>
   );

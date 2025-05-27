@@ -7,6 +7,7 @@ import {
   updateCategory,
 } from "../../features/categories/categoriesSlice";
 import { FaChevronLeft } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
 
 const CategoryForm = () => {
   const { id } = useParams();
@@ -47,16 +48,19 @@ const CategoryForm = () => {
     navigate("/categories");
   };
   if (isEdit && status === "loading") {
-    return <p>Ładowanie danych kategorii...</p>;
+    return <Spinner />;
   }
   if (status === "failed") {
     return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  if (!cat) {
+    return <p className="text-red-500">Nie znaleziono kategorii.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <Link
         to="/categories"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii
       </Link>
@@ -91,7 +95,7 @@ const CategoryForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           {isEdit ? "Zapisz" : "Utwórz"}
         </button>

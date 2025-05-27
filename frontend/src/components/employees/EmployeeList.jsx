@@ -8,6 +8,8 @@ import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
+import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const EmployeeList = () => {
   const dispatch = useDispatch();
@@ -149,10 +151,12 @@ const EmployeeList = () => {
           </div>
         </div>
       </form>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono pracowników</p>
       ) : (
         <>
           <Pagination
@@ -174,7 +178,7 @@ const EmployeeList = () => {
               {filtered.map((emp) => (
                 <div
                   key={emp.employeeId}
-                  className="grid grid-cols-1 sm:grid-cols-7 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-7 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div className="font-medium text-pink-600">
                     <Link
@@ -193,7 +197,7 @@ const EmployeeList = () => {
                     {emp.warehouseName}
                   </div>
                   <div className="text-sm text-gray-700 text-right">
-                    {emp.transactionsCount}
+                    {numberFormatter(emp.transactionsCount)}
                   </div>
                   <div className="flex justify-center text-gray-600">
                     <Link

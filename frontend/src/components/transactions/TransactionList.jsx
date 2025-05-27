@@ -4,11 +4,12 @@ import { Link } from "react-router-dom";
 import { fetchTransactions } from "../../features/transactions/transactionsSlice";
 import { FaEye } from "react-icons/fa";
 import { format } from "date-fns";
-import { currencyFormatter } from "../../utils/helpers";
+import { currencyFormatter, numberFormatter } from "../../utils/helpers";
 import DateInput from "../helper/DateInput";
 import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
+import Spinner from "../helper/Spinner";
 
 const TransactionList = () => {
   const dispatch = useDispatch();
@@ -103,7 +104,7 @@ const TransactionList = () => {
   });
   return (
     <>
-      <form className="flex justify-between items-center space-x-4">
+      <form className="flex justify-between space-x-4">
         <div className="flex flex-wrap gap-4 items-end">
           <DateInput
             label="Od dnia"
@@ -177,9 +178,11 @@ const TransactionList = () => {
         </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
-        <p>Ładowanie...</p>
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono transakcji</p>
       ) : (
         <>
           <Pagination
@@ -203,18 +206,25 @@ const TransactionList = () => {
               {filtered.map((tx) => (
                 <div
                   key={tx.transactionId}
-                  className="grid grid-cols-1 sm:grid-cols-9 gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-9 gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div>{format(new Date(tx.date), "yyyy-MM-dd")}</div>
-                  <div>{tx.description}</div>
-                  <div>{tx.type.replace(/_/g, " ")}</div>
+                  <div className="truncate">{tx.description}</div>
+                  <div>
+                    {tx.type
+                      .toLowerCase()
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </div>
                   <div>{tx.employeeId}</div>
                   <div>{tx.fromWarehouseId ?? tx.supplierId ?? "-"}</div>
                   <div>{tx.toWarehouseId ?? tx.clientId ?? "-"}</div>
                   <div className="text-right">
                     {currencyFormatter(tx.totalPrice)}
                   </div>
-                  <div className="text-right">{tx.totalSize}</div>
+                  <div className="text-right">
+                    {numberFormatter(tx.totalSize)}
+                  </div>
                   <div className="text-gray-600 flex justify-center">
                     <Link
                       to={`/transactions/${tx.transactionId}`}

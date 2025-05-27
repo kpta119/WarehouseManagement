@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { fetchRegions } from "../../features/geography/geographySlice";
 import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../helper/Spinner";
 
 const RegionList = ({ selectedRegion, onSelect }) => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const RegionList = ({ selectedRegion, onSelect }) => {
     dispatch(fetchRegions());
   }, [dispatch]);
   return status === "loading" || status === "idle" ? (
-    <p>Loading...</p>
+    <Spinner />
   ) : status === "failed" ? (
     <p className="text-red-500">Error: {error}</p>
   ) : (
@@ -23,7 +24,7 @@ const RegionList = ({ selectedRegion, onSelect }) => {
             ${
               selectedRegion.id === r.id
                 ? "bg-pink-100 text-pink-800"
-                : "hover:bg-gray-100"
+                : "hover:bg-gray-100 transition duration-200"
             }`}
             onClick={() => onSelect({ id: r.id, name: r.name })}
           >

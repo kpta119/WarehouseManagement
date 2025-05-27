@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   fetchProductById,
   createProduct,
   updateProduct,
 } from "../../features/products/productsSlice";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -63,10 +64,22 @@ const ProductForm = () => {
     }
   };
   if ((isEdit && prodStatus === "loading") || prodStatus === "idle") {
-    return <p>Ładowanie...</p>;
+    return <Spinner />;
+  }
+  if (prodStatus === "failed") {
+    return <p className="text-red-500">Błąd: {prodError}</p>;
+  }
+  if (isEdit && !product) {
+    return <p className="text-red-500">Nie znaleziono produktu.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <Link
+        to="/products"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
+      >
+        <FaChevronLeft className="inline mr-2" /> Powrót do Produktów
+      </Link>
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Produkt" : "Nowy Produkt"}
       </h1>
@@ -154,7 +167,7 @@ const ProductForm = () => {
         {prodError && <p className="text-red-500">{prodError}</p>}
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           {isEdit ? "Aktualizuj Produkt" : "Stwórz Produkt"}
         </button>

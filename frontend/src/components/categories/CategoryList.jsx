@@ -9,6 +9,7 @@ import { FaTrash, FaEdit, FaEye } from "react-icons/fa";
 import Pagination from "../helper/Pagination";
 import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
+import Spinner from "../helper/Spinner";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
@@ -46,8 +47,6 @@ const CategoryList = () => {
       dispatch(deleteCategory(id));
     }
   };
-  if (status === "loading") return <p>Ładowanie...</p>;
-  if (status === "failed") return <p className="text-red-500">Błąd: {error}</p>;
   return (
     <>
       <form className="flex items-center space-x-2 justify-between">
@@ -71,13 +70,14 @@ const CategoryList = () => {
           <option value="description-reverse">Opis (od Z do A)</option>
         </SelectInput>
       </form>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono kategorii</p>
       ) : (
         <>
-          {" "}
           <Pagination
             currentPage={page}
             totalPages={totalPages}
@@ -93,7 +93,7 @@ const CategoryList = () => {
               {filtered.map((cat) => (
                 <div
                   key={cat.categoryId}
-                  className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div className="font-medium text-pink-600">
                     <Link
@@ -103,7 +103,9 @@ const CategoryList = () => {
                       {cat.name}
                     </Link>
                   </div>
-                  <div className="text-sm text-gray-700">{cat.description}</div>
+                  <div className="text-sm text-gray-700 truncate">
+                    {cat.description}
+                  </div>
                   <div className="flex justify-center space-x-4 text-gray-600">
                     <Link
                       to={`/categories/${cat.categoryId}`}
@@ -127,7 +129,7 @@ const CategoryList = () => {
                 </div>
               ))}
             </div>
-          </div>{" "}
+          </div>
           <Pagination
             currentPage={page}
             totalPages={totalPages}

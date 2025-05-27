@@ -10,9 +10,7 @@ import {
 
 const SupplierForm = () => {
   const dispatch = useDispatch();
-  const { regions, countries, status, error } = useSelector(
-    (state) => state.geography
-  );
+  const { regions, countries } = useSelector((state) => state.geography);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -60,7 +58,7 @@ const SupplierForm = () => {
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
       <Link
         to="/suppliers"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="inline mr-2" /> Powrót do Dostawców
       </Link>
@@ -242,7 +240,7 @@ const SupplierForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition cursor-pointer"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           Stwórz dostawcę
         </button>

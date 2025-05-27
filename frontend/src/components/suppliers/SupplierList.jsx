@@ -8,6 +8,8 @@ import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import { fetchRegions } from "../../features/geography/geographySlice";
 import Pagination from "../helper/Pagination";
+import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const SupplierList = () => {
   const dispatch = useDispatch();
@@ -143,10 +145,12 @@ const SupplierList = () => {
           </div>
         </div>
       </form>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono dostawcy</p>
       ) : (
         <>
           <Pagination
@@ -167,7 +171,7 @@ const SupplierList = () => {
               {filtered.map((sup) => (
                 <div
                   key={sup.supplierId}
-                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div className="font-medium text-pink-600">
                     <Link
@@ -185,7 +189,7 @@ const SupplierList = () => {
                       : `${sup.address.street} ${sup.address.streetNumber}, ${sup.address.postalCode} ${sup.address.city}, ${sup.address.country}`}
                   </div>
                   <div className="text-sm text-gray-700 text-right">
-                    {sup.transactionsCount}
+                    {numberFormatter(sup.transactionsCount)}
                   </div>
                   <div className="flex justify-center text-gray-600">
                     <Link

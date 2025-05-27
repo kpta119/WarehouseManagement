@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   createWarehouse,
   updateWarehouse,
@@ -10,7 +10,8 @@ import {
   fetchRegions,
   fetchCountries,
 } from "../../features/geography/geographySlice";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
 
 const WarehousesForm = () => {
   const { id } = useParams();
@@ -22,12 +23,7 @@ const WarehousesForm = () => {
     status,
     error,
   } = useSelector((state) => state.warehouses);
-  const {
-    regions,
-    countries,
-    status: geographyStatus,
-    error: geographyError,
-  } = useSelector((state) => state.geography);
+  const { regions, countries } = useSelector((state) => state.geography);
   const [form, setForm] = useState({
     name: "",
     capacity: "",
@@ -90,10 +86,22 @@ const WarehousesForm = () => {
     }
   };
   if ((isEdit && status === "loading") || status === "idle") {
-    return <p>Loading...</p>;
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  if (isEdit && !warehouse) {
+    return <p className="text-red-500">Nie znaleziono magazynu.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
+      <Link
+        to="/warehouses"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
+      >
+        <FaChevronLeft className="inline mr-2" /> Powrót do Magazynów
+      </Link>
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Magazyn" : "Nowy Magazyn"}
       </h1>
@@ -227,7 +235,7 @@ const WarehousesForm = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           {isEdit ? "Zaktualizuj Magazyn" : "Stwórz Magazyn"}
         </button>

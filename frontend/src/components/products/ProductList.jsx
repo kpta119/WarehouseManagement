@@ -7,11 +7,12 @@ import {
 } from "../../features/products/productsSlice";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
 import { FaEye, FaTrash, FaEdit } from "react-icons/fa";
-import { currencyFormatter } from "../../utils/helpers";
+import { currencyFormatter, numberFormatter } from "../../utils/helpers";
 import Pagination from "../helper/Pagination";
 import NumberInput from "../helper/NumberInput";
 import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
+import Spinner from "../helper/Spinner";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -218,9 +219,11 @@ const ProductList = () => {
         </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
-        <p>Loading...</p>
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono produktu</p>
       ) : (
         <>
           <Pagination
@@ -243,7 +246,7 @@ const ProductList = () => {
               {filtered.map((product) => (
                 <div
                   key={product.productId}
-                  className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div>
                     <Link
@@ -253,7 +256,7 @@ const ProductList = () => {
                       {product.name}
                     </Link>
                   </div>
-                  <div className="text-sm text-gray-700">
+                  <div className="text-sm text-gray-700 truncate">
                     {product.description}
                   </div>
                   <div className="text-sm text-gray-700">
@@ -263,7 +266,7 @@ const ProductList = () => {
                     {currencyFormatter(product.unitPrice)}
                   </div>
                   <div className="text-sm text-gray-700 text-right">
-                    {product.unitSize}
+                    {numberFormatter(product.unitSize)}
                   </div>
                   <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
                     {product.inventoryCount < 5 && (
@@ -271,7 +274,7 @@ const ProductList = () => {
                         Niski Stan!
                       </div>
                     )}
-                    {product.inventoryCount}
+                    {numberFormatter(product.inventoryCount)}
                   </div>
                   <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
                     {product.productId < 3 && (
@@ -279,7 +282,7 @@ const ProductList = () => {
                         Bestseller!
                       </div>
                     )}
-                    {product.transactionCount}
+                    {numberFormatter(product.transactionCount)}
                   </div>
                   <div className="flex justify-center space-x-4 text-gray-600">
                     <Link

@@ -11,6 +11,8 @@ import Pagination from "../helper/Pagination";
 import SelectInput from "../helper/SelectInput";
 import TextInput from "../helper/TextInput";
 import NumberInput from "../helper/NumberInput";
+import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const WarehouseList = () => {
   const dispatch = useDispatch();
@@ -195,13 +197,14 @@ const WarehouseList = () => {
           <option value="transactions-reverse">Transakcje (malejąco)</option>
         </SelectInput>
       </div>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono magazynu</p>
       ) : (
         <>
-          {" "}
           <Pagination
             currentPage={page}
             totalPages={totalPages}
@@ -222,7 +225,7 @@ const WarehouseList = () => {
               {filtered.map((wh) => (
                 <div
                   key={wh.warehouseId}
-                  className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors"
+                  className="grid grid-cols-1 sm:grid-cols-8 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
                 >
                   <div>
                     <Link
@@ -232,19 +235,21 @@ const WarehouseList = () => {
                       {wh.name}
                     </Link>
                   </div>
-                  <div className="text-sm text-gray-700">{wh.capacity}</div>
                   <div className="text-sm text-gray-700">
-                    {wh.occupiedCapacity}
+                    {numberFormatter(wh.capacity)}
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    {numberFormatter(wh.occupiedCapacity)}
                   </div>
                   <div className="text-sm text-gray-700">{wh.address}</div>
                   <div className="text-sm text-gray-700 text-right">
-                    {wh.employeesCount}
+                    {numberFormatter(wh.employeesCount)}
                   </div>
                   <div className="text-sm text-gray-700 text-right">
-                    {wh.productsCount}
+                    {numberFormatter(wh.productsCount)}
                   </div>
                   <div className="text-sm text-gray-700 text-right">
-                    {wh.transactionsCount}
+                    {numberFormatter(wh.transactionsCount)}
                   </div>
                   <div className="flex justify-center space-x-4 text-gray-600">
                     <Link
@@ -269,7 +274,7 @@ const WarehouseList = () => {
                 </div>
               ))}
             </div>
-          </div>{" "}
+          </div>
           <Pagination
             currentPage={page}
             totalPages={totalPages}
