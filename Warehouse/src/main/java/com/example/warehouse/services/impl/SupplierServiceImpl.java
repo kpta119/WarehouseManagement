@@ -1,17 +1,24 @@
 package com.example.warehouse.services.impl;
 
-import com.example.warehouse.domain.*;
+import com.example.warehouse.domain.Address;
+import com.example.warehouse.domain.City;
+import com.example.warehouse.domain.Country;
+import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
 import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
 import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
-import com.example.warehouse.repositories.*;
+import com.example.warehouse.repositories.AddressRepository;
+import com.example.warehouse.repositories.CityRepository;
+import com.example.warehouse.repositories.CountryRepository;
+import com.example.warehouse.repositories.SupplierRepository;
 import com.example.warehouse.services.SupplierService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -69,11 +76,9 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public List<SupplierSummaryDto> getSuppliersWithTransactionCount() {
-        return supplierRepository.findAllSuppliersWithTransactionCounts()
-                .stream()
-                .map(businessEntitySummaryMapper::mapToSupplierDto)
-                .toList();
+    public Page<SupplierSummaryDto> getSuppliersWithTransactionCount(Pageable pageable) {
+        Page<Object[]> results = supplierRepository.findAllSuppliersWithTransactionCounts(pageable);
+        return results.map(businessEntitySummaryMapper::mapToSupplierDto);
     }
 
     @Override

@@ -7,11 +7,12 @@ import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistor
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.SupplierService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,10 +27,10 @@ public class SupplierController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllSuppliers() {
+    public ResponseEntity<?> getAllSuppliers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size) {
         try {
-            List<SupplierSummaryDto> allSuppliers = supplierService.getSuppliersWithTransactionCount();
-            return ResponseEntity.status(HttpStatus.OK).body(allSuppliers);
+            Page<SupplierSummaryDto> response = supplierService.getSuppliersWithTransactionCount(PageRequest.of(page, size));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

@@ -7,11 +7,12 @@ import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryD
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -27,10 +28,10 @@ public class ClientController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllClients() {
+    public ResponseEntity<?> getAllClients(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size) {
         try {
-            List<ClientSummaryDto> allClients = clientService.getClientsWithTransactionCount();
-            return ResponseEntity.status(HttpStatus.OK).body(allClients);
+            Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(PageRequest.of(page, size));
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

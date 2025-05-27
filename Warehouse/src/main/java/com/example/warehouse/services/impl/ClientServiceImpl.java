@@ -8,16 +8,17 @@ import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
-import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
+import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.repositories.AddressRepository;
 import com.example.warehouse.repositories.CityRepository;
 import com.example.warehouse.repositories.ClientRepository;
 import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.services.ClientService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -77,11 +78,9 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<ClientSummaryDto> getClientsWithTransactionCount(){
-        return clientRepository.findAllClientsWithTransactionCounts()
-                .stream()
-                .map(businessEntitySummaryMapper::mapToClientDto)
-                .toList();
+    public Page<ClientSummaryDto> getClientsWithTransactionCount(Pageable pageable){
+        Page<Object[]> results = clientRepository.findAllClientsWithTransactionCounts(pageable);
+        return results.map(businessEntitySummaryMapper::mapToClientDto);
     }
 
     @Override
