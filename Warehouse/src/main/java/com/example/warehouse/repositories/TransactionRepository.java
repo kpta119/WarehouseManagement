@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TransactionRepository extends CrudRepository<Transaction, Integer>, JpaSpecificationExecutor<Transaction>,
-        JpaRepository<Transaction, Integer> {
+public interface TransactionRepository extends CrudRepository<Transaction, Integer>, JpaSpecificationExecutor<Transaction>, JpaRepository<Transaction, Integer> {
     @Query("SELECT COUNT(t) FROM Transaction t WHERE " +
             "t.transactionType = :type AND " +
             "t.date BETWEEN :start AND :end AND " +

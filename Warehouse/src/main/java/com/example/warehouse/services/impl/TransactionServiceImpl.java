@@ -4,6 +4,9 @@ import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.services.TransactionService;
 import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,8 +31,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<Transaction> getAllTransactions(Date fromDate, Date toDate, Transaction.TransactionType type, Integer employeeId) {
-        return transactionRepository.findAll((root, query, cb) -> {
+    public Page<Transaction> getAllTransactions(Date fromDate, Date toDate, Transaction.TransactionType type, Integer employeeId, Pageable pageable) {
+        Specification<Transaction> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (fromDate != null) {
@@ -46,6 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
-        });
+        };
+        return transactionRepository.findAll(spec, pageable);
     }
 }

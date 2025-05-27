@@ -5,15 +5,15 @@ import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
 import com.example.warehouse.mappers.TransactionMapper;
 import com.example.warehouse.mappers.TransactionSummaryMapper;
 import com.example.warehouse.services.TransactionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/transactions")
@@ -45,14 +45,14 @@ public class TransactionController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
             @RequestParam(required = false) Transaction.TransactionType type,
-            @RequestParam(required = false) Integer employeeId
+            @RequestParam(required = false) Integer employeeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size
     ){
         try{
-            List<Transaction> transactions = transactionService.getAllTransactions(fromDate, toDate, type, employeeId);
-            List<TransactionSummaryDto> dtos = transactions.stream()
-                    .map(transactionSummaryMapper::mapToDto)
-                    .collect(Collectors.toList());
-            return ResponseEntity.status(HttpStatus.OK).body(dtos);
+            Page<Transaction> transactionsPage = transactionService.getAllTransactions(fromDate, toDate, type, employeeId, PageRequest.of(page, size));
+            Page<TransactionSummaryDto> response = transactionsPage.map(transactionSummaryMapper::mapToDto);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e){
