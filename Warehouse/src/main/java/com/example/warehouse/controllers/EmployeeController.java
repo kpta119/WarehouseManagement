@@ -29,12 +29,16 @@ public class EmployeeController {
 
     @GetMapping()
     public ResponseEntity<?> getAllEmployees(
+            @RequestParam(required = false) String partOfNameOrSurname,
+            @RequestParam(required = false) String regionName,
+            @RequestParam(required = false) Integer minTransactions,
+            @RequestParam(required = false) Integer maxTransactions,
             @RequestParam(required = false) Integer warehouseId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size
     ) {
         try {
-            Page<EmployeeSummaryDto> response = employeeService.getEmployeesWithTransactionCount(warehouseId, PageRequest.of(page, size));
+            Page<EmployeeSummaryDto> response = employeeService.getEmployeesWithTransactionCount(partOfNameOrSurname, regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());

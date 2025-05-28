@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface EmployeeService {
-    Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(Integer warehouseId, Pageable pageable);
+    Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(String partOfNameOrSurname, String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable);
 
     Employee createEmployee(EmployeeDto request);
 

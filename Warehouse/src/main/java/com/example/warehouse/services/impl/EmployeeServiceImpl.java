@@ -37,8 +37,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(Integer warehouseId, Pageable pageable) {
-        Page<Object[]> results = employeeRepository.findAllEmployeesWithTransactionCounts(warehouseId, pageable);
+    public Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(String partOfNameOrSurname, String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable) {
+        Page<Object[]> results = employeeRepository.findAllEmployeesWithTransactionCounts(partOfNameOrSurname, regionName, minTransactions, maxTransactions, warehouseId, pageable);
         return results.map(employeeSummaryMapper::mapToDto);
     }
 
