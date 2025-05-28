@@ -1,31 +1,39 @@
-// /pages/InventoryReceivePage.jsx
-
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
-import { fetchSuppliers } from "../features/suppliers/suppliersSlice";
-import { receiveInventory } from "../features/inventory/receiveSlice";
-import { searchProducts } from "../api/products";
+import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
+import { deliverInventory } from "../../features/inventory/deliverySlice";
+import { fetchProducts } from "../../features/products/productsSlice";
+import { fetchClients } from "../../features/clients/clientsSlice";
+import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
 
-const InventoryReceivePage = () => {
+const DeliveryPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
-  const { list: suppliers } = useSelector((s) => s.suppliers);
+  const { list: clients } = useSelector((s) => s.clients);
+  const { list: products } = useSelector((s) => s.products);
+  const { list: employees } = useSelector((s) => s.employees);
   const { status, error, transaction } = useSelector(
-    (s) => s.inventory.receive
+    (s) => s.inventory.delivery
   );
   const [form, setForm] = useState({
     warehouseId: "",
-    supplierId: "",
+    clientId: "",
+    employeeId: "",
     items: [{ productId: "", quantity: "" }],
   });
-  const [products, setProducts] = useState([]);
   useEffect(() => {
     dispatch(fetchWarehouses());
-    dispatch(fetchSuppliers());
-    searchProducts({}).then((res) => setProducts(res.data));
+    dispatch(fetchClients());
+    dispatch(fetchProducts());
   }, [dispatch]);
+  useEffect(() => {
+    dispatch(
+      fetchEmployees({
+        warehouseId: form.warehouseId ? Number(form.warehouseId) : undefined,
+      })
+    );
+  }, [dispatch, form.warehouseId]);
   const handleAddRow = () =>
     setForm((f) => ({
       ...f,
@@ -50,9 +58,10 @@ const InventoryReceivePage = () => {
       }
     });
     dispatch(
-      receiveInventory({
+      deliverInventory({
         warehouseId: Number(form.warehouseId),
-        supplierId: Number(form.supplierId),
+        clientId: Number(form.clientId),
+        employeeId: Number(form.employeeId),
         items: itemsPayload,
       })
     );
@@ -61,9 +70,7 @@ const InventoryReceivePage = () => {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center space-x-2">
         <FaTruck className="text-pink-500 w-6 h-6" />
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Przyjęcie towaru
-        </h1>
+        <h1 className="text-2xl font-semibold text-gray-800">Wydanie towaru</h1>
       </div>
       <form
         onSubmit={handleSubmit}
@@ -92,20 +99,41 @@ const InventoryReceivePage = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Dostawca</label>
+            <label className="block text-sm font-medium mb-1">Klient</label>
             <div className="relative">
               <select
                 required
-                value={form.supplierId}
+                value={form.clientId}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, supplierId: e.target.value }))
+                  setForm((f) => ({ ...f, clientId: e.target.value }))
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz dostawce</option>
-                {suppliers.map((s) => (
-                  <option key={s.supplierId} value={s.supplierId}>
-                    {s.name}
+                <option value="">Wybierz klienta</option>
+                {clients.map((c) => (
+                  <option key={c.clientId} value={c.clientId}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <div className="relative">
+              <select
+                required
+                value={form.employeeId}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, employeeId: e.target.value }))
+                }
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
+              >
+                <option value="">Wybierz pracownika</option>
+                {employees.map((e) => (
+                  <option key={e.employeeId} value={e.employeeId}>
+                    {e.name} {e.surname}
                   </option>
                 ))}
               </select>
@@ -147,13 +175,13 @@ const InventoryReceivePage = () => {
                   onChange={(e) =>
                     handleItemChange(idx, "quantity", e.target.value)
                   }
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => handleRemoveRow(idx)}
-                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer"
+                className="flex justify-center items-center text-red-500 hover:text-red-700 h-full cursor-pointer transition duration-200"
               >
                 <FaTrash />
               </button>
@@ -162,7 +190,7 @@ const InventoryReceivePage = () => {
           <button
             type="button"
             onClick={handleAddRow}
-            className="flex items-center text-pink-600 hover:text-pink-800 mt-4"
+            className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transition duration-200"
           >
             <FaPlus className="mr-1" /> Dodaj następny produkt
           </button>
@@ -171,16 +199,16 @@ const InventoryReceivePage = () => {
           {error && <p className="text-red-500 mb-2">Error: {error}</p>}
           {status === "succeeded" && (
             <p className="text-green-600 mb-2">
-              Received successfully! Transaction ID:{" "}
+              Delivered successfully! Transaction ID:{" "}
               {transaction?.transactionId}
             </p>
           )}
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50"
+            className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
-            Przyjmij towar
+            Wydaj produkt
           </button>
         </div>
       </form>
@@ -188,4 +216,4 @@ const InventoryReceivePage = () => {
   );
 };
 
-export default InventoryReceivePage;
+export default DeliveryPage;

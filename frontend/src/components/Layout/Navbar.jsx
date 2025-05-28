@@ -54,7 +54,6 @@ export default function Navbar() {
       {[
         "/products",
         "/",
-        "/warehouses",
         "/transactions",
         "/employees",
         "/suppliers",

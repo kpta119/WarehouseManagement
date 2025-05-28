@@ -1,10 +1,6 @@
 import apiClient from "../utils/apiClient";
-import { dummyCategories } from "../utils/dummyData";
 
-export const listCategories = () =>
-  import.meta.env.DEV
-    ? Promise.resolve({ data: dummyCategories })
-    : apiClient.get("/api/categories");
+export const listCategories = () => apiClient.get("/api/categories");
 
 export const createCategory = (data) => apiClient.post("/api/categories", data);
 
