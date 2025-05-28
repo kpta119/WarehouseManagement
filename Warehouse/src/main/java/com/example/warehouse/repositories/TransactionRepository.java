@@ -1,6 +1,7 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Transaction;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,4 +80,47 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
             ORDER BY t.id DESC
             """)
     List<Transaction> findLastAddedTransactionByWarehouseId(Integer warehouseId, Pageable pageable);
+
+
+    @Query(
+            value = """
+            SELECT t
+            FROM Transaction t
+            JOIN t.products tp
+            JOIN tp.product p
+            WHERE (:fromDate IS NULL OR t.date >= :fromDate)
+              AND (:toDate IS NULL OR t.date <= :toDate)
+              AND (:type IS NULL OR t.transactionType = :type)
+              AND (:employeeId IS NULL OR t.employee.id = :employeeId)
+            GROUP BY t
+            HAVING (:minTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) >= :minTotalPrice)
+               AND (:maxTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) <= :maxTotalPrice)
+               AND (:minTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) >= :minTotalSize)
+               AND (:maxTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) <= :maxTotalSize)
+    """,
+            countQuery = """
+            SELECT COUNT(t)
+            FROM Transaction t
+            JOIN t.products tp
+            JOIN tp.product p
+            WHERE (:fromDate IS NULL OR t.date >= :fromDate)
+              AND (:toDate IS NULL OR t.date <= :toDate)
+              AND (:type IS NULL OR t.transactionType = :type)
+              AND (:employeeId IS NULL OR t.employee.id = :employeeId)
+            GROUP BY t
+            HAVING (:minTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) >= :minTotalPrice)
+               AND (:maxTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) <= :maxTotalPrice)
+               AND (:minTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) >= :minTotalSize)
+               AND (:maxTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) <= :maxTotalSize)
+    """)
+    Page<Transaction> findAllWithFilters(
+            @Param("minTotalPrice") Double minTotalPrice,
+            @Param("maxTotalPrice") Double maxTotalPrice,
+            @Param("minTotalSize") Double minTotalSize,
+            @Param("maxTotalSize") Double maxTotalSize,
+            @Param("fromDate") Date fromDate,
+            @Param("toDate") Date toDate,
+            @Param("type") Transaction.TransactionType type,
+            @Param("employeeId") Integer employeeId,
+            Pageable pageable);
 }

@@ -42,6 +42,10 @@ public class TransactionController {
 
     @GetMapping()
     public ResponseEntity<?> getAllTransactions(
+            @RequestParam(required = false) Double minTotalPrice,
+            @RequestParam(required = false) Double maxTotalPrice,
+            @RequestParam(required = false) Double minTotalSize,
+            @RequestParam(required = false) Double maxTotalSize,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate,
             @RequestParam(required = false) Transaction.TransactionType type,
@@ -50,7 +54,7 @@ public class TransactionController {
             @RequestParam(defaultValue = "25") int size
     ){
         try{
-            Page<Transaction> transactionsPage = transactionService.getAllTransactions(fromDate, toDate, type, employeeId, PageRequest.of(page, size));
+            Page<Transaction> transactionsPage = transactionService.getAllTransactions(minTotalPrice, maxTotalPrice, minTotalSize, maxTotalSize, fromDate, toDate, type, employeeId, PageRequest.of(page, size));
             Page<TransactionSummaryDto> response = transactionsPage.map(transactionSummaryMapper::mapToDto);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (NoSuchElementException e) {

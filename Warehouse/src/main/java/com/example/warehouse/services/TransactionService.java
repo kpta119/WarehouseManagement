@@ -10,5 +10,5 @@ public interface TransactionService {
 
     Transaction getTransactionById(Integer transactionId);
 
-    Page<Transaction> getAllTransactions(Date fromDate, Date toDate, Transaction.TransactionType transactionType, Integer employeeId, Pageable pageable);
+    Page<Transaction> getAllTransactions(Double minTotalPrice, Double maxTotalPrice, Double minTotalSize, Double maxTotalSize, Date fromDate, Date toDate, Transaction.TransactionType transactionType, Integer employeeId, Pageable pageable);
 }
