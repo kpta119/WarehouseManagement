@@ -52,12 +52,17 @@ public class TransactionMapper {
                     pDto.setProductId(tp.getProduct().getId());
                     pDto.setName(tp.getProduct().getName());
                     pDto.setQuantity(tp.getQuantity());
-                    pDto.setUnitPrice(tp.getTransactionPrice()); // albo tp.getProduct().getUnitPrice()
+                    pDto.setUnitPrice(tp.getTransactionPrice());
                     pDto.setCategoryName(tp.getProduct().getCategory().getName());
                     return pDto;
                 })
                 .collect(Collectors.toList());
-
+        Integer totalItems = productDtos.stream()
+                        .mapToInt(ProductInfoDto::getQuantity).sum();
+        dto.setTotalItems(totalItems);
+        Double totalPrice = productDtos.stream()
+                .mapToDouble(p -> p.getUnitPrice()*p.getQuantity()).sum();
+        dto.setTotalPrice(totalPrice);
         dto.setProducts(productDtos);
 
         return dto;

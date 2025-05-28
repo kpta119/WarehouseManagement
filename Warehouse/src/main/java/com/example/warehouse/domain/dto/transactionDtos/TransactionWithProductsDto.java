@@ -24,5 +24,7 @@ public class TransactionWithProductsDto {
     private String clientName;
     private Integer supplierId;
     private String supplierName;
+    private Integer totalItems;
+    private Double totalPrice;
     private List<ProductInfoDto> products;
 }
