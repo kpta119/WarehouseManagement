@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 public interface ClientService {
     Client createClient(BusinessEntityDto request);
 
-    Page<ClientSummaryDto> getClientsWithTransactionCount(Pageable pageable);
+    Page<ClientSummaryDto> getClientsWithTransactionCount(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable);
 
     ClientWithHistoryDto getClientWithHistory(Integer clientId);
 }

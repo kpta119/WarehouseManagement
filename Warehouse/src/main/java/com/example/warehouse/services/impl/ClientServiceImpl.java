@@ -78,8 +78,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Page<ClientSummaryDto> getClientsWithTransactionCount(Pageable pageable){
-        Page<Object[]> results = clientRepository.findAllClientsWithTransactionCounts(pageable);
+    public Page<ClientSummaryDto> getClientsWithTransactionCount(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable){
+        Page<Object[]> results = clientRepository.findAllClientsWithTransactionCounts(regionName, minTransactions, maxTransactions, warehouseId, pageable);
         return results.map(businessEntitySummaryMapper::mapToClientDto);
     }
 
