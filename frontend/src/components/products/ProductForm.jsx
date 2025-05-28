@@ -106,6 +106,7 @@ const ProductForm = () => {
             name="description"
             value={form.description}
             onChange={handleChange}
+            required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
           />
         </div>

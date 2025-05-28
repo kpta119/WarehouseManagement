@@ -234,11 +234,12 @@ import { fetchCategories } from "../../features/categories/categoriesSlice";
 import { fetchProducts } from "../../features/products/productsSlice";
 import { FaChevronLeft, FaEdit } from "react-icons/fa";
 import { currencyFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const CategoryDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { list: categories, status } = useSelector((s) => s.categories);
+  const { list: categories, status, error } = useSelector((s) => s.categories);
   const { list: products, status: prodStatus } = useSelector((s) => s.products);
   const [productsShown, setProductsShown] = useState(25);
   useEffect(() => {
@@ -246,8 +247,9 @@ const CategoryDetail = () => {
     dispatch(fetchProducts({ categoryId: id }));
   }, [dispatch, status]);
   const cat = categories.find((c) => String(c.categoryId) === String(id));
-  if (status === "loading") return <p>Ładowanie...</p>;
-  if (!cat) return <p>Nie znaleziono kategorii.</p>;
+  if (status === "loading" || status === "idle") return <Spinner />;
+  if (status === "failed") return <p className="text-red-500">Błąd: {error}</p>;
+  if (!cat) return <p className="text-red-500">Nie znaleziono kategorii.</p>;
   return (
     <div className="space-y-6 max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <div className="flex items-center justify-between">
@@ -273,9 +275,9 @@ const CategoryDetail = () => {
           Produkty w tej kategorii
         </h2>
         {prodStatus === "loading" ? (
-          <p>Ładowanie produktów…</p>
+          <Spinner />
         ) : products.length === 0 ? (
-          <p>Brak produktów w tej kategorii.</p>
+          <p className="text-red-500">Brak produktów w tej kategorii.</p>
         ) : (
           <>
             <ul className="divide-y divide-gray-200">
@@ -323,6 +325,7 @@ import {
   updateCategory,
 } from "../../features/categories/categoriesSlice";
 import { FaChevronLeft } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
 
 const CategoryForm = () => {
   const { id } = useParams();
@@ -363,10 +366,13 @@ const CategoryForm = () => {
     navigate("/categories");
   };
   if (isEdit && status === "loading") {
-    return <p>Ładowanie danych kategorii...</p>;
+    return <Spinner />;
   }
   if (status === "failed") {
     return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  if (!cat) {
+    return <p className="text-red-500">Nie znaleziono kategorii.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
@@ -432,6 +438,7 @@ import { FaTrash, FaEdit, FaEye } from "react-icons/fa";
 import Pagination from "../helper/Pagination";
 import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
+import Spinner from "../helper/Spinner";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
@@ -469,8 +476,6 @@ const CategoryList = () => {
       dispatch(deleteCategory(id));
     }
   };
-  if (status === "loading") return <p>Ładowanie...</p>;
-  if (status === "failed") return <p className="text-red-500">Błąd: {error}</p>;
   return (
     <>
       <form className="flex items-center space-x-2 justify-between">
@@ -494,10 +499,12 @@ const CategoryList = () => {
           <option value="description-reverse">Opis (od Z do A)</option>
         </SelectInput>
       </form>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono kategorii</p>
       ) : (
         <>
           <Pagination
@@ -578,17 +585,24 @@ import {
   dateFormatter,
   numberFormatter,
 } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const ClientDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { current: client } = useSelector((s) => s.clients);
+  const { current: client, status, error } = useSelector((s) => s.clients);
   const [transactionsShown, setTransactionsShown] = useState(25);
   useEffect(() => {
     dispatch(fetchClientById(id));
   }, [dispatch, id]);
+  if (status === "loading") {
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
   if (!client) {
-    return <p>Ładowanie...</p>;
+    return <p className="text-red-500">Nie znaleziono klienta.</p>;
   }
   const { name, email, phoneNumber, address, history = [] } = client;
   const addr = address.street
@@ -618,7 +632,7 @@ const ClientDetail = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Historia transakcji</h2>
           {history.length === 0 ? (
-            <p>Brak historii transakcji.</p>
+            <p className="text-red-500">Brak historii transakcji.</p>
           ) : (
             <>
               <div className="bg-white rounded-lg shadow overflow-auto">
@@ -790,7 +804,7 @@ const ClientForm = () => {
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
           />
         </div>
-        {error && <p className="text-red-500 text-sm">Error: {error}</p>}
+        {error && <p className="text-red-500">Error: {error}</p>}
         <button
           type="submit"
           disabled={status === "loading"}
@@ -819,6 +833,7 @@ import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
 import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const ClientList = () => {
   const dispatch = useDispatch();
@@ -951,9 +966,11 @@ const ClientList = () => {
         </div>
       </form>
       {status === "loading" ? (
-        <p>Ładowanie...</p>
+        <Spinner />
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono klientów</p>
       ) : (
         <>
           <Pagination
@@ -1226,17 +1243,28 @@ import {
   dateFormatter,
   numberFormatter,
 } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const EmployeeDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [transactionsShown, setTransactionsShown] = useState(25);
-  const { current: employee } = useSelector((state) => state.employees);
+  const {
+    current: employee,
+    status,
+    error,
+  } = useSelector((state) => state.employees);
   useEffect(() => {
     dispatch(fetchEmployeeById(id));
   }, [dispatch, id]);
+  if (status === "loading" || status === "idle") {
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
   if (!employee) {
-    return <p>Ładowanie danych pracownika...</p>;
+    return <p className="text-red-500">Nie znaleziono pracownika.</p>;
   }
   const {
     name,
@@ -1284,7 +1312,7 @@ const EmployeeDetail = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Historia Transakcji</h2>
           {history.length === 0 ? (
-            <p>Brak historii transakcji.</p>
+            <p className="text-red-500">Brak historii transakcji.</p>
           ) : (
             <>
               <div className="bg-white rounded-lg shadow overflow-auto">
@@ -1538,6 +1566,7 @@ import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
 import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const EmployeeList = () => {
   const dispatch = useDispatch();
@@ -1679,10 +1708,12 @@ const EmployeeList = () => {
           </div>
         </div>
       </form>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono pracowników</p>
       ) : (
         <>
           <Pagination
@@ -1756,6 +1787,7 @@ export default EmployeeList;
 import { useEffect } from "react";
 import { fetchCountries } from "../../features/geography/geographySlice";
 import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../helper/Spinner";
 
 const CountryList = ({ regionId, regionName }) => {
   const dispatch = useDispatch();
@@ -1766,7 +1798,7 @@ const CountryList = ({ regionId, regionName }) => {
     }
   }, [dispatch, regionId]);
   return status === "loading" || status === "idle" ? (
-    <p>Loading...</p>
+    <Spinner />
   ) : status === "failed" ? (
     <p className="text-red-500">Error: {error}</p>
   ) : (
@@ -1788,7 +1820,7 @@ const CountryList = ({ regionId, regionName }) => {
           ))}
         </ul>
       ) : (
-        <p className="text-gray-500">Brak krajów w tym regionie.</p>
+        <p className="text-red-500">Brak krajów w tym regionie.</p>
       )}
     </div>
   );
@@ -1802,6 +1834,7 @@ export default CountryList;
 import { useEffect } from "react";
 import { fetchRegions } from "../../features/geography/geographySlice";
 import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../helper/Spinner";
 
 const RegionList = ({ selectedRegion, onSelect }) => {
   const dispatch = useDispatch();
@@ -1810,7 +1843,7 @@ const RegionList = ({ selectedRegion, onSelect }) => {
     dispatch(fetchRegions());
   }, [dispatch]);
   return status === "loading" || status === "idle" ? (
-    <p>Loading...</p>
+    <Spinner />
   ) : status === "failed" ? (
     <p className="text-red-500">Error: {error}</p>
   ) : (
@@ -1941,6 +1974,17 @@ const SelectInput = ({ children, label, value, setValue }) => (
 );
 
 export default SelectInput;
+
+
+// \components\helper\Spinner.jsx
+
+const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin h-8 w-8 border-4 border-pink-500 border-t-transparent rounded-full" />
+  </div>
+);
+
+export default Spinner;
 
 
 // \components\helper\TextInput.jsx
@@ -2895,17 +2939,28 @@ import {
   dateFormatter,
   numberFormatter,
 } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { current: product } = useSelector((state) => state.products);
+  const {
+    current: product,
+    status,
+    error,
+  } = useSelector((state) => state.products);
   const [transactionsShown, setTransactionsShown] = useState(25);
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
+  if (status === "loading" || status === "idle") {
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
   if (!product) {
-    return <p>Loading product details...</p>;
+    return <p className="text-red-500">Nie znaleziono produktu.</p>;
   }
   const {
     name,
@@ -2979,7 +3034,9 @@ const ProductDetail = () => {
           </div>
         </div>
       )}
-      {transactions && transactions.length > 0 && (
+      {transactions.length === 0 ? (
+        <p className="text-red-500">Brak transakcji.</p>
+      ) : (
         <div>
           <h2 className="text-xl font-semibold mb-2">Ostatnie Transakcje</h2>
           <div className="grid grid-cols-7 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
@@ -3062,6 +3119,7 @@ import {
 } from "../../features/products/productsSlice";
 import { fetchCategories } from "../../features/categories/categoriesSlice";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
 
 const ProductForm = () => {
   const { id } = useParams();
@@ -3117,7 +3175,13 @@ const ProductForm = () => {
     }
   };
   if ((isEdit && prodStatus === "loading") || prodStatus === "idle") {
-    return <p>Ładowanie...</p>;
+    return <Spinner />;
+  }
+  if (prodStatus === "failed") {
+    return <p className="text-red-500">Błąd: {prodError}</p>;
+  }
+  if (isEdit && !product) {
+    return <p className="text-red-500">Nie znaleziono produktu.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
@@ -3242,6 +3306,7 @@ import Pagination from "../helper/Pagination";
 import NumberInput from "../helper/NumberInput";
 import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
+import Spinner from "../helper/Spinner";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -3448,9 +3513,11 @@ const ProductList = () => {
         </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
-        <p>Loading...</p>
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono produktu</p>
       ) : (
         <>
           <Pagination
@@ -3561,17 +3628,28 @@ import {
   dateFormatter,
   numberFormatter,
 } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const SupplierDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [transactionsShown, setTransactionsShown] = useState(25);
-  const { current: supplier } = useSelector((state) => state.suppliers);
+  const {
+    current: supplier,
+    status,
+    error,
+  } = useSelector((state) => state.suppliers);
   useEffect(() => {
     dispatch(fetchSupplierById(id));
   }, [dispatch, id]);
+  if (status === "loading" || status === "idle") {
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
   if (!supplier) {
-    return <p>Ładowanie danych dostawcy...</p>;
+    return <p className="text-red-500">Nie znaleziono dostawcy.</p>;
   }
   const { name, email, phoneNumber, address, history = [] } = supplier;
   const addr = address.street
@@ -3601,7 +3679,7 @@ const SupplierDetail = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-4">Historia transakcji</h2>
           {history.length === 0 ? (
-            <p>Brak historii transakcji.</p>
+            <p className="text-red-500">Brak historii transakcji.</p>
           ) : (
             <>
               <div className="bg-white rounded-lg shadow overflow-auto">
@@ -3936,6 +4014,7 @@ import NumberInput from "../helper/NumberInput";
 import { fetchRegions } from "../../features/geography/geographySlice";
 import Pagination from "../helper/Pagination";
 import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const SupplierList = () => {
   const dispatch = useDispatch();
@@ -4071,10 +4150,12 @@ const SupplierList = () => {
           </div>
         </div>
       </form>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono dostawcy</p>
       ) : (
         <>
           <Pagination
@@ -4150,15 +4231,28 @@ import { fetchTransactionById } from "../../features/transactions/transactionsSl
 import { FaChevronLeft } from "react-icons/fa";
 import { format } from "date-fns";
 import { currencyFormatter, numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const TransactionDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { current: tx } = useSelector((state) => state.transactions);
+  const {
+    current: tx,
+    status,
+    error,
+  } = useSelector((state) => state.transactions);
   useEffect(() => {
     dispatch(fetchTransactionById(id));
   }, [dispatch, id]);
-  if (!tx) return <p>Loading...</p>;
+  if (status === "loading") {
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  if (!tx) {
+    return <p className="text-red-500">Nie znaleziono transakcji.</p>;
+  }
   const {
     transactionId,
     date,
@@ -4255,7 +4349,9 @@ const TransactionDetail = () => {
           </div>
         )}
       </div>
-      {products && products.length > 0 && (
+      {products.length === 0 ? (
+        <p className="text-red-500">Brak produktów</p>
+      ) : (
         <section>
           <h2 className="text-xl font-semibold mb-4">Produkty</h2>
           <div className="bg-gray-50 grid grid-cols-5 p-2 text-xs uppercase font-medium text-gray-500 rounded-t-lg">
@@ -4317,6 +4413,7 @@ import DateInput from "../helper/DateInput";
 import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
+import Spinner from "../helper/Spinner";
 
 const TransactionList = () => {
   const dispatch = useDispatch();
@@ -4485,9 +4582,11 @@ const TransactionList = () => {
         </SelectInput>
       </form>
       {status === "loading" || status === "idle" ? (
-        <p>Ładowanie...</p>
+        <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono transakcji</p>
       ) : (
         <>
           <Pagination
@@ -4584,11 +4683,23 @@ const WarehouseDetail = () => {
   const [employeesShown, setEmployeesShown] = useState(25);
   const [productsShown, setProductsShown] = useState(25);
   const [transactionsShown, setTransactionsShown] = useState(25);
-  const { current: warehouse } = useSelector((state) => state.warehouses);
+  const {
+    current: warehouse,
+    status,
+    error,
+  } = useSelector((state) => state.warehouses);
   useEffect(() => {
     dispatch(fetchWarehouseById(id));
   }, [dispatch, id]);
-  if (!warehouse) return <p>Loading warehouse details...</p>;
+  if (status === "loading") {
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  if (!warehouse) {
+    return <p className="text-red-500">Nie znaleziono magazynu.</p>;
+  }
   const {
     name,
     capacity,
@@ -4665,41 +4776,45 @@ const WarehouseDetail = () => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
           <h3 className="text-2xl font-semibold mb-4">Pracownicy</h3>
-          <div className="bg-white rounded-lg shadow overflow-auto">
-            <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-              <div>Imię i Nazwisko</div>
-              <div className="text-right">E-mail</div>
-              <div className="text-right">Nr. telefonu</div>
-              <div className="text-right">Stanowisko</div>
-              <div className="text-right">Detale</div>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {employees.slice(0, employeesShown).map((emp) => (
-                <div
-                  key={emp.employeeId}
-                  className="grid grid-cols-5 p-2 text-sm text-gray-700"
-                >
-                  <Link
-                    to={`/employees/${emp.employeeId}`}
-                    className="text-pink-500 hover:underline"
+          {employees.length === 0 ? (
+            <p className="text-red-500">Brak pracowników.</p>
+          ) : (
+            <div className="bg-white rounded-lg shadow overflow-auto">
+              <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
+                <div>Imię i Nazwisko</div>
+                <div className="text-right">E-mail</div>
+                <div className="text-right">Nr. telefonu</div>
+                <div className="text-right">Stanowisko</div>
+                <div className="text-right">Detale</div>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {employees.slice(0, employeesShown).map((emp) => (
+                  <div
+                    key={emp.employeeId}
+                    className="grid grid-cols-5 p-2 text-sm text-gray-700"
                   >
-                    {emp.name} {emp.surname}
-                  </Link>
-                  <div className="text-right truncate">{emp.email}</div>
-                  <div className="text-right">{emp.phoneNumber}</div>
-                  <div className="text-right">{emp.position}</div>
-                  <div className="flex justify-end text-gray-600">
                     <Link
                       to={`/employees/${emp.employeeId}`}
-                      className="hover:text-pink-500 transition duration-200"
+                      className="text-pink-500 hover:underline"
                     >
-                      <FaEye />
+                      {emp.name} {emp.surname}
                     </Link>
+                    <div className="text-right truncate">{emp.email}</div>
+                    <div className="text-right">{emp.phoneNumber}</div>
+                    <div className="text-right">{emp.position}</div>
+                    <div className="flex justify-end text-gray-600">
+                      <Link
+                        to={`/employees/${emp.employeeId}`}
+                        className="hover:text-pink-500 transition duration-200"
+                      >
+                        <FaEye />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           {employees.length > employeesShown && (
             <button
               onClick={() => setEmployeesShown((prev) => prev + 25)}
@@ -4711,47 +4826,51 @@ const WarehouseDetail = () => {
         </div>
         <div>
           <h3 className="text-2xl font-semibold mb-4">Produkty</h3>
-          <div className="bg-white rounded-lg shadow overflow-auto">
-            <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-              <div>Nazwa</div>
-              <div className="text-right">Ilość</div>
-              <div className="text-right">Cena za szt.</div>
-              <div className="text-right">Wartość</div>
-              <div className="text-right">Detale</div>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {products.slice(0, productsShown).map((pr) => (
-                <div
-                  key={pr.productId}
-                  className="grid grid-cols-5 p-2 text-sm text-gray-700"
-                >
-                  <Link
-                    to={`/products/${pr.productId}`}
-                    className="text-pink-500 hover:underline"
+          {products.length === 0 ? (
+            <p className="text-red-500">Brak produktów.</p>
+          ) : (
+            <div className="bg-white rounded-lg shadow overflow-auto">
+              <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
+                <div>Nazwa</div>
+                <div className="text-right">Ilość</div>
+                <div className="text-right">Cena za szt.</div>
+                <div className="text-right">Wartość</div>
+                <div className="text-right">Detale</div>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {products.slice(0, productsShown).map((pr) => (
+                  <div
+                    key={pr.productId}
+                    className="grid grid-cols-5 p-2 text-sm text-gray-700"
                   >
-                    {pr.name}
-                  </Link>
-                  <div className="text-right">
-                    {numberFormatter(pr.quantity)}
-                  </div>
-                  <div className="text-right">
-                    {currencyFormatter(pr.unitPrice)}
-                  </div>
-                  <div className="text-right">
-                    {currencyFormatter(pr.quantity * pr.unitPrice)}
-                  </div>
-                  <div className="flex justify-end text-gray-600">
                     <Link
                       to={`/products/${pr.productId}`}
-                      className="hover:text-pink-500 transition duration-200"
+                      className="text-pink-500 hover:underline"
                     >
-                      <FaEye />
+                      {pr.name}
                     </Link>
+                    <div className="text-right">
+                      {numberFormatter(pr.quantity)}
+                    </div>
+                    <div className="text-right">
+                      {currencyFormatter(pr.unitPrice)}
+                    </div>
+                    <div className="text-right">
+                      {currencyFormatter(pr.quantity * pr.unitPrice)}
+                    </div>
+                    <div className="flex justify-end text-gray-600">
+                      <Link
+                        to={`/products/${pr.productId}`}
+                        className="hover:text-pink-500 transition duration-200"
+                      >
+                        <FaEye />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           {products.length > productsShown && (
             <button
               onClick={() => setProductsShown((prev) => prev + 25)}
@@ -4764,51 +4883,55 @@ const WarehouseDetail = () => {
       </section>
       <section>
         <h3 className="text-2xl font-semibold mb-4">Ostatnie Transakcje</h3>
-        <div className="bg-white rounded-lg shadow overflow-auto">
-          <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-            <div>Data</div>
-            <div>Typ</div>
-            <div className="text-right">Łącznie</div>
-            <div className="text-right">Przez pracownika</div>
-            <div className="text-right">Detale</div>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {[...transactions]
-              .reverse()
-              .slice(0, transactionsShown)
-              .map((tx) => (
-                <div
-                  key={tx.transactionId}
-                  className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
-                >
-                  <div>{dateFormatter(tx.date)}</div>
-                  <div>
-                    {tx.type
-                      .toLowerCase()
-                      .replace(/_/g, " ")
-                      .replace(/\b\w/g, (c) => c.toUpperCase())}
-                  </div>
-                  <div className="text-right">
-                    {currencyFormatter(tx.totalPrice)}
-                  </div>
-                  <Link
-                    className="text-right text-pink-500 hover:underline"
-                    to={`/employees/${tx.employeeId}`}
+        {transactions.length === 0 ? (
+          <p className="text-red-500">Brak transakcji.</p>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-auto">
+            <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
+              <div>Data</div>
+              <div>Typ</div>
+              <div className="text-right">Łącznie</div>
+              <div className="text-right">Przez pracownika</div>
+              <div className="text-right">Detale</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[...transactions]
+                .reverse()
+                .slice(0, transactionsShown)
+                .map((tx) => (
+                  <div
+                    key={tx.transactionId}
+                    className="grid grid-cols-5 items-center p-2 text-sm text-gray-700"
                   >
-                    {tx.employeeName}
-                  </Link>
-                  <div className="flex justify-end text-gray-600">
+                    <div>{dateFormatter(tx.date)}</div>
+                    <div>
+                      {tx.type
+                        .toLowerCase()
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (c) => c.toUpperCase())}
+                    </div>
+                    <div className="text-right">
+                      {currencyFormatter(tx.totalPrice)}
+                    </div>
                     <Link
-                      to={`/transactions/${tx.transactionId}`}
-                      className="hover:text-pink-500 transition duration-200"
+                      className="text-right text-pink-500 hover:underline"
+                      to={`/employees/${tx.employeeId}`}
                     >
-                      <FaEye />
+                      {tx.employeeName}
                     </Link>
+                    <div className="flex justify-end text-gray-600">
+                      <Link
+                        to={`/transactions/${tx.transactionId}`}
+                        className="hover:text-pink-500 transition duration-200"
+                      >
+                        <FaEye />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
-        </div>
+        )}
         {transactions.length > transactionsShown && (
           <button
             onClick={() => setTransactionsShown((prev) => prev + 25)}
@@ -4840,6 +4963,7 @@ import {
   fetchCountries,
 } from "../../features/geography/geographySlice";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
 
 const WarehousesForm = () => {
   const { id } = useParams();
@@ -4851,12 +4975,7 @@ const WarehousesForm = () => {
     status,
     error,
   } = useSelector((state) => state.warehouses);
-  const {
-    regions,
-    countries,
-    status: geographyStatus,
-    error: geographyError,
-  } = useSelector((state) => state.geography);
+  const { regions, countries } = useSelector((state) => state.geography);
   const [form, setForm] = useState({
     name: "",
     capacity: "",
@@ -4919,7 +5038,13 @@ const WarehousesForm = () => {
     }
   };
   if ((isEdit && status === "loading") || status === "idle") {
-    return <p>Loading...</p>;
+    return <Spinner />;
+  }
+  if (status === "failed") {
+    return <p className="text-red-500">Błąd: {error}</p>;
+  }
+  if (isEdit && !warehouse) {
+    return <p className="text-red-500">Nie znaleziono magazynu.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
@@ -5090,6 +5215,7 @@ import SelectInput from "../helper/SelectInput";
 import TextInput from "../helper/TextInput";
 import NumberInput from "../helper/NumberInput";
 import { numberFormatter } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const WarehouseList = () => {
   const dispatch = useDispatch();
@@ -5274,10 +5400,12 @@ const WarehouseList = () => {
           <option value="transactions-reverse">Transakcje (malejąco)</option>
         </SelectInput>
       </div>
-      {status === "loading" ? (
-        <p>Ładowanie...</p>
+      {status === "loading" || status === "idle" ? (
+        <Spinner />
       ) : status === "failed" ? (
         <p className="text-red-500">Błąd: {error}</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-red-500">Nie znaleziono magazynu</p>
       ) : (
         <>
           <Pagination
@@ -6064,14 +6192,6 @@ const warehousesSlice = createSlice({
 export default warehousesSlice.reducer;
 
 
-// \hooks\useDebounce.jsx
-
-
-
-// \hooks\useFetch.jsx
-
-
-
 // \pages\CategoriesPage.jsx
 
 import { Link } from "react-router-dom";
@@ -6141,6 +6261,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchDashboardSummary } from "../features/dashboard/summarySlice";
 import SummaryTiles from "../components/Dashboard/SummaryTiles";
 import Charts from "../components/Dashboard/Charts";
+import Spinner from "../components/helper/Spinner";
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -6149,8 +6270,10 @@ const DashboardPage = () => {
   useEffect(() => {
     dispatch(fetchDashboardSummary(selectedWarehouse));
   }, [dispatch, selectedWarehouse]);
-  if (status === "loading" || status === "idle") return <p>Ładowanie...</p>;
+  if (status === "loading" || status === "idle") return <Spinner />;
   if (status === "failed") return <p className="text-red-500">{error}</p>;
+  if (!summary)
+    return <p className="text-red-500">Brak danych do wyświetlenia.</p>;
   return (
     <div className="space-y-6">
       <SummaryTiles summary={summary} />

@@ -61,7 +61,7 @@ const TransactionDetail = () => {
         </div>
         <div>
           <strong>Typ:</strong>{" "}
-          {tx.type
+          {type
             .toLowerCase()
             .replace(/_/g, " ")
             .replace(/\b\w/g, (c) => c.toUpperCase())}

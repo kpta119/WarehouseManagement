@@ -19,45 +19,42 @@ const TransactionList = () => {
     error,
   } = useSelector((state) => state.transactions);
   const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
-  const [filters, setFilters] = useState({
-    fromDate: "",
-    toDate: "",
-    type: "",
-    minTotalPrice: "",
-    maxTotalPrice: "",
-    minTotalSize: "",
-    maxTotalSize: "",
-  });
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [type, setType] = useState("");
+  const [minTotalPrice, setMinTotalPrice] = useState("");
+  const [maxTotalPrice, setMaxTotalPrice] = useState("");
+  const [minTotalSize, setMinTotalSize] = useState("");
+  const [maxTotalSize, setMaxTotalSize] = useState("");
   const [page, setPage] = useState(1);
   const totalPages = 10;
   const [sortOption, setSortOption] = useState("");
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((f) => ({ ...f, [name]: value }));
-  };
   useEffect(() => {
     dispatch(
       fetchTransactions({
-        fromDate: filters.fromDate || undefined,
-        toDate: filters.toDate || undefined,
-        type: filters.type || undefined,
-        minTotalPrice: filters.minTotalPrice
-          ? parseFloat(filters.minTotalPrice)
-          : undefined,
-        maxTotalPrice: filters.maxTotalPrice
-          ? parseFloat(filters.maxTotalPrice)
-          : undefined,
-        minTotalSize: filters.minTotalSize
-          ? parseFloat(filters.minTotalSize)
-          : undefined,
-        maxTotalSize: filters.maxTotalSize
-          ? parseFloat(filters.maxTotalSize)
-          : undefined,
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+        type: type || undefined,
+        minTotalPrice: minTotalPrice ? parseFloat(minTotalPrice) : undefined,
+        maxTotalPrice: maxTotalPrice ? parseFloat(maxTotalPrice) : undefined,
+        minTotalSize: minTotalSize ? parseFloat(minTotalSize) : undefined,
+        maxTotalSize: maxTotalSize ? parseFloat(maxTotalSize) : undefined,
         page: page || 1,
         warehouseId: selectedWarehouse || undefined,
       })
     );
-  }, [dispatch, filters, selectedWarehouse, page]);
+  }, [
+    dispatch,
+    selectedWarehouse,
+    page,
+    fromDate,
+    toDate,
+    type,
+    minTotalPrice,
+    maxTotalPrice,
+    minTotalSize,
+    maxTotalSize,
+  ]);
   const filtered = [...transactions].sort((a, b) => {
     switch (sortOption) {
       case "date":
@@ -106,21 +103,9 @@ const TransactionList = () => {
     <>
       <form className="flex justify-between space-x-4">
         <div className="flex flex-wrap gap-4 items-end">
-          <DateInput
-            label="Od dnia"
-            value={filters.fromDate}
-            setValue={handleChange}
-          />
-          <DateInput
-            label="Do dnia"
-            value={filters.toDate}
-            setValue={handleChange}
-          />
-          <SelectInput
-            label="Typ transakcji"
-            value={filters.type}
-            onChange={handleChange}
-          >
+          <DateInput label="Od dnia" value={fromDate} setValue={setFromDate} />
+          <DateInput label="Do dnia" value={toDate} setValue={setToDate} />
+          <SelectInput label="Typ transakcji" value={type} setValue={setType}>
             <option value="">Wszystkie</option>
             <option value="SUPPLIER_TO_WAREHOUSE">Supplier to Warehouse</option>
             <option value="WAREHOUSE_TO_CUSTOMER">Warehouse to Customer</option>
@@ -132,35 +117,35 @@ const TransactionList = () => {
             label="Łączna kwota (min)"
             isMinus={true}
             placeholder="Wpisz kwotę..."
-            value={filters.minTotalPrice}
-            setValue={handleChange}
+            value={minTotalPrice}
+            setValue={setMinTotalPrice}
           />
           <NumberInput
             label="Łączna kwota (max)"
             isMinus={false}
             placeholder="Wpisz kwotę..."
-            value={filters.maxTotalPrice}
-            setValue={handleChange}
+            value={maxTotalPrice}
+            setValue={setMaxTotalPrice}
           />
           <NumberInput
             label="Łączny rozmiar (min)"
             isMinus={true}
             placeholder="Wpisz kwotę..."
-            value={filters.minTotalSize}
-            setValue={handleChange}
+            value={minTotalSize}
+            setValue={setMinTotalSize}
           />
           <NumberInput
             label="Łączny rozmiar (max)"
             isMinus={false}
             placeholder="Wpisz kwotę..."
-            value={filters.maxTotalSize}
-            setValue={handleChange}
+            value={maxTotalSize}
+            setValue={setMaxTotalPrice}
           />
         </div>
         <SelectInput
           label="Sortowanie"
           value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
+          setValue={setSortOption}
         >
           <option value="">Sortuj przez</option>
           <option value="date">Data (od najstarszej)</option>

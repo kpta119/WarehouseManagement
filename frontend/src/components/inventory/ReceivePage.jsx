@@ -61,6 +61,7 @@ const ReceivePage = () => {
       receiveInventory({
         warehouseId: Number(form.warehouseId),
         supplierId: Number(form.supplierId),
+        employeeId: Number(form.employeeId),
         items: itemsPayload,
       })
     );

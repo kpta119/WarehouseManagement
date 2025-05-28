@@ -60,6 +60,7 @@ const TransferPage = () => {
       transferInventory({
         fromWarehouseId: Number(form.fromWarehouseId),
         toWarehouseId: Number(form.toWarehouseId),
+        employeeId: Number(form.employeeId),
         items: itemsPayload,
       })
     );

@@ -227,6 +227,7 @@ const WarehousesForm = () => {
           <input
             id="streetNumber"
             name="streetNumber"
+            type="number"
             value={form.streetNumber}
             onChange={handleChange}
             required

@@ -25,9 +25,9 @@ const CategoryForm = () => {
       dispatch(fetchCategories());
     }
   }, [dispatch, status]);
+  const cat = categories.find((c) => String(c.categoryId) === String(id));
   useEffect(() => {
     if (isEdit && status === "succeeded") {
-      const cat = categories.find((c) => String(c.categoryId) === String(id));
       if (cat) {
         setForm({ name: cat.name, description: cat.description });
       }
@@ -53,7 +53,7 @@ const CategoryForm = () => {
   if (status === "failed") {
     return <p className="text-red-500">Błąd: {error}</p>;
   }
-  if (!cat) {
+  if (isEdit && !cat) {
     return <p className="text-red-500">Nie znaleziono kategorii.</p>;
   }
   return (
@@ -90,6 +90,7 @@ const CategoryForm = () => {
             name="description"
             value={form.description}
             onChange={handleChange}
+            required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
           />
         </div>

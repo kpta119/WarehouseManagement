@@ -61,6 +61,7 @@ const DeliveryPage = () => {
       deliverInventory({
         warehouseId: Number(form.warehouseId),
         clientId: Number(form.clientId),
+        employeeId: Number(form.employeeId),
         items: itemsPayload,
       })
     );

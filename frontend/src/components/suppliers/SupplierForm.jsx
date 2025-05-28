@@ -229,7 +229,7 @@ const SupplierForm = () => {
             Numer domu
           </label>
           <input
-            type="text"
+            type="number"
             id="streetNumber"
             name="streetNumber"
             value={form.streetNumber}
