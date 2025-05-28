@@ -76,8 +76,8 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public Page<SupplierSummaryDto> getSuppliersWithTransactionCount(Pageable pageable) {
-        Page<Object[]> results = supplierRepository.findAllSuppliersWithTransactionCounts(pageable);
+    public Page<SupplierSummaryDto> getSuppliersWithTransactionCount(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId,Pageable pageable) {
+        Page<Object[]> results = supplierRepository.findAllSuppliersWithTransactionCounts(regionName, minTransactions, maxTransactions, warehouseId, pageable);
         return results.map(businessEntitySummaryMapper::mapToSupplierDto);
     }
 

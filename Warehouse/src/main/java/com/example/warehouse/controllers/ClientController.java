@@ -9,6 +9,7 @@ import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class ClientController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size) {
         try {
-            Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
+            Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size,  Sort.by(Sort.Direction.ASC, "id")));
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());

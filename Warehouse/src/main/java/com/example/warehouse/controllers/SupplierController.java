@@ -27,9 +27,15 @@ public class SupplierController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllSuppliers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size) {
+    public ResponseEntity<?> getAllSuppliers(
+            @RequestParam(required = false) String regionName,
+            @RequestParam(required = false) Integer minTransactions,
+            @RequestParam(required = false) Integer maxTransactions,
+            @RequestParam(required = false) Integer warehouseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size) {
         try {
-            Page<SupplierSummaryDto> response = supplierService.getSuppliersWithTransactionCount(PageRequest.of(page, size));
+            Page<SupplierSummaryDto> response = supplierService.getSuppliersWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());

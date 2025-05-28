@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 public interface SupplierService {
     Supplier createSupplier(BusinessEntityDto request);
 
-    Page<SupplierSummaryDto> getSuppliersWithTransactionCount(Pageable pageable);
+    Page<SupplierSummaryDto> getSuppliersWithTransactionCount(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable);
 
     SupplierWithHistoryDto getSupplierWithHistory(Integer supplierId);
 }
