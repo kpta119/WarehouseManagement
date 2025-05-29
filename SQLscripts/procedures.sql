@@ -49,7 +49,7 @@ BEGIN
         SET v_ChangeInCapacity = v_UnitSize * v_Quantity;
 
         INSERT INTO TransactionProduct(TransactionID, ProductID, Quantity, TransactionPrice)
-        VALUES (v_TransactionID, v_ProductID, v_Quantity, v_Quantity * v_UnitPrice);
+        VALUES (v_TransactionID, v_ProductID, v_Quantity, v_UnitPrice);
 
         IF p_TransactionType = 'SUPPLIER_TO_WAREHOUSE' THEN
 

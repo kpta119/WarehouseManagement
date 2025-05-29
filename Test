@@ -16,3 +16,7 @@ DELETE FROM Country;
 DELETE FROM Region;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+

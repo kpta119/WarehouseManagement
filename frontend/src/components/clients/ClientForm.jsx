@@ -1,15 +1,19 @@
-import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { createClient } from "../../features/clients/clientsSlice";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
-import { createSupplier } from "../features/suppliers/suppliersSlice";
-import { listRegions, listCountries } from "../api/geography";
+import { Link } from "react-router-dom";
+import {
+  fetchCountries,
+  fetchRegions,
+} from "../../features/geography/geographySlice";
 
-const SupplierFormPage = () => {
+const ClientForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [regions, setRegions] = useState([]);
-  const [countries, setCountries] = useState([]);
+  const { regions, countries } = useSelector((state) => state.geography);
+  const { status, error } = useSelector((state) => state.clients);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,22 +26,20 @@ const SupplierFormPage = () => {
     streetNumber: "",
   });
   useEffect(() => {
-    listRegions().then((res) => setRegions(res.data));
-  }, []);
+    dispatch(fetchRegions());
+  }, [dispatch]);
   useEffect(() => {
     if (form.regionId) {
-      listCountries(Number(form.regionId)).then((res) =>
-        setCountries(res.data)
-      );
+      dispatch(fetchCountries(form.regionId));
     } else {
-      setCountries([]);
+      dispatch(fetchCountries(null));
     }
-  }, [form.regionId]);
+  }, [dispatch, form.regionId]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       name: form.name,
@@ -52,19 +54,17 @@ const SupplierFormPage = () => {
         regionId: Number(form.regionId),
       },
     };
-    dispatch(createSupplier(payload)).then(() => navigate("/suppliers"));
+    dispatch(createClient(payload)).then(() => navigate("/clients"));
   };
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <div className="max-w-xl mx-auto mt-6 bg-white p-8 rounded-2xl shadow-lg">
       <Link
-        to="/suppliers"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        to="/clients"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
-        <FaChevronLeft className="inline mr-2" /> Powrót do Dostawców
+        <FaChevronLeft className="inline mr-2" /> Powrót do Klientów
       </Link>
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6">
-        Nowy Dostawca
-      </h1>
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6">Nowy Klient</h1>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
@@ -74,7 +74,6 @@ const SupplierFormPage = () => {
             Nazwa
           </label>
           <input
-            type="text"
             id="name"
             name="name"
             value={form.name}
@@ -91,9 +90,9 @@ const SupplierFormPage = () => {
             E-mail
           </label>
           <input
-            type="email"
             id="email"
             name="email"
+            type="email"
             value={form.email}
             onChange={handleChange}
             required
@@ -108,9 +107,9 @@ const SupplierFormPage = () => {
             Nr. telefonu
           </label>
           <input
-            type="tel"
             id="phoneNumber"
             name="phoneNumber"
+            type="tel"
             value={form.phoneNumber}
             onChange={handleChange}
             required
@@ -135,7 +134,7 @@ const SupplierFormPage = () => {
             >
               <option value="">Wybierz region</option>
               {regions.map((r) => (
-                <option key={r.regionId} value={r.regionId}>
+                <option key={r.id} value={r.id}>
                   {r.name}
                 </option>
               ))}
@@ -162,7 +161,7 @@ const SupplierFormPage = () => {
             >
               <option value="">Wybierz region, a potem kraj</option>
               {countries.map((c) => (
-                <option key={c.countryId} value={c.countryId}>
+                <option key={c.id} value={c.id}>
                   {c.name}
                 </option>
               ))}
@@ -229,7 +228,7 @@ const SupplierFormPage = () => {
             Numer domu
           </label>
           <input
-            type="text"
+            type="number"
             id="streetNumber"
             name="streetNumber"
             value={form.streetNumber}
@@ -238,15 +237,17 @@ const SupplierFormPage = () => {
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition"
           />
         </div>
+        {error && <p className="text-red-500">Error: {error}</p>}
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition cursor-pointer"
+          disabled={status === "loading"}
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
-          Stwórz dostawcę
+          Stwórz Klienta
         </button>
       </form>
     </div>
   );
 };
 
-export default SupplierFormPage;
+export default ClientForm;

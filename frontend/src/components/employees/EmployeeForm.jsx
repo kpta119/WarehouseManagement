@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
-import { createEmployee } from "../features/employees/employeesSlice";
-import { fetchWarehouses } from "../features/warehouses/warehousesSlice";
+import { createEmployee } from "../../features/employees/employeesSlice";
+import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
 
-const EmployeeFormPage = () => {
+const EmployeeForm = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const EmployeeFormPage = () => {
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
       <Link
         to="/employees"
-        className="flex items-center text-gray-600 hover:text-pink-500 mb-6"
+        className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
         <FaChevronLeft className="mr-2" /> Powrót do Pracowników
       </Link>
@@ -159,7 +159,7 @@ const EmployeeFormPage = () => {
         </div>
         <button
           type="submit"
-          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg shadow-md transition"
+          className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
           Utwórz Pracownika
         </button>
@@ -168,4 +168,4 @@ const EmployeeFormPage = () => {
   );
 };
 
-export default EmployeeFormPage;
+export default EmployeeForm;

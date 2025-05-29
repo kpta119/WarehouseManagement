@@ -3,8 +3,8 @@ import * as warehousesAPI from "../../api/warehouses";
 
 export const fetchWarehouses = createAsyncThunk(
   "warehouses/fetchAll",
-  async () => {
-    const response = await warehousesAPI.listWarehouses();
+  async (params) => {
+    const response = await warehousesAPI.listWarehouses(params);
     return response.data;
   }
 );

@@ -109,7 +109,7 @@ BEGIN
     IF NOT (
         (NEW.TransactionType = 'WAREHOUSE_TO_WAREHOUSE' AND NEW.FromWarehouseID IS NOT NULL AND NEW.ToWarehouseID IS NOT NULL)
         OR
-        (NEW.TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND NEW.SupplierID IS NOT NULL AND NEW.ToWarehouseID IS NOT NULL)
+        (NEW.TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND NEW.SupplierID IS NOT NULL AND NEW.FromWarehouseID IS NOT NULL)
         OR
         (NEW.TransactionType = 'WAREHOUSE_TO_CUSTOMER' AND NEW.FromWarehouseID IS NOT NULL AND NEW.ClientID IS NOT NULL)
     ) THEN
@@ -129,7 +129,7 @@ BEGIN
     IF NOT (
         (NEW.TransactionType = 'WAREHOUSE_TO_WAREHOUSE' AND NEW.FromWarehouseID IS NOT NULL AND NEW.ToWarehouseID IS NOT NULL)
         OR
-        (NEW.TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND NEW.SupplierID IS NOT NULL AND NEW.ToWarehouseID IS NOT NULL)
+        (NEW.TransactionType = 'SUPPLIER_TO_WAREHOUSE' AND NEW.SupplierID IS NOT NULL AND NEW.FromWarehouseID IS NOT NULL)
         OR
         (NEW.TransactionType = 'WAREHOUSE_TO_CUSTOMER' AND NEW.FromWarehouseID IS NOT NULL AND NEW.ClientID IS NOT NULL)
     ) THEN
@@ -139,3 +139,37 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER add_product_inventory_after_post_on_product
+AFTER INSERT ON Product
+FOR EACH ROW
+BEGIN
+    DECLARE v_warehouse_id INT;
+    DECLARE done INT DEFAULT FALSE;
+
+    DECLARE warehouse_cursor CURSOR FOR
+        SELECT WarehouseID FROM Warehouse;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN warehouse_cursor;
+
+    read_loop: LOOP
+        FETCH warehouse_cursor INTO v_warehouse_id;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        INSERT INTO ProductInventory (ProductID, WarehouseID, Quantity, Price)
+        VALUES (NEW.ProductID, v_warehouse_id, 0, NEW.UnitPrice);
+    END LOOP;
+
+    CLOSE warehouse_cursor;
+END$$
+
+DELIMITER ;
+
+ALTER TABLE Transaction
+ADD INDEX idx_employee_id_transaction (EmployeeID);

@@ -1,15 +1,9 @@
 import apiClient from "../utils/apiClient";
-import { dummyWarehouses, dummyWarehouseById } from "../utils/dummyData";
 
-export const listWarehouses = () =>
-  import.meta.env.DEV
-    ? Promise.resolve({ data: dummyWarehouses })
-    : apiClient.get("/api/warehouses");
+export const listWarehouses = () => apiClient.get("/api/warehouses");
 
 export const getWarehouseById = (warehouseId) =>
-  import.meta.env.DEV
-    ? Promise.resolve({ data: dummyWarehouseById })
-    : apiClient.get(`/api/warehouses/${warehouseId}`);
+  apiClient.get(`/api/warehouses/${warehouseId}`);
 
 export const createWarehouse = (data) =>
   apiClient.post("/api/warehouses", data);
