@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { FaSearch, FaEye, FaChevronDown } from "react-icons/fa";
+import { FaEye, FaChevronDown } from "react-icons/fa";
 import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { fetchRegions } from "../../features/geography/geographySlice";
 import TextInput from "../helper/TextInput";
@@ -10,6 +10,7 @@ import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
 import { numberFormatter } from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
 
 const EmployeeList = () => {
   const dispatch = useDispatch();
@@ -23,6 +24,9 @@ const EmployeeList = () => {
   const [selectedRegion, setSelectedRegion] = useState("");
   const [minTransactions, setMinTransactions] = useState("");
   const [maxTransactions, setMaxTransactions] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const debouncedMinTransactions = useDebounce(minTransactions);
+  const debouncedMaxTransactions = useDebounce(maxTransactions);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
   const totalPages = 10;
@@ -30,13 +34,13 @@ const EmployeeList = () => {
   useEffect(() => {
     dispatch(
       fetchEmployees({
-        name: searchTerm || undefined,
+        name: debouncedSearchTerm || undefined,
         regionId: selectedRegion || undefined,
-        minTransactions: minTransactions
-          ? parseInt(minTransactions)
+        minTransactions: debouncedMinTransactions
+          ? parseInt(debouncedMinTransactions)
           : undefined,
-        maxTransactions: maxTransactions
-          ? parseInt(maxTransactions)
+        maxTransactions: debouncedMaxTransactions
+          ? parseInt(debouncedMaxTransactions)
           : undefined,
         warehouseId: selectedWarehouse || undefined,
         page: page || 1,
@@ -44,52 +48,42 @@ const EmployeeList = () => {
     );
   }, [
     dispatch,
-    searchTerm,
+    debouncedSearchTerm,
     selectedRegion,
-    minTransactions,
-    maxTransactions,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
     selectedWarehouse,
     page,
   ]);
   useEffect(() => {
     dispatch(fetchRegions());
   }, [dispatch]);
-  const filtered = employees
-    .filter((emp) =>
-      `${emp.name} ${emp.surname}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name":
-          return `${a.name} ${a.surname}`.localeCompare(
-            `${b.name} ${b.surname}`
-          );
-        case "name-reverse":
-          return `${b.name} ${b.surname}`.localeCompare(
-            `${a.name} ${a.surname}`
-          );
-        case "email":
-          return a.email.localeCompare(b.email);
-        case "email-reverse":
-          return b.email.localeCompare(a.email);
-        case "phone":
-          return a.phoneNumber.localeCompare(b.phoneNumber);
-        case "phone-reverse":
-          return b.phoneNumber.localeCompare(a.phoneNumber);
-        case "positions":
-          return a.position.localeCompare(b.position);
-        case "positions-reverse":
-          return b.position.localeCompare(a.position);
-        case "warehouse":
-          return a.warehouseName.localeCompare(b.warehouseName);
-        case "warehouse-reverse":
-          return b.warehouseName.localeCompare(a.warehouseName);
-        default:
-          return 0;
-      }
-    });
+  const filtered = [...employees].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return `${a.name} ${a.surname}`.localeCompare(`${b.name} ${b.surname}`);
+      case "name-reverse":
+        return `${b.name} ${b.surname}`.localeCompare(`${a.name} ${a.surname}`);
+      case "email":
+        return a.email.localeCompare(b.email);
+      case "email-reverse":
+        return b.email.localeCompare(a.email);
+      case "phone":
+        return a.phoneNumber.localeCompare(b.phoneNumber);
+      case "phone-reverse":
+        return b.phoneNumber.localeCompare(a.phoneNumber);
+      case "positions":
+        return a.position.localeCompare(b.position);
+      case "positions-reverse":
+        return b.position.localeCompare(a.position);
+      case "warehouse":
+        return a.warehouseName.localeCompare(b.warehouseName);
+      case "warehouse-reverse":
+        return b.warehouseName.localeCompare(a.warehouseName);
+      default:
+        return 0;
+    }
+  });
   return (
     <>
       <form className="flex justify-between items-center space-x-4">

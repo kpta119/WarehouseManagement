@@ -18,7 +18,7 @@ const ClientDetail = () => {
   useEffect(() => {
     dispatch(fetchClientById(id));
   }, [dispatch, id]);
-  if (status === "loading") {
+  if (status === "loading" || status === "idle") {
     return <Spinner />;
   }
   if (status === "failed") {

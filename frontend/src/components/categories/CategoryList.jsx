@@ -10,38 +10,38 @@ import Pagination from "../helper/Pagination";
 import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
   const { list: categories, status, error } = useSelector((s) => s.categories);
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
   const totalPages = 10;
   useEffect(() => {
     dispatch(
       fetchCategories({
-        searchTerm: searchTerm || undefined,
+        searchTerm: debouncedSearchTerm || undefined,
         page: page || 1,
       })
     );
-  }, [dispatch]);
-  const filtered = categories
-    .filter((cat) => cat.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "name-reverse":
-          return b.name.localeCompare(a.name);
-        case "description":
-          return a.description.localeCompare(b.description);
-        case "description-reverse":
-          return b.description.localeCompare(a.description);
-        default:
-          return 0;
-      }
-    });
+  }, [dispatch, debouncedSearchTerm, page]);
+  const filtered = [...categories].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "name-reverse":
+        return b.name.localeCompare(a.name);
+      case "description":
+        return a.description.localeCompare(b.description);
+      case "description-reverse":
+        return b.description.localeCompare(a.description);
+      default:
+        return 0;
+    }
+  });
   const handleDelete = (id) => {
     if (window.confirm("Czy na pewno chcesz usunąć tę kategorię?")) {
       dispatch(deleteCategory(id));

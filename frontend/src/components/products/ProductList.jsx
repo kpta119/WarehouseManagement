@@ -13,6 +13,7 @@ import NumberInput from "../helper/NumberInput";
 import TextInput from "../helper/TextInput";
 import SelectInput from "../helper/SelectInput";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -33,6 +34,15 @@ const ProductList = () => {
   const [maxInventory, setMaxInventory] = useState("");
   const [minTransactions, setMinTransactions] = useState("");
   const [maxTransactions, setMaxTransactions] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const debouncedMinPrice = useDebounce(minPrice);
+  const debouncedMaxPrice = useDebounce(maxPrice);
+  const debouncedMinSize = useDebounce(minSize);
+  const debouncedMaxSize = useDebounce(maxSize);
+  const debouncedMinInventory = useDebounce(minInventory);
+  const debouncedMaxInventory = useDebounce(maxInventory);
+  const debouncedMinTransactions = useDebounce(minTransactions);
+  const debouncedMaxTransactions = useDebounce(maxTransactions);
   const [page, setPage] = useState(1);
   const [sortOption, setSortOption] = useState("");
   useEffect(() => {
@@ -41,81 +51,84 @@ const ProductList = () => {
   useEffect(() => {
     dispatch(
       fetchProducts({
-        name: searchTerm || undefined,
+        name: debouncedSearchTerm || undefined,
         categoryId: categoryFilter || undefined,
-        minPrice: minPrice ? parseFloat(minPrice) : undefined,
-        maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
-        minSize: minSize ? parseFloat(minSize) : undefined,
-        maxSize: maxSize ? parseFloat(maxSize) : undefined,
+        minPrice: debouncedMinPrice ? parseFloat(debouncedMinPrice) : undefined,
+        maxPrice: debouncedMaxPrice ? parseFloat(debouncedMaxPrice) : undefined,
+        minSize: debouncedMinSize ? parseFloat(debouncedMinSize) : undefined,
+        maxSize: debouncedMaxSize ? parseFloat(debouncedMaxSize) : undefined,
         warehouseId: selectedWarehouse || undefined,
-        minInventory: minInventory ? parseInt(minInventory) : undefined,
-        maxInventory: maxInventory ? parseInt(maxInventory) : undefined,
-        minTransactions: minTransactions
-          ? parseInt(minTransactions)
+        minInventory: debouncedMinInventory
+          ? parseInt(debouncedMinInventory)
           : undefined,
-        maxTransactions: maxTransactions
-          ? parseInt(maxTransactions)
+        maxInventory: debouncedMaxInventory
+          ? parseInt(debouncedMaxInventory)
+          : undefined,
+        minTransactions: debouncedMinTransactions
+          ? parseInt(debouncedMinTransactions)
+          : undefined,
+        maxTransactions: debouncedMaxTransactions
+          ? parseInt(debouncedMaxTransactions)
           : undefined,
         page: page || 1,
       })
     );
   }, [
     dispatch,
-    searchTerm,
+    debouncedSearchTerm,
     categoryFilter,
     selectedWarehouse,
-    minPrice,
-    maxPrice,
-    minSize,
-    maxSize,
-    minInventory,
-    maxInventory,
-    minTransactions,
-    maxTransactions,
+    debouncedMinPrice,
+    debouncedMaxPrice,
+    debouncedMinSize,
+    debouncedMaxSize,
+    debouncedMinInventory,
+    debouncedMaxInventory,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
     page,
   ]);
-  const filtered = products
-    .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "name-reverse":
-          return b.name.localeCompare(a.name);
-        case "description":
-          return a.description.localeCompare(b.description);
-        case "description-reverse":
-          return b.description.localeCompare(a.description);
-        case "category":
-          return a.categoryName.localeCompare(b.categoryName);
-        case "category-reverse":
-          return b.categoryName.localeCompare(a.categoryName);
-        case "price":
-          return a.unitPrice - b.unitPrice;
-        case "price-reverse":
-          return b.unitPrice - a.unitPrice;
-        case "size":
-          return a.unitSize - b.unitSize;
-        case "size-reverse":
-          return b.unitSize - a.unitSize;
-        case "inventory":
-          return a.inventoryCount - b.inventoryCount;
-        case "inventory-reverse":
-          return b.inventoryCount - a.inventoryCount;
-        case "transactions":
-          return a.transactionCount - b.transactionCount;
-        case "transactions-reverse":
-          return b.transactionCount - a.transactionCount;
-        default:
-          return 0;
-      }
-    });
+  const filtered = [...products].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "name-reverse":
+        return b.name.localeCompare(a.name);
+      case "description":
+        return a.description.localeCompare(b.description);
+      case "description-reverse":
+        return b.description.localeCompare(a.description);
+      case "category":
+        return a.categoryName.localeCompare(b.categoryName);
+      case "category-reverse":
+        return b.categoryName.localeCompare(a.categoryName);
+      case "price":
+        return a.unitPrice - b.unitPrice;
+      case "price-reverse":
+        return b.unitPrice - a.unitPrice;
+      case "size":
+        return a.unitSize - b.unitSize;
+      case "size-reverse":
+        return b.unitSize - a.unitSize;
+      case "inventory":
+        return a.inventoryCount - b.inventoryCount;
+      case "inventory-reverse":
+        return b.inventoryCount - a.inventoryCount;
+      case "transactions":
+        return a.transactionCount - b.transactionCount;
+      case "transactions-reverse":
+        return b.transactionCount - a.transactionCount;
+      default:
+        return 0;
+    }
+  });
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       dispatch(deleteProduct(id));
     }
   };
   const totalPages = 10;
+  console.log(products);
   return (
     <>
       <form className="flex space-x-4 justify-between">
@@ -138,7 +151,6 @@ const ProductList = () => {
               </option>
             ))}
           </SelectInput>
-
           <NumberInput
             label="Cena (min)"
             placeholder="Wybierz cenę..."
@@ -277,7 +289,7 @@ const ProductList = () => {
                     {numberFormatter(product.inventoryCount)}
                   </div>
                   <div className="text-sm text-gray-700 flex items-center justify-end gap-4">
-                    {product.productId < 3 && (
+                    {product.isBestseller && (
                       <div className="bg-green-500 px-4 rounded text-white">
                         Bestseller!
                       </div>

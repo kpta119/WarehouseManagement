@@ -25,7 +25,7 @@ const CategoryDetail = () => {
     <div className="space-y-6 max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <div className="flex items-center justify-between">
         <Link
-          to="/products"
+          to="/categories"
           className="text-gray-600 hover:text-pink-500 transition duration-200"
         >
           <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii

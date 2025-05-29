@@ -1,9 +1,10 @@
 import os
+import re
 
 def export_text(file_path):
     with open(file_path, 'r', encoding="utf-8") as file:
         content = file.read()
-    return content
+    return re.sub(r'\s+', '', content)
     
 def export_files_in_directory(directory_path):
     result = ""
@@ -13,9 +14,9 @@ def export_files_in_directory(directory_path):
             if file.endswith('.jsx'):
                 try:
                     base_path = r"C:\Users\Adrian Garbowski\Desktop\Programs\College\BD2\frontend\src"
-                    result += f"// {file_path.replace(base_path, '')}\n\n"
+                    result += f"// {file_path.replace(base_path, '')}"
                     file_text = export_text(file_path)
-                    result += f"{file_text}\n\n"
+                    result += f"{file_text}"
                 except Exception as e:
                     print(f"Error reading {file_path}: {e}")
     return result

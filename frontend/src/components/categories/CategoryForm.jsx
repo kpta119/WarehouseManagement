@@ -18,6 +18,7 @@ const CategoryForm = () => {
     list: categories,
     status,
     error,
+    formStatus,
   } = useSelector((state) => state.categories);
   const [form, setForm] = useState({ name: "", description: "" });
   useEffect(() => {
@@ -40,12 +41,17 @@ const CategoryForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = { name: form.name, description: form.description };
+    let result;
     if (isEdit) {
-      await dispatch(updateCategory({ id: Number(id), data: payload }));
+      result = await dispatch(
+        updateCategory({ id: Number(id), data: payload })
+      );
     } else {
-      await dispatch(createCategory(payload));
+      result = await dispatch(createCategory(payload));
     }
-    navigate("/categories");
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate("/categories");
+    }
   };
   if (isEdit && status === "loading") {
     return <Spinner />;
@@ -67,6 +73,11 @@ const CategoryForm = () => {
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Kategorię" : "Nowa Kategoria"}
       </h1>
+      {formStatus === "failed" && (
+        <p className="text-red-500 mb-4">
+          Błąd: {error || "Nie udało się zapisać kategorii."}
+        </p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
@@ -98,7 +109,13 @@ const CategoryForm = () => {
           type="submit"
           className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
-          {isEdit ? "Zapisz" : "Utwórz"}
+          {formStatus === "loading" ? (
+            <Spinner color="white" />
+          ) : isEdit ? (
+            "Zapisz"
+          ) : (
+            "Utwórz"
+          )}
         </button>
       </form>
     </div>

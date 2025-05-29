@@ -7,10 +7,12 @@ import {
   fetchRegions,
   fetchCountries,
 } from "../../features/geography/geographySlice";
+import Spinner from "../helper/Spinner";
 
 const SupplierForm = () => {
   const dispatch = useDispatch();
   const { regions, countries } = useSelector((state) => state.geography);
+  const { formStatus, error } = useSelector((state) => state.suppliers);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -37,7 +39,7 @@ const SupplierForm = () => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       name: form.name,
@@ -52,7 +54,10 @@ const SupplierForm = () => {
         regionId: Number(form.regionId),
       },
     };
-    dispatch(createSupplier(payload)).then(() => navigate("/suppliers"));
+    const result = await dispatch(createSupplier(payload));
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate("/suppliers");
+    }
   };
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -65,6 +70,9 @@ const SupplierForm = () => {
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
         Nowy Dostawca
       </h1>
+      {formStatus === "failed" && (
+        <p className="text-red-500 mb-4">Błąd: {error}</p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
@@ -242,7 +250,11 @@ const SupplierForm = () => {
           type="submit"
           className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
-          Stwórz dostawcę
+          {formStatus === "loading" ? (
+            <Spinner color="white" />
+          ) : (
+            "Stwórz dostawcę"
+          )}
         </button>
       </form>
     </div>

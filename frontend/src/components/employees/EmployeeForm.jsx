@@ -4,12 +4,14 @@ import { useNavigate, useParams, Link } from "react-router-dom";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import { createEmployee } from "../../features/employees/employeesSlice";
 import { fetchWarehouses } from "../../features/warehouses/warehousesSlice";
+import Spinner from "../helper/Spinner";
 
 const EmployeeForm = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { list: warehouses } = useSelector((state) => state.warehouses);
+  const { error, formStatus } = useSelector((state) => state.employees);
   const [form, setForm] = useState({
     name: "",
     surname: "",
@@ -25,7 +27,7 @@ const EmployeeForm = () => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       name: form.name,
@@ -35,7 +37,10 @@ const EmployeeForm = () => {
       position: form.position,
       warehouseId: parseInt(form.warehouseId, 10),
     };
-    dispatch(createEmployee(payload)).then(() => navigate("/employees"));
+    const result = await dispatch(createEmployee(payload));
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate("/employees");
+    }
   };
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg">
@@ -48,6 +53,9 @@ const EmployeeForm = () => {
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
         Nowy Pracownik
       </h1>
+      {formStatus === "failed" && (
+        <p className="text-red-500 mb-4">Błąd: {error}</p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
@@ -161,7 +169,11 @@ const EmployeeForm = () => {
           type="submit"
           className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
-          Utwórz Pracownika
+          {formStatus === "loading" ? (
+            <Spinner color="white" />
+          ) : (
+            "Utwórz Pracownika"
+          )}
         </button>
       </form>
     </div>

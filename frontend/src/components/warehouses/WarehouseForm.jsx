@@ -22,6 +22,7 @@ const WarehousesForm = () => {
     current: warehouse,
     status,
     error,
+    formStatus,
   } = useSelector((state) => state.warehouses);
   const { regions, countries } = useSelector((state) => state.geography);
   const [form, setForm] = useState({
@@ -65,7 +66,7 @@ const WarehousesForm = () => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       name: form.name,
@@ -77,12 +78,16 @@ const WarehousesForm = () => {
       street: form.street,
       streetNumber: form.streetNumber,
     };
+    let result;
     if (isEdit) {
-      dispatch(updateWarehouse({ id: parseInt(id, 10), data: payload })).then(
-        () => navigate("/warehouses")
+      result = await dispatch(
+        updateWarehouse({ id: parseInt(id, 10), data: payload })
       );
     } else {
-      dispatch(createWarehouse(payload)).then(() => navigate("/warehouses"));
+      result = await dispatch(createWarehouse(payload));
+    }
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate("/warehouses");
     }
   };
   if ((isEdit && status === "loading") || status === "idle") {
@@ -105,7 +110,9 @@ const WarehousesForm = () => {
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Magazyn" : "Nowy Magazyn"}
       </h1>
-      {status === "failed" && <p className="text-red-500">Error: {error}</p>}
+      {formStatus === "failed" && (
+        <p className="text-red-500 mb-4">Error: {error}</p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
@@ -116,7 +123,7 @@ const WarehousesForm = () => {
             name="name"
             value={form.name}
             onChange={handleChange}
-            required
+            // required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
           />
         </div>
@@ -238,7 +245,13 @@ const WarehousesForm = () => {
           type="submit"
           className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
-          {isEdit ? "Zaktualizuj Magazyn" : "Stwórz Magazyn"}
+          {formStatus === "loading" ? (
+            <Spinner color="white" />
+          ) : isEdit ? (
+            "Zaktualizuj Magazyn"
+          ) : (
+            "Stwórz Magazyn"
+          )}
         </button>
       </form>
     </div>

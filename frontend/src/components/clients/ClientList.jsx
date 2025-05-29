@@ -10,29 +10,33 @@ import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
 import { numberFormatter } from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
 
 const ClientList = () => {
   const dispatch = useDispatch();
-  const { list: clients, status, error } = useSelector((s) => s.clients);
+  const { list: data, status, error } = useSelector((s) => s.clients);
+  const { content: clients, totalPages } = data;
   const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
   const [minTransactions, setMinTransactions] = useState("");
   const [maxTransactions, setMaxTransactions] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const debouncedMinTransactions = useDebounce(minTransactions);
+  const debouncedMaxTransactions = useDebounce(maxTransactions);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
-  const totalPages = 10;
   const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
     dispatch(
       fetchClients({
-        name: searchTerm || undefined,
+        name: debouncedSearchTerm || undefined,
         regionId: selectedRegion || undefined,
-        minTransactions: minTransactions
-          ? parseInt(minTransactions)
+        minTransactions: debouncedMinTransactions
+          ? parseInt(debouncedMinTransactions)
           : undefined,
-        maxTransactions: maxTransactions
-          ? parseInt(maxTransactions)
+        maxTransactions: debouncedMaxTransactions
+          ? parseInt(debouncedMaxTransactions)
           : undefined,
         warehouseId: selectedWarehouse || undefined,
         page: page || 1,
@@ -40,44 +44,45 @@ const ClientList = () => {
     );
   }, [
     dispatch,
-    searchTerm,
+    debouncedSearchTerm,
     selectedRegion,
-    minTransactions,
-    maxTransactions,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
     selectedWarehouse,
     page,
   ]);
   useEffect(() => {
     dispatch(fetchRegions());
   }, [dispatch]);
-  const filtered = clients
-    .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "name-reverse":
-          return b.name.localeCompare(a.name);
-        case "email":
-          return a.email.localeCompare(b.email);
-        case "email-reverse":
-          return b.email.localeCompare(a.email);
-        case "phone":
-          return a.phoneNumber.localeCompare(b.phoneNumber);
-        case "phone-reverse":
-          return b.phoneNumber.localeCompare(a.phoneNumber);
-        case "address":
-          return a.address.localeCompare(b.address);
-        case "address-reverse":
-          return b.address.localeCompare(a.address);
-        case "transactions":
-          return a.transactionsCount - b.transactionsCount;
-        case "transactions-reverse":
-          return b.transactionsCount - a.transactionsCount;
-        default:
-          return 0;
-      }
-    });
+  if (!clients) {
+    return <Spinner />;
+  }
+  const filtered = [...clients].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "name-reverse":
+        return b.name.localeCompare(a.name);
+      case "email":
+        return a.email.localeCompare(b.email);
+      case "email-reverse":
+        return b.email.localeCompare(a.email);
+      case "phone":
+        return a.phoneNumber.localeCompare(b.phoneNumber);
+      case "phone-reverse":
+        return b.phoneNumber.localeCompare(a.phoneNumber);
+      case "address":
+        return a.address.localeCompare(b.address);
+      case "address-reverse":
+        return b.address.localeCompare(a.address);
+      case "transactions":
+        return a.transactionsCount - b.transactionsCount;
+      case "transactions-reverse":
+        return b.transactionsCount - a.transactionsCount;
+      default:
+        return 0;
+    }
+  });
   return (
     <>
       <form className="flex justify-between items-center space-x-4">

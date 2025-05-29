@@ -1,6 +1,7 @@
 import apiClient from "../utils/apiClient";
 
-export const listClients = () => apiClient.get("/api/clients");
+export const listClients = (params) =>
+  apiClient.get("/api/clients", { params });
 
 export const getClientById = (clientId) =>
   apiClient.get(`/api/clients/${clientId}`);

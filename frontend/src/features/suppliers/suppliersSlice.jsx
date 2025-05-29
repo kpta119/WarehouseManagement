@@ -18,19 +18,32 @@ export const fetchSupplierById = createAsyncThunk(
 export const createSupplier = createAsyncThunk(
   "suppliers/create",
   async (data) => {
-    const response = await suppliersAPI.createSupplier(data);
-    return response.data;
+    try {
+      const response = await suppliersAPI.createSupplier(data);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
 
 const suppliersSlice = createSlice({
   name: "suppliers",
-  initialState: { list: [], current: null, status: "idle", error: null },
+  initialState: {
+    list: { content: [] },
+    current: null,
+    status: "idle",
+    error: null,
+    formStatus: "idle",
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchSuppliers.pending, (state) => {
         state.status = "loading";
+        state.formStatus = "idle";
+        state.list = { content: [] };
+        state.error = null;
       })
       .addCase(fetchSuppliers.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -40,11 +53,26 @@ const suppliersSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+      .addCase(fetchSupplierById.pending, (state) => {
+        state.status = "loading";
+        state.current = null;
+        state.error = null;
+      })
       .addCase(fetchSupplierById.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.current = action.payload;
       })
+      .addCase(createSupplier.pending, (state) => {
+        state.formStatus = "loading";
+        state.error = null;
+      })
       .addCase(createSupplier.fulfilled, (state, action) => {
-        state.list.push(action.payload);
+        state.formStatus = "succeeded";
+        state.list.content.push(action.payload);
+      })
+      .addCase(createSupplier.rejected, (state, action) => {
+        state.formStatus = "failed";
+        state.error = action.error.message;
       });
   },
 });

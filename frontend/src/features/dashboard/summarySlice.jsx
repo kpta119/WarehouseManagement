@@ -17,6 +17,8 @@ const summarySlice = createSlice({
     builder
       .addCase(fetchDashboardSummary.pending, (state) => {
         state.status = "loading";
+        state.data = null;
+        state.error = null;
       })
       .addCase(fetchDashboardSummary.fulfilled, (state, action) => {
         state.status = "succeeded";

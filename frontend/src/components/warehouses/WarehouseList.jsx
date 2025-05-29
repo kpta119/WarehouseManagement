@@ -13,6 +13,7 @@ import TextInput from "../helper/TextInput";
 import NumberInput from "../helper/NumberInput";
 import { numberFormatter } from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
 
 const WarehouseList = () => {
   const dispatch = useDispatch();
@@ -34,49 +35,111 @@ const WarehouseList = () => {
   const [maxProducts, setMaxProducts] = useState("");
   const [minTransactions, setMinTransactions] = useState("");
   const [maxTransactions, setMaxTransactions] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const debouncedMinCapacity = useDebounce(minCapacity);
+  const debouncedMaxCapacity = useDebounce(maxCapacity);
+  const debouncedMinOccupied = useDebounce(minOccupied);
+  const debouncedMaxOccupied = useDebounce(maxOccupied);
+  const debouncedMinEmployees = useDebounce(minEmployees);
+  const debouncedMaxEmployees = useDebounce(maxEmployees);
+  const debouncedMinProducts = useDebounce(minProducts);
+  const debouncedMaxProducts = useDebounce(maxProducts);
+  const debouncedMinTransactions = useDebounce(minTransactions);
+  const debouncedMaxTransactions = useDebounce(maxTransactions);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
   const totalPages = 10;
   useEffect(() => {
-    dispatch(fetchWarehouses());
     dispatch(fetchRegions());
   }, [dispatch]);
-  const filtered = warehouses
-    .filter((wh) => wh.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "name-reverse":
-          return b.name.localeCompare(a.name);
-        case "capacity":
-          return a.capacity - b.capacity;
-        case "capacity-reverse":
-          return b.capacity - a.capacity;
-        case "occupied":
-          return a.occupiedCapacity - b.occupiedCapacity;
-        case "occupied-reverse":
-          return b.occupiedCapacity - a.occupiedCapacity;
-        case "address":
-          return a.address.localeCompare(b.address);
-        case "address-reverse":
-          return b.address.localeCompare(a.address);
-        case "employees":
-          return a.employeesCount - b.employeesCount;
-        case "employees-reverse":
-          return b.employeesCount - a.employeesCount;
-        case "products":
-          return a.productsCount - b.productsCount;
-        case "products-reverse":
-          return b.productsCount - a.productsCount;
-        case "transactions":
-          return a.transactionsCount - b.transactionsCount;
-        case "transactions-reverse":
-          return b.transactionsCount - a.transactionsCount;
-        default:
-          return 0;
-      }
-    });
+  useEffect(() => {
+    dispatch(
+      fetchWarehouses({
+        searchTerm: debouncedSearchTerm || undefined,
+        regionId: regionFilter || undefined,
+        minCapacity: debouncedMinCapacity
+          ? Number(debouncedMinCapacity)
+          : undefined,
+        maxCapacity: debouncedMaxCapacity
+          ? Number(debouncedMaxCapacity)
+          : undefined,
+        minOccupied: debouncedMinOccupied
+          ? Number(debouncedMinOccupied)
+          : undefined,
+        maxOccupied: debouncedMaxOccupied
+          ? Number(debouncedMaxOccupied)
+          : undefined,
+        minEmployees: debouncedMinEmployees
+          ? Number(debouncedMinEmployees)
+          : undefined,
+        maxEmployees: debouncedMaxEmployees
+          ? Number(debouncedMaxEmployees)
+          : undefined,
+        minProducts: debouncedMinProducts
+          ? Number(debouncedMinProducts)
+          : undefined,
+        maxProducts: debouncedMaxProducts
+          ? Number(debouncedMaxProducts)
+          : undefined,
+        minTransactions: debouncedMinTransactions
+          ? Number(debouncedMinTransactions)
+          : undefined,
+        maxTransactions: debouncedMaxTransactions
+          ? Number(debouncedMaxTransactions)
+          : undefined,
+        page: page || 1,
+      })
+    );
+  }, [
+    dispatch,
+    debouncedSearchTerm,
+    regionFilter,
+    debouncedMinCapacity,
+    debouncedMaxCapacity,
+    debouncedMinOccupied,
+    debouncedMaxOccupied,
+    debouncedMinEmployees,
+    debouncedMaxEmployees,
+    debouncedMinProducts,
+    debouncedMaxProducts,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
+    page,
+  ]);
+  const filtered = [...warehouses].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "name-reverse":
+        return b.name.localeCompare(a.name);
+      case "capacity":
+        return a.capacity - b.capacity;
+      case "capacity-reverse":
+        return b.capacity - a.capacity;
+      case "occupied":
+        return a.occupiedCapacity - b.occupiedCapacity;
+      case "occupied-reverse":
+        return b.occupiedCapacity - a.occupiedCapacity;
+      case "address":
+        return a.address.localeCompare(b.address);
+      case "address-reverse":
+        return b.address.localeCompare(a.address);
+      case "employees":
+        return a.employeesCount - b.employeesCount;
+      case "employees-reverse":
+        return b.employeesCount - a.employeesCount;
+      case "products":
+        return a.productsCount - b.productsCount;
+      case "products-reverse":
+        return b.productsCount - a.productsCount;
+      case "transactions":
+        return a.transactionsCount - b.transactionsCount;
+      case "transactions-reverse":
+        return b.transactionsCount - a.transactionsCount;
+      default:
+        return 0;
+    }
+  });
   const handleDelete = (id) => {
     if (window.confirm("Czy na pewno chcesz usunąć ten magazyn?")) {
       dispatch(deleteWarehouse(id));

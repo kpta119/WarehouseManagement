@@ -18,7 +18,7 @@ const TransactionDetail = () => {
   useEffect(() => {
     dispatch(fetchTransactionById(id));
   }, [dispatch, id]);
-  if (status === "loading") {
+  if (status === "loading" || status === "idle") {
     return <Spinner />;
   }
   if (status === "failed") {

@@ -18,12 +18,19 @@ export const fetchTransactionById = createAsyncThunk(
 
 const transactionsSlice = createSlice({
   name: "transactions",
-  initialState: { list: [], current: null, status: "idle", error: null },
+  initialState: {
+    list: { content: [] },
+    current: null,
+    status: "idle",
+    error: null,
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchTransactions.pending, (state) => {
         state.status = "loading";
+        state.list = { content: [] };
+        state.error = null;
       })
       .addCase(fetchTransactions.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -33,7 +40,13 @@ const transactionsSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+      .addCase(fetchTransactionById.pending, (state) => {
+        state.status = "loading";
+        state.current = null;
+        state.error = null;
+      })
       .addCase(fetchTransactionById.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.current = action.payload;
       });
   },

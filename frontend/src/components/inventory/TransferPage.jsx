@@ -5,6 +5,8 @@ import { transferInventory } from "../../features/inventory/transferSlice";
 import { fetchProducts } from "../../features/products/productsSlice";
 import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaExchangeAlt, FaPlus, FaTrash } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
+import { Link } from "react-router-dom";
 
 const TransferPage = () => {
   const dispatch = useDispatch();
@@ -48,7 +50,7 @@ const TransferPage = () => {
     items[idx][field] = value;
     setForm((f) => ({ ...f, items }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const itemsPayload = {};
     form.items.forEach(({ productId, quantity }) => {
@@ -56,7 +58,7 @@ const TransferPage = () => {
         itemsPayload[productId] = Number(quantity);
       }
     });
-    dispatch(
+    const result = await dispatch(
       transferInventory({
         fromWarehouseId: Number(form.fromWarehouseId),
         toWarehouseId: Number(form.toWarehouseId),
@@ -64,6 +66,14 @@ const TransferPage = () => {
         items: itemsPayload,
       })
     );
+    if (result.meta.requestStatus === "fulfilled") {
+      setForm(() => ({
+        fromWarehouseId: "",
+        toWarehouseId: "",
+        employeeId: "",
+        items: [{ productId: "", quantity: "" }],
+      }));
+    }
   };
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -72,6 +82,20 @@ const TransferPage = () => {
         <h1 className="text-2xl font-semibold text-gray-800">
           Przeniesienie towaru
         </h1>
+        {status === "failed" && (
+          <p className="text-red-500 ml-4">Błąd: {error}</p>
+        )}
+        {status === "succeeded" && (
+          <p className="text-green-600 ml-4">
+            Przeniesienie zakończone sukcesem! ID transakcji:{" "}
+            <Link
+              to={`/transactions/${transaction?.transactionId}`}
+              className="text-pink-600 hover:underline"
+            >
+              {transaction?.transactionId}
+            </Link>
+          </p>
+        )}
       </div>
       <form
         onSubmit={handleSubmit}
@@ -199,19 +223,16 @@ const TransferPage = () => {
           </button>
         </div>
         <div className="pt-4 border-t">
-          {error && <p className="text-red-500 mb-2">Error: {error}</p>}
-          {status === "succeeded" && (
-            <p className="text-green-600 mb-2">
-              Transferred successfully! Transaction ID:{" "}
-              {transaction?.transactionId}
-            </p>
-          )}
           <button
             type="submit"
             disabled={status === "loading"}
             className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
-            Przenieś towar
+            {status === "loading" ? (
+              <Spinner color="white" />
+            ) : (
+              "Przenieś towar"
+            )}
           </button>
         </div>
       </form>

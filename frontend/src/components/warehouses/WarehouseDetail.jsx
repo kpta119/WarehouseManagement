@@ -17,6 +17,7 @@ import {
   dateFormatter,
   numberFormatter,
 } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
 
 const WarehouseDetail = () => {
   const { id } = useParams();
@@ -32,7 +33,7 @@ const WarehouseDetail = () => {
   useEffect(() => {
     dispatch(fetchWarehouseById(id));
   }, [dispatch, id]);
-  if (status === "loading") {
+  if (status === "loading" || status === "idle") {
     return <Spinner />;
   }
   if (status === "failed") {

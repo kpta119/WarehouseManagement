@@ -6,13 +6,16 @@ import { receiveInventory } from "../../features/inventory/receiveSlice";
 import { fetchProducts } from "../../features/products/productsSlice";
 import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaPlus, FaTrash, FaTruck } from "react-icons/fa";
+import Spinner from "../helper/Spinner";
+import { Link } from "react-router-dom";
 
 const ReceivePage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
-  const { list: suppliers } = useSelector((s) => s.suppliers);
+  const { list: suppliersData } = useSelector((s) => s.suppliers);
   const { list: products } = useSelector((s) => s.products);
   const { list: employees } = useSelector((s) => s.employees);
+  const { content: suppliers } = suppliersData;
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.receive
   );
@@ -49,7 +52,7 @@ const ReceivePage = () => {
     items[idx][field] = value;
     setForm((f) => ({ ...f, items }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const itemsPayload = {};
     form.items.forEach(({ productId, quantity }) => {
@@ -57,7 +60,7 @@ const ReceivePage = () => {
         itemsPayload[productId] = Number(quantity);
       }
     });
-    dispatch(
+    const result = await dispatch(
       receiveInventory({
         warehouseId: Number(form.warehouseId),
         supplierId: Number(form.supplierId),
@@ -65,6 +68,14 @@ const ReceivePage = () => {
         items: itemsPayload,
       })
     );
+    if (result.meta.requestStatus === "fulfilled") {
+      setForm(() => ({
+        warehouseId: "",
+        supplierId: "",
+        employeeId: "",
+        items: [{ productId: "", quantity: "" }],
+      }));
+    }
   };
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -73,6 +84,20 @@ const ReceivePage = () => {
         <h1 className="text-2xl font-semibold text-gray-800">
           Przyjęcie towaru
         </h1>
+        {status === "failed" && (
+          <p className="text-red-500 ml-4">Błąd: {error}</p>
+        )}
+        {status === "succeeded" && (
+          <p className="text-green-600 ml-4">
+            Towar został przyjęty pomyślnie! Transakcja ID:{" "}
+            <Link
+              to={`/transactions/${transaction?.transactionId}`}
+              className="text-pink-600 hover:underline"
+            >
+              {transaction?.transactionId}
+            </Link>
+          </p>
+        )}
       </div>
       <form
         onSubmit={handleSubmit}
@@ -198,19 +223,16 @@ const ReceivePage = () => {
           </button>
         </div>
         <div className="pt-4 border-t">
-          {error && <p className="text-red-500 mb-2">Error: {error}</p>}
-          {status === "succeeded" && (
-            <p className="text-green-600 mb-2">
-              Received successfully! Transaction ID:{" "}
-              {transaction?.transactionId}
-            </p>
-          )}
           <button
             type="submit"
             disabled={status === "loading"}
             className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
-            Przyjmij towar
+            {status === "loading" ? (
+              <Spinner color="white" />
+            ) : (
+              "Przyjmij towar"
+            )}
           </button>
         </div>
       </form>

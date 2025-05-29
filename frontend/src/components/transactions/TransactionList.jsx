@@ -10,14 +10,16 @@ import SelectInput from "../helper/SelectInput";
 import NumberInput from "../helper/NumberInput";
 import Pagination from "../helper/Pagination";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
 
 const TransactionList = () => {
   const dispatch = useDispatch();
   const {
-    list: transactions,
+    list: data,
     status,
     error,
   } = useSelector((state) => state.transactions);
+  const { content: transactions, totalPages } = data;
   const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -26,8 +28,11 @@ const TransactionList = () => {
   const [maxTotalPrice, setMaxTotalPrice] = useState("");
   const [minTotalSize, setMinTotalSize] = useState("");
   const [maxTotalSize, setMaxTotalSize] = useState("");
+  const debouncedMinTotalPrice = useDebounce(minTotalPrice);
+  const debouncedMaxTotalPrice = useDebounce(maxTotalPrice);
+  const debouncedMinTotalSize = useDebounce(minTotalSize);
+  const debouncedMaxTotalSize = useDebounce(maxTotalSize);
   const [page, setPage] = useState(1);
-  const totalPages = 10;
   const [sortOption, setSortOption] = useState("");
   useEffect(() => {
     dispatch(
@@ -35,10 +40,18 @@ const TransactionList = () => {
         fromDate: fromDate || undefined,
         toDate: toDate || undefined,
         type: type || undefined,
-        minTotalPrice: minTotalPrice ? parseFloat(minTotalPrice) : undefined,
-        maxTotalPrice: maxTotalPrice ? parseFloat(maxTotalPrice) : undefined,
-        minTotalSize: minTotalSize ? parseFloat(minTotalSize) : undefined,
-        maxTotalSize: maxTotalSize ? parseFloat(maxTotalSize) : undefined,
+        minTotalPrice: debouncedMinTotalPrice
+          ? parseFloat(debouncedMinTotalPrice)
+          : undefined,
+        maxTotalPrice: debouncedMaxTotalPrice
+          ? parseFloat(debouncedMaxTotalPrice)
+          : undefined,
+        minTotalSize: debouncedMinTotalSize
+          ? parseFloat(debouncedMinTotalSize)
+          : undefined,
+        maxTotalSize: debouncedMaxTotalSize
+          ? parseFloat(debouncedMaxTotalSize)
+          : undefined,
         page: page || 1,
         warehouseId: selectedWarehouse || undefined,
       })
@@ -50,11 +63,14 @@ const TransactionList = () => {
     fromDate,
     toDate,
     type,
-    minTotalPrice,
-    maxTotalPrice,
-    minTotalSize,
-    maxTotalSize,
+    debouncedMinTotalPrice,
+    debouncedMaxTotalPrice,
+    debouncedMinTotalSize,
+    debouncedMaxTotalSize,
   ]);
+  if (!transactions) {
+    return <Spinner />;
+  }
   const filtered = [...transactions].sort((a, b) => {
     switch (sortOption) {
       case "date":
@@ -139,7 +155,7 @@ const TransactionList = () => {
             isMinus={false}
             placeholder="Wpisz kwotę..."
             value={maxTotalSize}
-            setValue={setMaxTotalPrice}
+            setValue={setMaxTotalSize}
           />
         </div>
         <SelectInput
