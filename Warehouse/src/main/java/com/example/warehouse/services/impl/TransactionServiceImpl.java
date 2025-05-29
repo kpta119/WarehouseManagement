@@ -29,12 +29,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<Transaction> getAllTransactions(Double minTotalPrice, Double maxTotalPrice, Double minTotalSize, Double maxTotalSize, Date fromDate, Date toDate, Transaction.TransactionType type, Integer employeeId, Pageable pageable) {
+        Date normalizedFromDate = (fromDate != null) ? startOfDay(fromDate) : null;
         return transactionRepository.findAllWithFilters(
                 minTotalPrice,
                 maxTotalPrice,
                 minTotalSize,
                 maxTotalSize,
-                startOfDay(fromDate),
+                normalizedFromDate,
                 toDate,
                 type,
                 employeeId,
