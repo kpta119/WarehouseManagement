@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +46,7 @@ public class ClientController {
                         .getContent();
                 return ResponseEntity.status(HttpStatus.OK).body(allResults);
             } else {
-                Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id")));
+                Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             }
         } catch (Exception e) {
