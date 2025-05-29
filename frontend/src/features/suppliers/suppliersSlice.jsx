@@ -1,25 +1,27 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as suppliersAPI from "../../api/suppliers";
+import suppliersAPI from "../../api/suppliers";
 
 export const fetchSuppliers = createAsyncThunk(
   "suppliers/fetchAll",
   async (params) => {
-    const response = await suppliersAPI.listSuppliers(params);
+    const response = await suppliersAPI.list(params);
     return response.data;
   }
 );
+
 export const fetchSupplierById = createAsyncThunk(
   "suppliers/fetchById",
   async (id) => {
-    const response = await suppliersAPI.getSupplierById(id);
+    const response = await suppliersAPI.getId(id);
     return response.data;
   }
 );
+
 export const createSupplier = createAsyncThunk(
   "suppliers/create",
   async (data) => {
     try {
-      const response = await suppliersAPI.createSupplier(data);
+      const response = await suppliersAPI.create(data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
@@ -30,7 +32,7 @@ export const createSupplier = createAsyncThunk(
 const suppliersSlice = createSlice({
   name: "suppliers",
   initialState: {
-    list: { content: [] },
+    list: { content: [], page: {} },
     current: null,
     status: "idle",
     error: null,
@@ -42,7 +44,7 @@ const suppliersSlice = createSlice({
       .addCase(fetchSuppliers.pending, (state) => {
         state.status = "loading";
         state.formStatus = "idle";
-        state.list = { content: [] };
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchSuppliers.fulfilled, (state, action) => {

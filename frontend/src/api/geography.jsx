@@ -1,8 +1,10 @@
 import apiClient from "../utils/apiClient";
 
-export const listRegions = () => apiClient.get("/api/regions");
+const geographyAPI = {
+  regions: () => apiClient.get("/api/regions"),
+  countries: (regionId) =>
+    apiClient.get("/api/countries", { params: { regionId } }),
+  create: (data) => apiClient.post("/api/addresses", data),
+};
 
-export const listCountries = (regionId) =>
-  apiClient.get("/api/countries", { params: { regionId } });
-
-export const createAddress = (data) => apiClient.post("/api/addresses", data);
+export default geographyAPI;

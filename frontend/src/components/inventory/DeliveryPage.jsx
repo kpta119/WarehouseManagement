@@ -12,10 +12,9 @@ import { Link } from "react-router-dom";
 const DeliveryPage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
-  const { list: clientsData } = useSelector((s) => s.clients);
+  const { list: clients } = useSelector((s) => s.clients);
   const { list: products } = useSelector((s) => s.products);
   const { list: employees } = useSelector((s) => s.employees);
-  const { content: clients } = clientsData;
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.delivery
   );
@@ -26,14 +25,27 @@ const DeliveryPage = () => {
     items: [{ productId: "", quantity: "" }],
   });
   useEffect(() => {
-    dispatch(fetchWarehouses());
-    dispatch(fetchClients());
-    dispatch(fetchProducts());
+    dispatch(
+      fetchWarehouses({
+        all: true,
+      })
+    );
+    dispatch(
+      fetchClients({
+        all: true,
+      })
+    );
+    dispatch(
+      fetchProducts({
+        all: true,
+      })
+    );
   }, [dispatch]);
   useEffect(() => {
     dispatch(
       fetchEmployees({
         warehouseId: form.warehouseId ? Number(form.warehouseId) : undefined,
+        all: true,
       })
     );
   }, [dispatch, form.warehouseId]);

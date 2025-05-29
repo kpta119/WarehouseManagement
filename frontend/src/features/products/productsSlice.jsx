@@ -1,45 +1,49 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as productsAPI from "../../api/products";
+import productsAPI from "../../api/products";
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
   async (params) => {
-    const response = await productsAPI.searchProducts(params);
+    const response = await productsAPI.get(params);
     return response.data;
   }
 );
+
 export const fetchProductById = createAsyncThunk(
   "products/fetchById",
   async (id) => {
-    const response = await productsAPI.getProductById(id);
+    const response = await productsAPI.getId(id);
     return response.data;
   }
 );
+
 export const createProduct = createAsyncThunk(
   "products/create",
   async (data) => {
     try {
-      const response = await productsAPI.createProduct(data);
+      const response = await productsAPI.create(data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
     }
   }
 );
+
 export const updateProduct = createAsyncThunk(
   "products/update",
   async ({ id, data }) => {
     try {
-      const response = await productsAPI.updateProduct(id, data);
+      const response = await productsAPI.update(id, data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
     }
   }
 );
+
 export const deleteProduct = createAsyncThunk("products/delete", async (id) => {
   try {
-    await productsAPI.deleteProduct(id);
+    await productsAPI.delete(id);
     return id;
   } catch (err) {
     throw new Error(err.response?.data?.description || err.message);

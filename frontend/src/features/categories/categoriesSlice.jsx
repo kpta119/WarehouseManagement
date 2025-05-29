@@ -1,40 +1,43 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as categoriesAPI from "../../api/categories";
+import categoriesAPI from "../../api/categories";
 
 export const fetchCategories = createAsyncThunk(
   "categories/fetchAll",
   async (params) => {
-    const response = await categoriesAPI.listCategories(params);
+    const response = await categoriesAPI.list(params);
     return response.data;
   }
 );
+
 export const createCategory = createAsyncThunk(
   "categories/create",
   async (data) => {
     try {
-      const response = await categoriesAPI.createCategory(data);
+      const response = await categoriesAPI.create(data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
     }
   }
 );
+
 export const updateCategory = createAsyncThunk(
   "categories/update",
   async ({ id, data }) => {
     try {
-      const response = await categoriesAPI.updateCategory(id, data);
+      const response = await categoriesAPI.update(id, data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
     }
   }
 );
+
 export const deleteCategory = createAsyncThunk(
   "categories/delete",
   async (id) => {
     try {
-      await categoriesAPI.deleteCategory(id);
+      await categoriesAPI.delete(id);
       return id;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);

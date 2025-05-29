@@ -12,10 +12,9 @@ import { Link } from "react-router-dom";
 const ReceivePage = () => {
   const dispatch = useDispatch();
   const { list: warehouses } = useSelector((s) => s.warehouses);
-  const { list: suppliersData } = useSelector((s) => s.suppliers);
+  const { list: suppliers } = useSelector((s) => s.suppliers);
   const { list: products } = useSelector((s) => s.products);
   const { list: employees } = useSelector((s) => s.employees);
-  const { content: suppliers } = suppliersData;
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.receive
   );
@@ -26,14 +25,27 @@ const ReceivePage = () => {
     items: [{ productId: "", quantity: "" }],
   });
   useEffect(() => {
-    dispatch(fetchWarehouses());
-    dispatch(fetchSuppliers());
-    dispatch(fetchProducts());
+    dispatch(
+      fetchWarehouses({
+        all: true,
+      })
+    );
+    dispatch(
+      fetchSuppliers({
+        all: true,
+      })
+    );
+    dispatch(
+      fetchProducts({
+        all: true,
+      })
+    );
   }, [dispatch]);
   useEffect(() => {
     dispatch(
       fetchEmployees({
         warehouseId: form.warehouseId ? Number(form.warehouseId) : undefined,
+        all: true,
       })
     );
   }, [dispatch, form.warehouseId]);

@@ -1,25 +1,27 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as employeesAPI from "../../api/employees";
+import employeesAPI from "../../api/employees";
 
 export const fetchEmployees = createAsyncThunk(
   "employees/fetchAll",
   async (params) => {
-    const response = await employeesAPI.listEmployees(params);
+    const response = await employeesAPI.list(params);
     return response.data;
   }
 );
+
 export const fetchEmployeeById = createAsyncThunk(
   "employees/fetchById",
   async (id) => {
-    const response = await employeesAPI.getEmployeeById(id);
+    const response = await employeesAPI.get(id);
     return response.data;
   }
 );
+
 export const createEmployee = createAsyncThunk(
   "employees/create",
   async (data) => {
     try {
-      const response = await employeesAPI.createEmployee(data);
+      const response = await employeesAPI.create(data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
@@ -30,7 +32,7 @@ export const createEmployee = createAsyncThunk(
 const employeesSlice = createSlice({
   name: "employees",
   initialState: {
-    list: [],
+    list: { content: [], page: {} },
     current: null,
     status: "idle",
     error: null,
@@ -42,7 +44,7 @@ const employeesSlice = createSlice({
       .addCase(fetchEmployees.pending, (state) => {
         state.status = "loading";
         state.formStatus = "idle";
-        state.list = [];
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchEmployees.fulfilled, (state, action) => {

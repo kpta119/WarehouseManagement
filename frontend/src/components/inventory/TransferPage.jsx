@@ -23,8 +23,16 @@ const TransferPage = () => {
     items: [{ productId: "", quantity: "" }],
   });
   useEffect(() => {
-    dispatch(fetchWarehouses());
-    dispatch(fetchProducts());
+    dispatch(
+      fetchWarehouses({
+        all: true,
+      })
+    );
+    dispatch(
+      fetchProducts({
+        all: true,
+      })
+    );
   }, [dispatch]);
   useEffect(() => {
     dispatch(
@@ -32,6 +40,7 @@ const TransferPage = () => {
         warehouseId: form.toWarehouseId
           ? Number(form.toWarehouseId)
           : undefined,
+        all: true,
       })
     );
   }, [dispatch, form.toWarehouseId]);

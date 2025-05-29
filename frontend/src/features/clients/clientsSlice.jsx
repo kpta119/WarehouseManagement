@@ -1,24 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as clientsAPI from "../../api/clients";
-import { create } from "lodash";
+import clientsAPI from "../../api/clients";
 
 export const fetchClients = createAsyncThunk(
   "clients/fetchAll",
   async (params) => {
-    const response = await clientsAPI.listClients(params);
+    const response = await clientsAPI.list(params);
     return response.data;
   }
 );
+
 export const fetchClientById = createAsyncThunk(
   "clients/fetchById",
   async (id) => {
-    const response = await clientsAPI.getClientById(id);
+    const response = await clientsAPI.getId(id);
     return response.data;
   }
 );
+
 export const createClient = createAsyncThunk("clients/create", async (data) => {
   try {
-    const response = await clientsAPI.createClient(data);
+    const response = await clientsAPI.create(data);
     return response.data;
   } catch (err) {
     throw new Error(err.response?.data?.description || err.message);
@@ -28,7 +29,7 @@ export const createClient = createAsyncThunk("clients/create", async (data) => {
 const clientsSlice = createSlice({
   name: "clients",
   initialState: {
-    list: { content: [] },
+    list: { content: [], page: {} },
     current: null,
     status: "idle",
     error: null,
@@ -40,7 +41,7 @@ const clientsSlice = createSlice({
       .addCase(fetchClients.pending, (state) => {
         state.status = "loading";
         state.formStatus = "idle";
-        state.list = { content: [] };
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchClients.fulfilled, (state, action) => {

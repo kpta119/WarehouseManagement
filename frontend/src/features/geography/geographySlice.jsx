@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as geographyAPI from "../../api/geography";
+import geographyAPI from "../../api/geography";
 
 export const fetchRegions = createAsyncThunk(
   "geography/fetchRegions",
   async () => {
-    const response = await geographyAPI.listRegions();
+    const response = await geographyAPI.regions();
     return response.data;
   }
 );
@@ -12,7 +12,7 @@ export const fetchRegions = createAsyncThunk(
 export const fetchCountries = createAsyncThunk(
   "geography/fetchCountries",
   async (regionId) => {
-    const response = await geographyAPI.listCountries(regionId);
+    const response = await geographyAPI.countries(regionId);
     return response.data;
   }
 );
@@ -21,7 +21,7 @@ export const createAddress = createAsyncThunk(
   "geography/createAddress",
   async (data) => {
     try {
-      const response = await geographyAPI.createAddress(data);
+      const response = await geographyAPI.create(data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);

@@ -1,17 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as transactionsAPI from "../../api/transactions";
+import transactionsAPI from "../../api/transactions";
 
 export const fetchTransactions = createAsyncThunk(
   "transactions/fetchAll",
   async (params) => {
-    const response = await transactionsAPI.listTransactions(params);
+    const response = await transactionsAPI.list(params);
     return response.data;
   }
 );
+
 export const fetchTransactionById = createAsyncThunk(
   "transactions/fetchById",
   async (id) => {
-    const response = await transactionsAPI.getTransactionById(id);
+    const response = await transactionsAPI.getId(id);
     return response.data;
   }
 );
@@ -19,7 +20,7 @@ export const fetchTransactionById = createAsyncThunk(
 const transactionsSlice = createSlice({
   name: "transactions",
   initialState: {
-    list: { content: [] },
+    list: { content: [], page: {} },
     current: null,
     status: "idle",
     error: null,
@@ -29,7 +30,7 @@ const transactionsSlice = createSlice({
     builder
       .addCase(fetchTransactions.pending, (state) => {
         state.status = "loading";
-        state.list = { content: [] };
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchTransactions.fulfilled, (state, action) => {

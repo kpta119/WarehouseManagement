@@ -1,47 +1,51 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as warehousesAPI from "../../api/warehouses";
+import warehousesAPI from "../../api/warehouses";
 
 export const fetchWarehouses = createAsyncThunk(
   "warehouses/fetchAll",
   async (params) => {
-    const response = await warehousesAPI.listWarehouses(params);
+    const response = await warehousesAPI.list(params);
     return response.data;
   }
 );
+
 export const fetchWarehouseById = createAsyncThunk(
   "warehouses/fetchById",
   async (id) => {
-    const response = await warehousesAPI.getWarehouseById(id);
+    const response = await warehousesAPI.getId(id);
     return response.data;
   }
 );
+
 export const createWarehouse = createAsyncThunk(
   "warehouses/create",
   async (data) => {
     try {
-      const response = await warehousesAPI.createWarehouse(data);
+      const response = await warehousesAPI.create(data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
     }
   }
 );
+
 export const updateWarehouse = createAsyncThunk(
   "warehouses/update",
   async ({ id, data }) => {
     try {
-      const response = await warehousesAPI.updateWarehouse(id, data);
+      const response = await warehousesAPI.update(id, data);
       return response.data;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);
     }
   }
 );
+
 export const deleteWarehouse = createAsyncThunk(
   "warehouses/delete",
   async (id) => {
     try {
-      await warehousesAPI.deleteWarehouse(id);
+      await warehousesAPI.delete(id);
       return id;
     } catch (err) {
       throw new Error(err.response?.data?.description || err.message);

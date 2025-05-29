@@ -1,9 +1,9 @@
-import apiClient from "../utils/apiClient";
+import createCRUD from "./crud";
 
-export const listClients = (params) =>
-  apiClient.get("/api/clients", { params });
+const clientsAPI = createCRUD("clients", {
+  get: true,
+  getId: true,
+  create: true,
+});
 
-export const getClientById = (clientId) =>
-  apiClient.get(`/api/clients/${clientId}`);
-
-export const createClient = (data) => apiClient.post("/api/clients", data);
+export default clientsAPI;

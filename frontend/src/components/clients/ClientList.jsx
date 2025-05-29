@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import { fetchClients } from "../../features/clients/clientsSlice";
-import { FaChevronDown, FaEye } from "react-icons/fa";
-import TextInput from "../helper/TextInput";
 import { fetchRegions } from "../../features/geography/geographySlice";
-import SelectInput from "../helper/SelectInput";
-import NumberInput from "../helper/NumberInput";
-import Pagination from "../helper/Pagination";
-import { numberFormatter } from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
 import useDebounce from "../../hooks/useDebounce";
+import ItemsList from "../Layout/ItemsList";
+import FormList from "../Layout/FormList";
 
 const ClientList = () => {
   const dispatch = useDispatch();
   const { list: data, status, error } = useSelector((s) => s.clients);
-  const { content: clients, totalPages } = data;
+  const { content: clients, page: pageInfo } = data;
+  const { totalPages } = pageInfo;
   const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("");
@@ -28,6 +24,15 @@ const ClientList = () => {
   const [page, setPage] = useState(1);
   const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   useEffect(() => {
+    setPage(1);
+  }, [
+    debouncedSearchTerm,
+    selectedRegion,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
+    selectedWarehouse,
+  ]);
+  useEffect(() => {
     dispatch(
       fetchClients({
         name: debouncedSearchTerm || undefined,
@@ -39,7 +44,7 @@ const ClientList = () => {
           ? parseInt(debouncedMaxTransactions)
           : undefined,
         warehouseId: selectedWarehouse || undefined,
-        page: page || 1,
+        page: page - 1 || 0,
       })
     );
   }, [
@@ -85,67 +90,63 @@ const ClientList = () => {
   });
   return (
     <>
-      <form className="flex justify-between items-center space-x-4">
-        <div className="flex justify-between items-center space-x-4">
-          <TextInput
-            label="Nazwa"
-            placeholder="Szukaj klientów..."
-            value={searchTerm}
-            setValue={setSearchTerm}
-          />
-          <SelectInput
-            label="Region"
-            value={selectedRegion}
-            setValue={setSelectedRegion}
-          >
-            <option value="">Wszystkie Regiony</option>
-            {regions.map((reg) => (
-              <option key={reg.id} value={reg.id}>
-                {reg.name}
-              </option>
-            ))}
-          </SelectInput>
-          <NumberInput
-            label="Transakcje (min)"
-            placeholder="Wybierz transakcje..."
-            isMinus={true}
-            value={minTransactions}
-            setValue={setMinTransactions}
-          />
-          <NumberInput
-            label="Transakcje (max)"
-            placeholder="Wybierz transakcje..."
-            isMinus={false}
-            value={maxTransactions}
-            setValue={setMaxTransactions}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Sortowanie</label>
-          <div className="relative">
-            <select
-              className="border appearance-none border-gray-300 rounded-lg px-3 py-2 pr-12 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <option value="">Sortuj przez</option>
-              <option value="name">Nazwa (od A do Z)</option>
-              <option value="name-reverse">Nazwa (od Z do A)</option>
-              <option value="email">E-mail (od A do Z)</option>
-              <option value="email-reverse">E-mail (od Z do A)</option>
-              <option value="phone">Nr. telefonu (rosnąco)</option>
-              <option value="phone-reverse">Nr. telefonu (malejąco)</option>
-              <option value="address">Adres (od A do Z)</option>
-              <option value="address-reverse">Adres (od Z do A)</option>
-              <option value="transactions">Liczba transakcji (rosnąco)</option>
-              <option value="transactions-reverse">
-                Liczba transakcji (malejąco)
-              </option>
-            </select>
-            <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          </div>
-        </div>
-      </form>
+      <FormList
+        inputs={[
+          {
+            type: "text",
+            label: "Nazwa",
+            placeholder: "Szukaj klientów...",
+            value: searchTerm,
+            setValue: setSearchTerm,
+          },
+          {
+            type: "select",
+            label: "Region",
+            value: selectedRegion,
+            setValue: setSelectedRegion,
+            options: regions.map((reg) => ({
+              value: reg.id,
+              label: reg.name,
+            })),
+          },
+          {
+            type: "number",
+            label: "Transakcje (min)",
+            placeholder: "Wybierz transakcje...",
+            isMinus: true,
+            value: minTransactions,
+            setValue: setMinTransactions,
+          },
+          {
+            type: "number",
+            label: "Transakcje (max)",
+            placeholder: "Wybierz transakcje...",
+            isMinus: false,
+            value: maxTransactions,
+            setValue: setMaxTransactions,
+          },
+        ]}
+        sorting={{
+          sortOption,
+          setSortOption,
+          options: [
+            { value: "", label: "Sortuj przez" },
+            { value: "name", label: "Nazwa (od A do Z)" },
+            { value: "name-reverse", label: "Nazwa (od Z do A)" },
+            { value: "email", label: "E-mail (od A do Z)" },
+            { value: "email-reverse", label: "E-mail (od Z do A)" },
+            { value: "phone", label: "Nr. telefonu (rosnąco)" },
+            { value: "phone-reverse", label: "Nr. telefonu (malejąco)" },
+            { value: "address", label: "Adres (od A do Z)" },
+            { value: "address-reverse", label: "Adres (od Z do A)" },
+            { value: "transactions", label: "Liczba transakcji (rosnąco)" },
+            {
+              value: "transactions-reverse",
+              label: "Liczba transakcji (malejąco)",
+            },
+          ],
+        }}
+      />
       {status === "loading" ? (
         <Spinner />
       ) : status === "failed" ? (
@@ -153,61 +154,28 @@ const ClientList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-red-500">Nie znaleziono klientów</p>
       ) : (
-        <>
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-          <div className="bg-white rounded-lg shadow overflow-auto">
-            <div className="hidden sm:grid grid-cols-6 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <div>Nazwa</div>
-              <div>E-mail</div>
-              <div>Nr. telefonu</div>
-              <div>Adres</div>
-              <div className="text-right">Liczba transakcji</div>
-              <div className="text-center">Akcje</div>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {filtered.map((c) => (
-                <div
-                  key={c.clientId}
-                  className="grid grid-cols-1 sm:grid-cols-6 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
-                >
-                  <div className="font-medium text-pink-600">
-                    <Link
-                      to={`/clients/${c.clientId}`}
-                      className="hover:underline"
-                    >
-                      {c.name}
-                    </Link>
-                  </div>
-                  <div className="text-sm text-gray-700 truncate">
-                    {c.email}
-                  </div>
-                  <div className="text-sm text-gray-700">{c.phoneNumber}</div>
-                  <div className="text-sm text-gray-700">{c.address}</div>
-                  <div className="text-sm text-gray-700 text-right">
-                    {numberFormatter(c.transactionsCount)}
-                  </div>
-                  <div className="flex justify-center text-gray-600">
-                    <Link
-                      to={`/clients/${c.clientId}`}
-                      className="hover:text-pink-500 transition duration-200"
-                    >
-                      <FaEye />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-        </>
+        <ItemsList
+          pagination={{ page, setPage, totalPages }}
+          labels={[
+            { name: "Nazwa", type: "Link" },
+            { name: "E-mail", type: "Text-Long" },
+            { name: "Nr. telefonu", type: "Text" },
+            { name: "Adres", type: "Text" },
+            { name: "Transakcje", type: "Number" },
+          ]}
+          data={filtered.map((item) => ({
+            id: item.clientId,
+            name: item.name,
+            email: item.email,
+            phoneNumber: item.phoneNumber,
+            address: item.address,
+            transactionsCount: item.transactionsCount,
+          }))}
+          actions={{
+            get: true,
+          }}
+          path="clients"
+        />
       )}
     </>
   );
