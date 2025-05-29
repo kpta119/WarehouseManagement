@@ -17,7 +17,7 @@ public class TransactionSummaryMapper {
 
         dto.setTransactionId(transaction.getId());
         dto.setType(transaction.getTransactionType().name());
-        dto.setDate(simpleDateFormat.format(transaction.getDate()));
+        dto.setDate(transaction.getDate() != null ? simpleDateFormat.format(transaction.getDate()) : null);
         dto.setDescription(transaction.getDescription());
 
         if (transaction.getEmployee() != null) {

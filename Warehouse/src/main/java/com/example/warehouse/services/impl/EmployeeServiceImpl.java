@@ -9,9 +9,10 @@ import com.example.warehouse.mappers.EmployeeSummaryMapper;
 import com.example.warehouse.mappers.EmployeeWithHistoryMapper;
 import com.example.warehouse.repositories.*;
 import com.example.warehouse.services.EmployeeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -36,11 +37,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<EmployeeSummaryDto> getEmployeesWithTransactionCount(Integer warehouseId) {
-        return employeeRepository.findAllEmployeesWithTransactionCounts(warehouseId)
-                .stream()
-                .map(employeeSummaryMapper::mapToDto)
-                .toList();
+    public Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(String partOfNameOrSurname, String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable) {
+        Page<Object[]> results = employeeRepository.findAllEmployeesWithTransactionCounts(partOfNameOrSurname, regionName, minTransactions, maxTransactions, warehouseId, pageable);
+        return results.map(employeeSummaryMapper::mapToDto);
     }
 
     @Override

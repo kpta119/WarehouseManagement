@@ -14,7 +14,6 @@ public class TransactionMapper {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
     public TransactionWithProductsDto mapToDto(Transaction transaction) {
         TransactionWithProductsDto dto = new TransactionWithProductsDto();
 
@@ -29,18 +28,22 @@ public class TransactionMapper {
 
         if (transaction.getFromWarehouse() != null) {
             dto.setFromWarehouseId(transaction.getFromWarehouse().getId());
+            dto.setFromWarehouseName(transaction.getFromWarehouse().getName());
         }
 
         if (transaction.getToWarehouse() != null) {
             dto.setToWarehouseId(transaction.getToWarehouse().getId());
+            dto.setToWarehouseName(transaction.getToWarehouse().getName());
         }
 
         if (transaction.getClient() != null) {
             dto.setClientId(transaction.getClient().getId());
+            dto.setClientName(transaction.getClient().getName());
         }
 
         if (transaction.getSupplier() != null) {
             dto.setSupplierId(transaction.getSupplier().getId());
+            dto.setSupplierName(transaction.getSupplier().getName());
         }
 
         List<ProductInfoDto> productDtos = transaction.getProducts().stream()
@@ -49,12 +52,17 @@ public class TransactionMapper {
                     pDto.setProductId(tp.getProduct().getId());
                     pDto.setName(tp.getProduct().getName());
                     pDto.setQuantity(tp.getQuantity());
-                    pDto.setUnitPrice(tp.getTransactionPrice()); // albo tp.getProduct().getUnitPrice()
+                    pDto.setUnitPrice(tp.getTransactionPrice());
                     pDto.setCategoryName(tp.getProduct().getCategory().getName());
                     return pDto;
                 })
                 .collect(Collectors.toList());
-
+        Integer totalItems = productDtos.stream()
+                        .mapToInt(ProductInfoDto::getQuantity).sum();
+        dto.setTotalItems(totalItems);
+        Double totalPrice = productDtos.stream()
+                .mapToDouble(p -> p.getUnitPrice()*p.getQuantity()).sum();
+        dto.setTotalPrice(totalPrice);
         dto.setProducts(productDtos);
 
         return dto;

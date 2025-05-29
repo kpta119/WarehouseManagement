@@ -20,5 +20,7 @@ public class AddressDto {
     private String postalCode;
     private String city;
     private Integer countryId;
+    private String countryName;
     private Integer regionId;
+    private String regionName;
 }

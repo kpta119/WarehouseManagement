@@ -3,15 +3,12 @@ package com.example.warehouse.services.impl;
 import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.services.TransactionService;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -31,25 +28,27 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<Transaction> getAllTransactions(Date fromDate, Date toDate, Transaction.TransactionType type, Integer employeeId, Pageable pageable) {
-        Specification<Transaction> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
+    public Page<Transaction> getAllTransactions(Double minTotalPrice, Double maxTotalPrice, Double minTotalSize, Double maxTotalSize, Date fromDate, Date toDate, Transaction.TransactionType type, Integer employeeId, Pageable pageable) {
+        Date normalizedFromDate = (fromDate != null) ? startOfDay(fromDate) : null;
+        return transactionRepository.findAllWithFilters(
+                minTotalPrice,
+                maxTotalPrice,
+                minTotalSize,
+                maxTotalSize,
+                normalizedFromDate,
+                toDate,
+                type,
+                employeeId,
+                pageable);
+    }
 
-            if (fromDate != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
-            }
-            if (toDate != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
-            }
-            if (type != null) {
-                predicates.add(cb.equal(root.get("transactionType"), type));
-            }
-            if (employeeId != null) {
-                predicates.add(cb.equal(root.get("employee").get("id"), employeeId));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-        return transactionRepository.findAll(spec, pageable);
+    private Date startOfDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 }

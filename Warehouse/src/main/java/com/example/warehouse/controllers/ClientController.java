@@ -9,10 +9,13 @@ import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -28,10 +31,25 @@ public class ClientController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllClients(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "25") int size) {
+    public ResponseEntity<?> getAllClients(
+            @RequestParam(required = false) String regionName,
+            @RequestParam(required = false) Integer minTransactions,
+            @RequestParam(required = false) Integer maxTransactions,
+            @RequestParam(required = false) Integer warehouseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size,
+            @RequestParam(defaultValue = "false") boolean all
+    ) {
         try {
-            Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(PageRequest.of(page, size));
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            if (all){
+                List<ClientSummaryDto> allResults = clientService
+                        .getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, Pageable.unpaged())
+                        .getContent();
+                return ResponseEntity.status(HttpStatus.OK).body(allResults);
+            } else {
+                Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id")));
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
