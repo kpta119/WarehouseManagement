@@ -13,4 +13,6 @@ public class ProductSearchEndpointDto extends ProductDto {
     private String categoryName;
     private Integer inventoryCount;
     private Integer transactionCount;
+    private boolean isLowStock;
+    private boolean isBestSelling;
 }

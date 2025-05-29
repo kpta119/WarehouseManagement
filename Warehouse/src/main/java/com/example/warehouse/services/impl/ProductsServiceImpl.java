@@ -5,6 +5,7 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.ProductInventory;
 import com.example.warehouse.domain.TransactionProduct;
 import com.example.warehouse.domain.dto.dateDtos.Period;
+import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import com.example.warehouse.repositories.CategoryRepository;
@@ -12,7 +13,9 @@ import com.example.warehouse.repositories.ProductInventoryRepository;
 import com.example.warehouse.repositories.ProductRepository;
 import com.example.warehouse.repositories.TransactionProductRepository;
 import com.example.warehouse.services.ProductsService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -42,8 +45,8 @@ public class ProductsServiceImpl implements ProductsService {
     }
 
     @Override
-    public List<Object[]> getAllProducts(String name, Integer categoryId, Double minPrice, Double maxPrice, Double minSize, Double maxSize, Integer warehouseId) {
-        return productRepository.findAllProducts(name, categoryId, minPrice, maxPrice, minSize, maxSize, warehouseId);
+    public Page<Object[]> getAllProducts(ProductSearchFilterDto productFilters, Pageable pageable) {
+        return productRepository.findAllProducts(productFilters, pageable);
     }
 
     @Override
@@ -69,7 +72,7 @@ public class ProductsServiceImpl implements ProductsService {
                 .orElseThrow(() -> new NoSuchElementException("Product not found with ID: " + productId));
 
         List<TransactionProduct> transactions = product.getProductTransactions();
-        return transactions.stream().map(transactionProduct ->{
+        return transactions.stream().map(transactionProduct -> {
             ProductTransactionInfoDto transactionInfoDto = new ProductTransactionInfoDto();
             transactionInfoDto.setTransactionId(transactionProduct.getTransaction().getId());
             transactionInfoDto.setDate(simpleDateFormat.format(transactionProduct.getTransaction().getDate()));
@@ -94,6 +97,7 @@ public class ProductsServiceImpl implements ProductsService {
             case week -> Date.valueOf(now.minusWeeks(1));
             case month -> Date.valueOf(now.minusMonths(1));
             case year -> Date.valueOf(now.minusYears(1));
+            case allTime -> Date.valueOf(LocalDate.of(1970, 1, 1));
         };
         PageRequest pageRequest = PageRequest.of(0, topN);
         return (warehouseId != null) ? transactionProductRepository.findTopNBestSellingProductsByWarehouseId(warehouseId, fromDate, pageRequest)

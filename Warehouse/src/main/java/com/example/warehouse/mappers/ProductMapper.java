@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class ProductMapper {
 
-    public ProductSearchEndpointDto mapToDto(Object[] product) {
+    public ProductSearchEndpointDto mapToDto(Object[] product, List<Integer> lowStockProductIds, List<Integer> bestSellingProducts) {
 
         ProductSearchEndpointDto dto = new ProductSearchEndpointDto();
 
@@ -26,6 +26,8 @@ public class ProductMapper {
         dto.setInventoryCount(((Number) product[5]).intValue());
         dto.setTransactionCount(((Number) product[6]).intValue());
         dto.setCategoryName((String) product[7]);
+        dto.setLowStock(lowStockProductIds.contains(dto.getProductId()));
+        dto.setBestSelling(bestSellingProducts.contains(dto.getProductId()));
         return dto;
     }
 

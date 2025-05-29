@@ -38,15 +38,15 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(6)
+                jsonPath("$.content.length()").value(6)
         ).andExpect(
-                jsonPath("$[0].name").value("Laptop")
+                jsonPath("$.content[0].name").value("Laptop")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(999.99)
+                jsonPath("$.content[0].unitPrice").value(999.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(5)
+                jsonPath("$.content[0].inventoryCount").value(5)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(2)
+                jsonPath("$.content[0].transactionCount").value(2)
         );
     }
 
@@ -59,15 +59,15 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(1)
+                jsonPath("$.content.length()").value(1)
         ).andExpect(
-                jsonPath("$[0].name").value("Laptop")
+                jsonPath("$.content[0].name").value("Laptop")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(999.99)
+                jsonPath("$.content[0].unitPrice").value(999.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(5)
+                jsonPath("$.content[0].inventoryCount").value(5)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(2)
+                jsonPath("$.content[0].transactionCount").value(2)
         );
     }
 
@@ -80,15 +80,15 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(2)
+                jsonPath("$.content.length()").value(2)
         ).andExpect(
-                jsonPath("$[1].name").value("Smartphone")
+                jsonPath("$.content[1].name").value("Smartphone")
         ).andExpect(
-                jsonPath("$[1].unitPrice").value(799.99)
+                jsonPath("$.content[1].unitPrice").value(799.99)
         ).andExpect(
-                jsonPath("$[1].inventoryCount").value(0)
+                jsonPath("$.content[1].inventoryCount").value(0)
         ).andExpect(
-                jsonPath("$[1].transactionCount").value(0)
+                jsonPath("$.content[1].transactionCount").value(0)
         );
     }
 
@@ -102,15 +102,15 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(2)
+                jsonPath("$.content.length()").value(2)
         ).andExpect(
-                jsonPath("$[0].name").value("Chair")
+                jsonPath("$.content[0].name").value("Chair")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(49.99)
+                jsonPath("$.content[0].unitPrice").value(49.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(3)
+                jsonPath("$.content[0].inventoryCount").value(3)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
+                jsonPath("$.content[0].transactionCount").value(1)
         );
     }
 
@@ -124,15 +124,15 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(3)
+                jsonPath("$.content.length()").value(3)
         ).andExpect(
-                jsonPath("$[0].name").value("T-Shirt")
+                jsonPath("$.content[0].name").value("T-Shirt")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(19.99)
+                jsonPath("$.content[0].unitPrice").value(19.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(10)
+                jsonPath("$.content[0].inventoryCount").value(10)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
+                jsonPath("$.content[0].transactionCount").value(1)
         );
     }
 
@@ -145,23 +145,67 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(2)
+                jsonPath("$.content.length()").value(2)
         ).andExpect(
-                jsonPath("$[1].name").value("T-Shirt")
+                jsonPath("$.content[1].name").value("T-Shirt")
         ).andExpect(
-                jsonPath("$[1].unitPrice").value(19.99)
+                jsonPath("$.content[1].unitPrice").value(19.99)
         ).andExpect(
-                jsonPath("$[1].inventoryCount").value(6)
+                jsonPath("$.content[1].inventoryCount").value(6)
         ).andExpect(
-                jsonPath("$[1].transactionCount").value(1)
+                jsonPath("$.content[1].transactionCount").value(1)
         ).andExpect(
-                jsonPath("$[0].name").value("Laptop")
+                jsonPath("$.content[0].name").value("Laptop")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(999.99)
+                jsonPath("$.content[0].unitPrice").value(999.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(3)
+                jsonPath("$.content[0].inventoryCount").value(3)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
+                jsonPath("$.content[0].transactionCount").value(1)
+        );
+    }
+
+    @Test
+    public void testReturnsProductsWithCorrectInventoryCountBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/search")
+                        .param("minInventory", "5")
+                        .param("maxInventory", "10")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(3)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Laptop")
+        ).andExpect(
+                jsonPath("$.content[0].inventoryCount").value(5)
+        ).andExpect(
+                jsonPath("$.content[1].name").value("T-Shirt")
+        ).andExpect(
+                jsonPath("$.content[1].inventoryCount").value(10)
+        ).andExpect(
+                jsonPath("$.content[2].name").value("Apple")
+        ).andExpect(
+                jsonPath("$.content[2].inventoryCount").value(5)
+        );
+    }
+
+    @Test
+    public void testReturnsProductsWithCorrectTransactionCountBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/search")
+                        .param("minTransactions", "2")
+                        .param("maxTransactions", "2")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(1)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Laptop")
+        ).andExpect(
+                jsonPath("$.content[0].transactionCount").value(2)
         );
     }
 
@@ -339,6 +383,25 @@ public class ProductControllerTests {
     }
 
     @Test
+    public void testGetTop3BestSellingAllTheTime() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "allTime")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.length()").value(3)
+        ).andExpect(
+                jsonPath("$[0]").value(3)
+        ).andExpect(
+                jsonPath("$[1]").value(5)
+        ).andExpect(
+                jsonPath("$[2]").value(4)
+        );
+    }
+
+    @Test
     public void testCreateProduct() throws Exception {
         String newProductJson = """
                 {
@@ -372,9 +435,9 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(1)
+                jsonPath("$.content.length()").value(1)
         ).andExpect(
-                jsonPath("$[0].name").value("New Product")
+                jsonPath("$.content[0].name").value("New Product")
         );
     }
 
