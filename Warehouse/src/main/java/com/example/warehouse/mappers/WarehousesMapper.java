@@ -36,7 +36,9 @@ public class WarehousesMapper {
         return dto;
     }
 
-    public WarehouseDetailsDto mapToDto(Warehouse warehouse, List<Transaction> transactions, List<Employee> employees) {
+    public WarehouseDetailsDto mapToDto(
+            Warehouse warehouse, List<Transaction> transactions, List<Employee> employees, Integer totalItems, Double totalValue
+    ) {
         WarehouseDetailsDto dto = new WarehouseDetailsDto();
         dto.setWarehouseId(warehouse.getId());
         dto.setName(warehouse.getName());
@@ -45,6 +47,8 @@ public class WarehousesMapper {
         dto.setAddress(
                 warehouse.getAddress().getStreet() + " " + warehouse.getAddress().getStreetNumber() + ", " + warehouse.getAddress().getCity().getName()
         );
+        dto.setTotalItems(totalItems);
+        dto.setTotalValue(totalValue);
         dto.setEmployees(employees.stream().map(employee -> {
             EmployeeDto employeeDto = new EmployeeDto();
             employeeDto.setEmployeeId(employee.getId());
@@ -67,11 +71,15 @@ public class WarehousesMapper {
         }).toList());
         dto.setTransactions(transactions.stream().map(transaction -> {
             WarehouseTransactionInfoDto transactionDto = new WarehouseTransactionInfoDto();
+            Employee employee = transaction.getEmployee();
+
             transactionDto.setTransactionId(transaction.getId());
             transactionDto.setType(transaction.getTransactionType().name());
             transactionDto.setDate(dateFormat.format(transaction.getDate()));
             transactionDto.setDescription(transaction.getDescription());
             transactionDto.setTotalPrice(transaction.getTotalPrice());
+            transactionDto.setEmployeeId(employee.getId());
+            transactionDto.setEmployeeName(employee.getName() + " " + employee.getSurname());
             return transactionDto;
         }).toList());
         transactions.sort(Comparator.comparing(Transaction::getDate));
@@ -97,4 +105,5 @@ public class WarehousesMapper {
         dto.setAddressId(warehouse.getAddress().getId());
         return dto;
     }
+
 }

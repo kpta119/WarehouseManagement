@@ -13,6 +13,10 @@ public interface WarehousesService {
 
     WarehouseDetailsDto getWarehouseById(Integer warehouseId);
 
+    Integer countTotalItemsInWarehouse(Warehouse warehouse);
+
+    Double calculateTotalValueInWarehouse(Warehouse warehouse);
+
     Warehouse createWarehouse(WarehouseModifyDto warehouseDto);
 
     Warehouse updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId);

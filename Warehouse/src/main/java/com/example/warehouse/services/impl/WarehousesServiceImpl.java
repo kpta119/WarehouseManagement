@@ -54,7 +54,23 @@ public class WarehousesServiceImpl implements WarehousesService {
                 .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
         List<Transaction> transactions = transactionRepository.findAllByWarehouseId(warehouseId);
         List<Employee> employees = warehouse.getEmployees();
-        return warehousesMapper.mapToDto(warehouse, transactions, employees);
+        Integer totalItems = countTotalItemsInWarehouse(warehouse);
+        Double totalValue = calculateTotalValueInWarehouse(warehouse);
+        return warehousesMapper.mapToDto(warehouse, transactions, employees, totalItems, totalValue);
+    }
+
+    @Override
+    public Integer countTotalItemsInWarehouse(Warehouse warehouse) {
+        return warehouse.getProductInventories().stream()
+                .mapToInt(ProductInventory::getQuantity)
+                .sum();
+    }
+
+    @Override
+    public Double calculateTotalValueInWarehouse(Warehouse warehouse) {
+        return warehouse.getProductInventories().stream()
+                .mapToDouble(productInventory -> productInventory.getQuantity() * productInventory.getProduct().getUnitPrice())
+                .sum();
     }
 
     @Override

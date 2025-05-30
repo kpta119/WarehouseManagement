@@ -181,6 +181,10 @@ public class WarehousesControllerTests {
         ).andExpect(
                 jsonPath("$.capacity").value(1000.0)
         ).andExpect(
+                jsonPath("$.totalItems").value(2)
+        ).andExpect(
+                jsonPath("$.totalValue").value(1999.98)
+        ).andExpect(
                 jsonPath("$.occupiedCapacity").value(500.0)
         ).andExpect(
                 jsonPath("$.address").value("Champs-Élysées 101, Paris")

@@ -15,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WarehouseDetailsDto extends WarehouseBase {
+    private Integer totalItems;
+    private Double totalValue;
     private List<EmployeeDto> employees;
     private List<ProductInWarehouseDto> products;
     private List<WarehouseTransactionInfoDto> transactions;
