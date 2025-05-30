@@ -1,8 +1,9 @@
-import apiClient from "../utils/apiClient";
+import createCRUD from "./crud";
 
-export const listSuppliers = () => apiClient.get("/api/suppliers");
+const suppliersAPI = createCRUD("suppliers", {
+  get: true,
+  getId: true,
+  create: true,
+});
 
-export const getSupplierById = (supplierId) =>
-  apiClient.get(`/api/suppliers/${supplierId}`);
-
-export const createSupplier = (data) => apiClient.post("/api/suppliers", data);
+export default suppliersAPI;

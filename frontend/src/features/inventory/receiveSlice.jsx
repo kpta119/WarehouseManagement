@@ -1,11 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { receiveFromSupplier } from "../../api/inventory";
+import inventoryAPI from "../../api/inventory";
 
 export const receiveInventory = createAsyncThunk(
   "inventory/receive",
   async (data) => {
-    const response = await receiveFromSupplier(data);
-    return response.data;
+    try {
+      const response = await inventoryAPI.receive(data);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
 

@@ -1,15 +1,11 @@
-import apiClient from "../utils/apiClient";
+import createCRUD from "./crud";
 
-export const listWarehouses = () => apiClient.get("/api/warehouses");
+const warehousesAPI = createCRUD("warehouses", {
+  get: true,
+  getId: true,
+  create: true,
+  update: true,
+  delete: true,
+});
 
-export const getWarehouseById = (warehouseId) =>
-  apiClient.get(`/api/warehouses/${warehouseId}`);
-
-export const createWarehouse = (data) =>
-  apiClient.post("/api/warehouses", data);
-
-export const updateWarehouse = (warehouseId, data) =>
-  apiClient.put(`/api/warehouses/${warehouseId}`, data);
-
-export const deleteWarehouse = (warehouseId) =>
-  apiClient.delete(`/api/warehouses/${warehouseId}`);
+export default warehousesAPI;

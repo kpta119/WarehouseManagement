@@ -1,11 +1,10 @@
-import apiClient from "../utils/apiClient";
+import createCRUD from "./crud";
 
-export const listCategories = () => apiClient.get("/api/categories");
+const categoriesAPI = createCRUD("categories", {
+  get: true,
+  create: true,
+  update: true,
+  delete: true,
+});
 
-export const createCategory = (data) => apiClient.post("/api/categories", data);
-
-export const updateCategory = (categoryId, data) =>
-  apiClient.put(`/api/categories/${categoryId}`, data);
-
-export const deleteCategory = (categoryId) =>
-  apiClient.delete(`/api/categories/${categoryId}`);
+export default categoriesAPI;

@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as geographyAPI from "../../api/geography";
+import geographyAPI from "../../api/geography";
 
 export const fetchRegions = createAsyncThunk(
   "geography/fetchRegions",
   async () => {
-    const response = await geographyAPI.listRegions();
+    const response = await geographyAPI.regions();
     return response.data;
   }
 );
@@ -12,7 +12,7 @@ export const fetchRegions = createAsyncThunk(
 export const fetchCountries = createAsyncThunk(
   "geography/fetchCountries",
   async (regionId) => {
-    const response = await geographyAPI.listCountries(regionId);
+    const response = await geographyAPI.countries(regionId);
     return response.data;
   }
 );
@@ -20,8 +20,12 @@ export const fetchCountries = createAsyncThunk(
 export const createAddress = createAsyncThunk(
   "geography/createAddress",
   async (data) => {
-    const response = await geographyAPI.createAddress(data);
-    return response.data;
+    try {
+      const response = await geographyAPI.create(data);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
 
@@ -38,6 +42,8 @@ const geographySlice = createSlice({
     builder
       .addCase(fetchRegions.pending, (state) => {
         state.status = "loading";
+        state.regions = [];
+        state.error = null;
       })
       .addCase(fetchRegions.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -49,6 +55,8 @@ const geographySlice = createSlice({
       })
       .addCase(fetchCountries.pending, (state) => {
         state.status = "loading";
+        state.countries = [];
+        state.error = null;
       })
       .addCase(fetchCountries.fulfilled, (state, action) => {
         state.status = "succeeded";

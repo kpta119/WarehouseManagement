@@ -30,10 +30,11 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { list: warehouses } = useSelector((s) => s.warehouses);
+  const { list: data } = useSelector((s) => s.warehouses);
+  const { content: warehouses } = data;
   const selectedWarehouse = useSelector((s) => s.selectedWarehouse);
   useEffect(() => {
-    dispatch(fetchWarehouses());
+    dispatch(fetchWarehouses({ all: true }));
   }, [dispatch]);
   const handleLogout = () => {
     dispatch(logout());

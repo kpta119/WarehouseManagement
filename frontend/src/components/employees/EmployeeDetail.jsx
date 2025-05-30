@@ -9,6 +9,22 @@ import {
   numberFormatter,
 } from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as LineTooltip,
+  BarChart,
+  Bar,
+  Tooltip as BarTooltip,
+  Pie,
+  PieChart,
+  Legend,
+  Cell,
+} from "recharts";
 
 const EmployeeDetail = () => {
   const { id } = useParams();
@@ -41,6 +57,29 @@ const EmployeeDetail = () => {
     warehouseName,
     history = [],
   } = employee;
+  const monthlyData = Object.values(
+    history.reduce((acc, { date, totalPrice, totalItems }) => {
+      const month = date.slice(0, 7);
+      if (!acc[month]) {
+        acc[month] = { month, totalPrice: 0, totalItems: 0 };
+      }
+      acc[month].totalPrice += totalPrice;
+      acc[month].totalItems += totalItems;
+      return acc;
+    }, {})
+  );
+  const typeCounts = history.reduce((acc, tx) => {
+    acc[tx.type] = (acc[tx.type] || 0) + 1;
+    return acc;
+  }, {});
+  const pieData = Object.entries(typeCounts).map(([name, value]) => ({
+    name: name
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase()),
+    value,
+  }));
+  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"];
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="bg-white p-6 rounded-lg shadow space-y-2">
@@ -56,25 +95,125 @@ const EmployeeDetail = () => {
         <h1 className="text-3xl font-semibold text-gray-800">
           {name} {surname}
         </h1>
-        <p>
-          <strong>Stanowisko:</strong> {position}
-        </p>
-        <p>
-          <strong>Email:</strong> {email}
-        </p>
-        <p>
-          <strong>Telefon:</strong> {phoneNumber}
-        </p>
-        <p>
-          <strong>Magazyn:</strong>{" "}
-          <Link
-            to={`/warehouses/${warehouseId}`}
-            className="text-pink-600 hover:underline"
-          >
-            {warehouseName}
-          </Link>
-        </p>
+        <div className="bg-white py-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Stanowisko</h2>
+            <p className="text-gray-800">{position}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">E-mail</h2>
+            <p className="text-gray-800">{email}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Nr. telefonu</h2>
+            <p className="text-gray-800">{phoneNumber}</p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Ilość przedmiotów</h2>
+            <p className="text-gray-800">
+              {numberFormatter(
+                history.reduce((acc, tx) => acc + tx.totalItems, 0)
+              )}
+            </p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Łączna wartość</h2>
+            <p className="text-gray-800">
+              {currencyFormatter(
+                history.reduce((acc, tx) => acc + tx.totalPrice, 0)
+              )}
+            </p>
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold mb-2">Magazyn</h2>
+            <Link
+              to={`/warehouses/${warehouseId}`}
+              className="text-pink-600 hover:underline"
+            >
+              {warehouseName}
+            </Link>
+          </div>
+        </div>
         <section>
+          {history.length > 0 && (
+            <div className="space-y-8 flex gap-4">
+              <div className="w-1/2">
+                <h3 className="text-xl font-semibold mb-2 text-center">
+                  Zaksięgowane pieniądze na miesiąc
+                </h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart
+                    data={monthlyData}
+                    margin={{ left: 50, right: 5, top: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" tick={{ fill: "#6B7280" }} />
+                    <YAxis
+                      tickFormatter={(v) => currencyFormatter(v)}
+                      tick={{ fill: "#6B7280" }}
+                    />
+                    <LineTooltip
+                      formatter={(value) => currencyFormatter(value)}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="totalPrice"
+                      name="Łączna kwota"
+                      stroke="#3B82F6"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="w-1/2">
+                <h3 className="text-xl font-semibold mb-2 text-center">
+                  Ilość przedmiotów na miesiąc
+                </h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={monthlyData}>
+                    <XAxis dataKey="month" tick={{ fill: "#6B7280" }} />
+                    <YAxis tick={{ fill: "#6B7280" }} />
+                    <BarTooltip formatter={(v) => numberFormatter(v)} />
+                    <Bar
+                      dataKey="totalItems"
+                      name="Sztuk w miesiącu"
+                      fill="#10B981"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+          {pieData.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-2 text-center">
+                Udział typów transakcji
+              </h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    label
+                  >
+                    {pieData.map((entry, idx) => (
+                      <Cell
+                        key={entry.name}
+                        fill={COLORS[idx % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Legend verticalAlign="bottom" height={36} />
+                  <LineTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
           <h2 className="text-2xl font-semibold mb-4">Historia Transakcji</h2>
           {history.length === 0 ? (
             <p className="text-red-500">Brak historii transakcji.</p>
@@ -107,7 +246,7 @@ const EmployeeDetail = () => {
                         </div>
                         <div className="truncate">{tx.description}</div>
                         <div className="text-right">
-                          {numberFormatter(tx.itemsCount)}
+                          {numberFormatter(tx.totalItems)}
                         </div>
                         <div className="text-right">
                           {currencyFormatter(tx.totalPrice)}

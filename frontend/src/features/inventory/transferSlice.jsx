@@ -1,11 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { transferBetweenWarehouses } from "../../api/inventory";
+import inventoryAPI from "../../api/inventory";
 
 export const transferInventory = createAsyncThunk(
   "inventory/transfer",
   async (data) => {
-    const response = await transferBetweenWarehouses(data);
-    return response.data;
+    try {
+      const response = await inventoryAPI.transfer(data);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
 

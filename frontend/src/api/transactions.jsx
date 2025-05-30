@@ -1,7 +1,8 @@
-import apiClient from "../utils/apiClient";
+import createCRUD from "./crud";
 
-export const listTransactions = (params) =>
-  apiClient.get("/api/transactions", { params });
+const transactionsAPI = createCRUD("transactions", {
+  get: true,
+  getId: true,
+});
 
-export const getTransactionById = (transactionId) =>
-  apiClient.get(`/api/transactions/${transactionId}`);
+export default transactionsAPI;

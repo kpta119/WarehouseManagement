@@ -1,47 +1,48 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import {
   fetchCategories,
   deleteCategory,
 } from "../../features/categories/categoriesSlice";
-import { FaTrash, FaEdit, FaEye } from "react-icons/fa";
-import Pagination from "../helper/Pagination";
-import TextInput from "../helper/TextInput";
-import SelectInput from "../helper/SelectInput";
 import Spinner from "../helper/Spinner";
+import useDebounce from "../../hooks/useDebounce";
+import ItemsList from "../Layout/ItemsList";
+import FormList from "../Layout/FormList";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
-  const { list: categories, status, error } = useSelector((s) => s.categories);
+  const { list: data, status, error } = useSelector((s) => s.categories);
+  const { content: categories, page: pageInfo, formStatus } = data;
+  const { totalPages } = pageInfo;
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
-  const totalPages = 10;
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchTerm]);
   useEffect(() => {
     dispatch(
       fetchCategories({
-        searchTerm: searchTerm || undefined,
-        page: page || 1,
+        searchTerm: debouncedSearchTerm || undefined,
+        page: page - 1 || 0,
       })
     );
-  }, [dispatch]);
-  const filtered = categories
-    .filter((cat) => cat.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "name":
-          return a.name.localeCompare(b.name);
-        case "name-reverse":
-          return b.name.localeCompare(a.name);
-        case "description":
-          return a.description.localeCompare(b.description);
-        case "description-reverse":
-          return b.description.localeCompare(a.description);
-        default:
-          return 0;
-      }
-    });
+  }, [dispatch, debouncedSearchTerm, page]);
+  const filtered = [...categories].sort((a, b) => {
+    switch (sortOption) {
+      case "name":
+        return a.name.localeCompare(b.name);
+      case "name-reverse":
+        return b.name.localeCompare(a.name);
+      case "description":
+        return a.description.localeCompare(b.description);
+      case "description-reverse":
+        return b.description.localeCompare(a.description);
+      default:
+        return 0;
+    }
+  });
   const handleDelete = (id) => {
     if (window.confirm("Czy na pewno chcesz usunąć tę kategorię?")) {
       dispatch(deleteCategory(id));
@@ -49,27 +50,27 @@ const CategoryList = () => {
   };
   return (
     <>
-      <form className="flex items-center space-x-2 justify-between">
-        <div className="flex flex-wrap gap-4 items-end">
-          <TextInput
-            label="Nazwa"
-            placeholder="Szukaj kategorii..."
-            value={searchTerm}
-            setValue={setSearchTerm}
-          />
-        </div>
-        <SelectInput
-          label="Sortowanie"
-          value={sortOption}
-          setValue={setSortOption}
-        >
-          <option value="">Sortuj przez</option>
-          <option value="name">Nazwa (od A do Z)</option>
-          <option value="name-reverse">Nazwa (od Z do A)</option>
-          <option value="description">Opis (od A do Z)</option>
-          <option value="description-reverse">Opis (od Z do A)</option>
-        </SelectInput>
-      </form>
+      <FormList
+        inputs={[
+          {
+            type: "text",
+            label: "Nazwa",
+            placeholder: "Wyszukaj po nazwie...",
+            value: searchTerm,
+            setValue: setSearchTerm,
+          },
+        ]}
+        sorting={{
+          sortOption,
+          setSortOption,
+          options: [
+            { value: "name", label: "Nazwa (od A do Z)" },
+            { value: "name-reverse", label: "Nazwa (od Z do A)" },
+            { value: "description", label: "Opis (od A do Z)" },
+            { value: "description-reverse", label: "Opis (od Z do A)" },
+          ],
+        }}
+      />
       {status === "loading" || status === "idle" ? (
         <Spinner />
       ) : status === "failed" ? (
@@ -78,62 +79,25 @@ const CategoryList = () => {
         <p className="text-red-500">Nie znaleziono kategorii</p>
       ) : (
         <>
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
-          <div className="bg-white rounded-lg shadow overflow-auto">
-            <div className="hidden sm:grid grid-cols-3 gap-4 p-4 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <div>Nazwa</div>
-              <div>Opis</div>
-              <div className="text-center">Akcje</div>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {filtered.map((cat) => (
-                <div
-                  key={cat.categoryId}
-                  className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4 p-4 hover:bg-pink-50 transition-colors duration-200"
-                >
-                  <div className="font-medium text-pink-600">
-                    <Link
-                      to={`/categories/${cat.categoryId}`}
-                      className="hover:underline"
-                    >
-                      {cat.name}
-                    </Link>
-                  </div>
-                  <div className="text-sm text-gray-700 truncate">
-                    {cat.description}
-                  </div>
-                  <div className="flex justify-center space-x-4 text-gray-600">
-                    <Link
-                      to={`/categories/${cat.categoryId}`}
-                      className="hover:text-pink-500 transition duration-200"
-                    >
-                      <FaEye />
-                    </Link>
-                    <Link
-                      to={`/categories/${cat.categoryId}/edit`}
-                      className="hover:text-pink-500 transition duration-200"
-                    >
-                      <FaEdit />
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(cat.categoryId)}
-                      className="hover:text-pink-500 transition duration-200 cursor-pointer"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
+          {error && <p className="text-red-500">Błąd: {error}</p>}
+          <ItemsList
+            pagination={{ page, setPage, totalPages }}
+            labels={[
+              { name: "Nazwa", type: "Link" },
+              { name: "Opis", type: "Text-Long" },
+            ]}
+            data={filtered.map((item) => ({
+              id: item.categoryId,
+              name: item.name,
+              description: item.description,
+            }))}
+            actions={{
+              get: true,
+              put: true,
+              delete: true,
+            }}
+            path="categories"
+            handleDelete={handleDelete}
           />
         </>
       )}

@@ -10,6 +10,12 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  BarChart,
+  Bar,
 } from "recharts";
 import { FaChevronLeft, FaEdit, FaEye } from "react-icons/fa";
 import {
@@ -17,6 +23,8 @@ import {
   dateFormatter,
   numberFormatter,
 } from "../../utils/helpers";
+import Spinner from "../helper/Spinner";
+import { fetchProducts } from "../../features/products/productsSlice";
 
 const WarehouseDetail = () => {
   const { id } = useParams();
@@ -29,10 +37,16 @@ const WarehouseDetail = () => {
     status,
     error,
   } = useSelector((state) => state.warehouses);
+  const { list: data } = useSelector((state) => state.products);
+  const { content: productsData } = data;
+  console.log(data);
   useEffect(() => {
     dispatch(fetchWarehouseById(id));
   }, [dispatch, id]);
-  if (status === "loading") {
+  useEffect(() => {
+    dispatch(fetchProducts({ all: true }));
+  }, [dispatch, id]);
+  if (status === "loading" || status === "idle") {
     return <Spinner />;
   }
   if (status === "failed") {
@@ -53,6 +67,36 @@ const WarehouseDetail = () => {
     totalItems,
     totalValue,
   } = warehouse;
+  const pieData = Object.entries(
+    warehouse.products
+      .filter(
+        (product) =>
+          productsData.find((p) => p.productId === product.productId)
+            ?.categoryName
+      )
+      .map((product) => ({
+        name: productsData.find((p) => p.productId === product.productId)
+          ?.categoryName,
+        value: product.quantity * product.unitPrice,
+      }))
+      .reduce((acc, curr) => {
+        acc[curr.name] = (acc[curr.name] || 0) + curr.value;
+        return acc;
+      }, {})
+  ).map(([name, value]) => ({
+    name,
+    value,
+  }));
+  const PIE_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"];
+  const empCounts = warehouse.transactions.reduce((acc, tx) => {
+    acc[tx.employeeName] = (acc[tx.employeeName] || 0) + 1;
+    return acc;
+  }, {});
+  const barData = Object.entries(empCounts).map(([employeeName, count]) => ({
+    employeeName: employeeName.split(" ")[0],
+    count,
+  }));
+  console.log(pieData);
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
@@ -112,6 +156,57 @@ const WarehouseDetail = () => {
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+        <div className="flex gap-4 my-8">
+          {pieData.length > 0 && (
+            <div className="w-1/2">
+              <h3 className="text-xl font-semibold mb-2 text-center">
+                Wartość zapasów wg kategorii
+              </h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    label
+                  >
+                    {pieData.map((_, idx) => (
+                      <Cell
+                        key={idx}
+                        fill={PIE_COLORS[idx % PIE_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Legend verticalAlign="bottom" height={36} />
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {barData.length > 0 && (
+            <div className="w-1/2">
+              <h3 className="text-xl font-semibold mb-2 text-center">
+                Liczba transakcji przez pracownika
+              </h3>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart
+                  data={barData}
+                  margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="employeeName" tick={{ fill: "#6B7280" }} />
+                  <YAxis tick={{ fill: "#6B7280" }} />
+                  <Tooltip formatter={(value) => numberFormatter(value)} />
+                  <Bar dataKey="count" name="Transakcje" fill="#10B981" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       </section>
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">

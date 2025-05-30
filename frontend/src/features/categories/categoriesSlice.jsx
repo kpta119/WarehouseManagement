@@ -1,43 +1,66 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as categoriesAPI from "../../api/categories";
+import categoriesAPI from "../../api/categories";
 
 export const fetchCategories = createAsyncThunk(
   "categories/fetchAll",
   async (params) => {
-    const response = await categoriesAPI.listCategories(params);
+    const response = await categoriesAPI.list(params);
     return response.data;
   }
 );
+
 export const createCategory = createAsyncThunk(
   "categories/create",
   async (data) => {
-    const response = await categoriesAPI.createCategory(data);
-    return response.data;
+    try {
+      const response = await categoriesAPI.create(data);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
+
 export const updateCategory = createAsyncThunk(
   "categories/update",
   async ({ id, data }) => {
-    const response = await categoriesAPI.updateCategory(id, data);
-    return response.data;
+    try {
+      const response = await categoriesAPI.update(id, data);
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
+
 export const deleteCategory = createAsyncThunk(
   "categories/delete",
   async (id) => {
-    await categoriesAPI.deleteCategory(id);
-    return id;
+    try {
+      await categoriesAPI.delete(id);
+      return id;
+    } catch (err) {
+      throw new Error(err.response?.data?.description || err.message);
+    }
   }
 );
 
 const categoriesSlice = createSlice({
   name: "categories",
-  initialState: { list: [], status: "idle", error: null },
+  initialState: {
+    list: { content: [], page: {} },
+    status: "idle",
+    error: null,
+    formStatus: "idle",
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCategories.pending, (state) => {
         state.status = "loading";
+        state.formStatus = "idle";
+        state.list = { content: [], page: {} };
+        state.error = null;
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -47,17 +70,46 @@ const categoriesSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+      .addCase(createCategory.pending, (state) => {
+        state.formStatus = "loading";
+        state.error = null;
+      })
       .addCase(createCategory.fulfilled, (state, action) => {
-        state.list.push(action.payload);
+        state.formStatus = "succeeded";
+        state.list.content.push(action.payload);
+      })
+      .addCase(createCategory.rejected, (state, action) => {
+        state.formStatus = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(updateCategory.pending, (state) => {
+        state.formStatus = "loading";
+        state.error = null;
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
-        const idx = state.list.findIndex(
+        state.formStatus = "succeeded";
+        const idx = state.list.content.findIndex(
           (c) => c.categoryId === action.payload.categoryId
         );
-        if (idx !== -1) state.list[idx] = action.payload;
+        if (idx !== -1) state.list.content[idx] = action.payload;
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.formStatus = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(deleteCategory.pending, (state) => {
+        state.formStatus = "loading";
+        state.error = null;
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
-        state.list = state.list.filter((c) => c.categoryId !== action.payload);
+        state.formStatus = "succeeded";
+        state.list.content = state.list.content.filter(
+          (c) => c.categoryId !== action.payload
+        );
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
+        state.formStatus = "failed";
+        state.error = action.error.message;
       });
   },
 });

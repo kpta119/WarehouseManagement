@@ -5,7 +5,7 @@ const DateInput = ({ label, value, setValue }) => (
       type="date"
       name="fromDate"
       value={value}
-      onChange={setValue}
+      onChange={(e) => setValue(e.target.value)}
       className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
     />
   </div>

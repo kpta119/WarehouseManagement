@@ -19,8 +19,10 @@ const ProductForm = () => {
     current: product,
     status: prodStatus,
     error: prodError,
+    formStatus,
   } = useSelector((state) => state.products);
-  const { list: categories } = useSelector((state) => state.categories);
+  const { list: dataCategories } = useSelector((state) => state.categories);
+  const { content: categories } = dataCategories;
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -29,7 +31,7 @@ const ProductForm = () => {
     categoryId: "",
   });
   useEffect(() => {
-    dispatch(fetchCategories());
+    dispatch(fetchCategories({ all: true }));
     if (isEdit) dispatch(fetchProductById(id));
   }, [dispatch, id, isEdit]);
   useEffect(() => {
@@ -47,7 +49,7 @@ const ProductForm = () => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
       ...form,
@@ -55,12 +57,16 @@ const ProductForm = () => {
       unitSize: parseFloat(form.unitSize),
       categoryId: parseInt(form.categoryId, 10),
     };
+    let result;
     if (isEdit) {
-      dispatch(updateProduct({ id: parseInt(id, 10), data: payload })).then(
-        () => navigate("/products")
+      result = await dispatch(
+        updateProduct({ id: parseInt(id, 10), data: payload })
       );
     } else {
-      dispatch(createProduct(payload)).then(() => navigate("/products"));
+      result = await dispatch(createProduct(payload));
+    }
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate("/products");
     }
   };
   if ((isEdit && prodStatus === "loading") || prodStatus === "idle") {
@@ -83,6 +89,9 @@ const ProductForm = () => {
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Produkt" : "Nowy Produkt"}
       </h1>
+      {formStatus === "failed" && (
+        <p className="text-red-500 mb-4">Błąd: {prodError}</p>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
@@ -165,12 +174,17 @@ const ProductForm = () => {
             <FaChevronDown className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
         </div>
-        {prodError && <p className="text-red-500">{prodError}</p>}
         <button
           type="submit"
           className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition cursor-pointer duration-200"
         >
-          {isEdit ? "Aktualizuj Produkt" : "Stwórz Produkt"}
+          {formStatus === "loading" ? (
+            <Spinner color="white" />
+          ) : isEdit ? (
+            "Aktualizuj Produkt"
+          ) : (
+            "Stwórz Produkt"
+          )}
         </button>
       </form>
     </div>

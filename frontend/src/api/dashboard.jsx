@@ -1,4 +1,8 @@
 import apiClient from "../utils/apiClient";
 
-export const getDashboardSummary = (warehouseId) =>
-  apiClient.get("/api/dashboard/summary", { params: { warehouseId } });
+const dashboardAPI = {
+  get: (warehouseId) =>
+    apiClient.get("/api/dashboard/summary", { params: { warehouseId } }),
+};
+
+export default dashboardAPI;

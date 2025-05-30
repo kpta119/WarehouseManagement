@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getDashboardSummary } from "../../api/dashboard";
+import dashboardAPI from "../../api/dashboard";
 
 export const fetchDashboardSummary = createAsyncThunk(
   "dashboard/fetchSummary",
   async (warehouseId) => {
-    const response = await getDashboardSummary(warehouseId);
+    const response = await dashboardAPI.get(warehouseId);
     return response.data;
   }
 );
@@ -17,6 +17,8 @@ const summarySlice = createSlice({
     builder
       .addCase(fetchDashboardSummary.pending, (state) => {
         state.status = "loading";
+        state.data = null;
+        state.error = null;
       })
       .addCase(fetchDashboardSummary.fulfilled, (state, action) => {
         state.status = "succeeded";
