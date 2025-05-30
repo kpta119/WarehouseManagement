@@ -506,6 +506,7 @@ public class ProductControllerTests {
     public void testUpdateProduct() throws Exception {
         String updatedProductJson = """
                 {
+                    "name": "LaptopV2",
                     "description": "Ola Boga",
                     "unitPrice": 99.4,
                     "unitSize": 2.0,
@@ -520,6 +521,8 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
+                jsonPath("$.name").value("LaptopV2")
+        ).andExpect(
                 jsonPath("$.description").value("Ola Boga")
         ).andExpect(
                 jsonPath("$.unitPrice").value(99.4)
@@ -528,7 +531,7 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.categoryId").value(4)
         ).andExpect(
-                jsonPath("$.name").value("Laptop")
+                jsonPath("$.name").value("LaptopV2")
         );
 
         // Verify that the product was updated in the database
@@ -546,7 +549,7 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.categoryName").value("Furniture")
         ).andExpect(
-                jsonPath("$.name").value("Laptop")
+                jsonPath("$.name").value("LaptopV2")
         );
     }
 
@@ -578,6 +581,7 @@ public class ProductControllerTests {
     public void testUpdateProductNotFound() throws Exception {
         String updatedProductJson = """
                 {
+                    "name": "Nonexistent Product",
                     "description": "Updated Description",
                     "unitPrice": 99.99,
                     "unitSize": 1.5,

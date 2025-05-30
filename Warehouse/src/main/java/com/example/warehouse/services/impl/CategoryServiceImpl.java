@@ -37,12 +37,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + categoryId));
 
-        if (categoryDto.getName() != null) {
-            category.setName(categoryDto.getName());
-        }
-        if (categoryDto.getDescription() != null) {
-            category.setDescription(categoryDto.getDescription());
-        }
+        category.setName(categoryDto.getName());
+        category.setDescription(categoryDto.getDescription());
 
         return categoryRepository.save(category);
     }

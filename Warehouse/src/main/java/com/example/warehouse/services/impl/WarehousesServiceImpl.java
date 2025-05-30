@@ -96,32 +96,22 @@ public class WarehousesServiceImpl implements WarehousesService {
         Warehouse existingWarehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
         Address Address = existingWarehouse.getAddress();
-        if (warehouseDto.getName() != null) {
-            existingWarehouse.setName(warehouseDto.getName());
-        }
-        if (warehouseDto.getCapacity() != null) {
-            existingWarehouse.setCapacity(warehouseDto.getCapacity());
-        }
-        if (warehouseDto.getStreetNumber() != null) {
-            Address.setStreetNumber(Integer.valueOf(warehouseDto.getStreetNumber()));
-        }
-        if (warehouseDto.getStreet() != null) {
-            Address.setStreet(warehouseDto.getStreet());
-        }
-        if (warehouseDto.getCity() != null && warehouseDto.getPostalCode() != null && warehouseDto.getCountryId() != null) {
-            Optional<City> foundCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
-                    warehouseDto.getPostalCode(), warehouseDto.getCity(), warehouseDto.getCountryId());
-            Country foundCountry = countryRepository.findById(warehouseDto.getCountryId())
-                    .orElseThrow(() -> new NoSuchElementException("Country not found with ID: " + warehouseDto.getCountryId()));
-            City city = foundCity.orElseGet(() -> {
-                City newCity = new City();
-                newCity.setName(warehouseDto.getCity());
-                newCity.setPostalCode(warehouseDto.getPostalCode());
-                newCity.setCountry(foundCountry);
-                return cityRepository.save(newCity);
-            });
-            Address.setCity(city);
-        }
+        existingWarehouse.setName(warehouseDto.getName());
+        existingWarehouse.setCapacity(warehouseDto.getCapacity());
+        Address.setStreetNumber(Integer.valueOf(warehouseDto.getStreetNumber()));
+        Address.setStreet(warehouseDto.getStreet());
+        Optional<City> foundCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
+                warehouseDto.getPostalCode(), warehouseDto.getCity(), warehouseDto.getCountryId());
+        Country foundCountry = countryRepository.findById(warehouseDto.getCountryId())
+                .orElseThrow(() -> new NoSuchElementException("Country not found with ID: " + warehouseDto.getCountryId()));
+        City city = foundCity.orElseGet(() -> {
+            City newCity = new City();
+            newCity.setName(warehouseDto.getCity());
+            newCity.setPostalCode(warehouseDto.getPostalCode());
+            newCity.setCountry(foundCountry);
+            return cityRepository.save(newCity);
+        });
+        Address.setCity(city);
         return warehouseRepository.save(existingWarehouse);
     }
 

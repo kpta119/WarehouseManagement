@@ -379,87 +379,17 @@ public class WarehousesControllerTests {
     }
 
     @Test
-    public void testUpdateWarehouseChangeOfNameCapacityAndStreet() throws Exception {
-        String updateWarehouseJson = """
-                {
-                    "name": "Updated Warehouse",
-                    "capacity": 2000.0,
-                    "street": "Champs-Élysées",
-                    "streetNumber": "103"
-                }
-                """;
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateWarehouseJson)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.warehouseId").value(1)
-        ).andExpect(
-                jsonPath("$.name").value("Updated Warehouse")
-        ).andExpect(
-                jsonPath("$.capacity").value(2000.0)
-        ).andExpect(
-                jsonPath("$.addressId").value(1)
-        );
-
-        // Verify the warehouse was updated in the database
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.name").value("Updated Warehouse")
-        ).andExpect(
-                jsonPath("$.capacity").value(2000.0)
-        ).andExpect(
-                jsonPath("$.address").value("Champs-Élysées 103, Paris")
-        );
-    }
-
-    @Test
-    public void testUpdateWarehouseChangeAddressNewCityNameAndPostCode() throws Exception {
-        String updateWarehouseJson = """
-                {
-                    "city": "Lyon",
-                    "postalCode": "69001",
-                    "countryId": 1
-                }
-                """;
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateWarehouseJson)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.warehouseId").value(1)
-        ).andExpect(
-                jsonPath("$.addressId").value(1)
-        );
-
-        // Verify the address was updated in the database
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.address").value("Champs-Élysées 101, Lyon")
-        );
-    }
-
-    @Test
     public void testUpdateWarehouseChangeAddressCityExists() throws Exception {
         String updateWarehouseJson = """
                 {
+                    "name": "Ale cool",
+                    "capacity": 2000.0,
+                    "regionId": 3,
+                    "countryId": 3,
                     "city": "New York",
                     "postalCode": "10001",
-                    "countryId": 3
+                    "street": "Champs-Élysées",
+                    "streetNumber": "102"
                 }
                 """;
 
@@ -482,7 +412,7 @@ public class WarehousesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.address").value("Champs-Élysées 101, New York")
+                jsonPath("$.address").value("Champs-Élysées 102, New York")
         );
     }
 

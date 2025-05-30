@@ -161,7 +161,8 @@ public class CategoriesControllerTests {
     public void testUpdateCategoryWithOnlyOneData() throws Exception {
         String invalidCategoryJson = """
                 {
-                    "name": "New name"
+                    "name": "New name",
+                    "description": "Gadgets and devicesV2"
                 }
                 """;
 
@@ -174,7 +175,7 @@ public class CategoriesControllerTests {
         ).andExpect(
                 jsonPath("$.name").value("New name")
         ).andExpect(
-                jsonPath("$.description").value("Gadgets and devices")
+                jsonPath("$.description").value("Gadgets and devicesV2")
         ).andExpect(
                 jsonPath("$.categoryId").value(1)
         );
@@ -189,7 +190,7 @@ public class CategoriesControllerTests {
         ).andExpect(
                 jsonPath("$.content[0].name").value("New name")
         ).andExpect(
-                jsonPath("$.content[0].description").value("Gadgets and devices")
+                jsonPath("$.content[0].description").value("Gadgets and devicesV2")
         ).andExpect(
                 jsonPath("$.content[0].categoryId").value(1)
         );

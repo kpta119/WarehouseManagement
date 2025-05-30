@@ -131,23 +131,13 @@ public class ProductsServiceImpl implements ProductsService {
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new NoSuchElementException("Product not found with ID: " + productId));
 
-        if (product.getName() != null) {
-            existingProduct.setName(product.getName());
-        }
-        if (product.getDescription() != null) {
-            existingProduct.setDescription(product.getDescription());
-        }
-        if (product.getUnitPrice() != null) {
-            existingProduct.setUnitPrice(product.getUnitPrice());
-        }
-        if (product.getUnitSize() != null) {
-            existingProduct.setUnitSize(product.getUnitSize());
-        }
-        if (product.getCategoryId() != null) {
-            Category category = categoryRepository.findById(product.getCategoryId())
-                    .orElseThrow(() -> new NoSuchElementException("Category not found with ID: " + product.getCategoryId()));
-            existingProduct.setCategory(category);
-        }
+        existingProduct.setName(product.getName());
+        existingProduct.setDescription(product.getDescription());
+        existingProduct.setUnitPrice(product.getUnitPrice());
+        existingProduct.setUnitSize(product.getUnitSize());
+        Category category = categoryRepository.findById(product.getCategoryId())
+                .orElseThrow(() -> new NoSuchElementException("Category not found with ID: " + product.getCategoryId()));
+        existingProduct.setCategory(category);
 
         return productRepository.save(existingProduct);
     }

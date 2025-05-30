@@ -5,6 +5,7 @@ import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
 import com.example.warehouse.mappers.CategoryMapper;
 import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
+import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -60,7 +61,7 @@ public class CategoriesController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<?> updateCategory(@PathVariable Integer categoryId, @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<?> updateCategory(@PathVariable Integer categoryId, @Validated(OnUpdate.class) @RequestBody CategoryDto categoryDto) {
         try {
             Category updatedCategory = categoryService.updateCategory(categoryId, categoryDto);
             return ResponseEntity.ok(categoryMapper.mapToDto(updatedCategory));

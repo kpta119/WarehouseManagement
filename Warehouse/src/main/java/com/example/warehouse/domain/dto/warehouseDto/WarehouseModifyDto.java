@@ -15,18 +15,18 @@ import lombok.NoArgsConstructor;
 public class WarehouseModifyDto {
     private Integer warehouseId;
 
-    @NotBlank(message = "Name cannot be blank", groups = {OnCreate.class})
+    @NotBlank(message = "Name cannot be blank", groups = {OnCreate.class, OnUpdate.class})
     private String name;
 
-    @NotNull(message = "Capacity cannot be null", groups = {OnCreate.class})
+    @NotNull(message = "Capacity cannot be null", groups = {OnCreate.class, OnUpdate.class})
     @Positive(message = "Capacity must be positive", groups = {OnCreate.class, OnUpdate.class})
     private Double capacity;
 
-    @NotNull(message = "RegionId cannot be null", groups = {OnCreate.class})
+    @NotNull(message = "RegionId cannot be null", groups = {OnCreate.class, OnUpdate.class})
     @Positive(message = "RegionId must be positive", groups = {OnCreate.class, OnUpdate.class})
     private Integer regionId;
 
-    @NotNull(message = "CountryId cannot be null", groups = {OnCreate.class})
+    @NotNull(message = "CountryId cannot be null", groups = {OnCreate.class, OnUpdate.class})
     @Positive(message = "CountryId must be positive", groups = {OnCreate.class, OnUpdate.class})
     private Integer countryId;
 
