@@ -38,7 +38,7 @@ public class ProductsController {
         this.productMapper = productMapper;
     }
 
-    @GetMapping("/search")
+    @GetMapping()
     public ResponseEntity<?> getAllProducts(
             @ModelAttribute ProductSearchFilterDto productFilters,
             @RequestParam(defaultValue = "0") int page,
@@ -46,14 +46,15 @@ public class ProductsController {
             @RequestParam(defaultValue = "false") boolean all
     ) {
         try {
-            Page<Object[]> productsWithInventory;
+            Pageable pageable;
             if (all) {
-                productsWithInventory = productsService.getAllProducts(productFilters, Pageable.unpaged());
+                pageable = Pageable.unpaged();
             } else {
-                productsWithInventory = productsService.getAllProducts(productFilters, PageRequest.of(page, size));
+                pageable = PageRequest.of(page, size);
             }
+            Page<Object[]> productsWithInventory = productsService.getAllProducts(productFilters, pageable);
             List<Integer> lowStockProductIds = productsService.getLowStockProductIds(productFilters.getWarehouseId(), lowStockThreshold);
-            List<Integer> bestSellingProducts = productsService.getBestSellingProducts(productFilters.getWarehouseId(), Period.year, topN);
+            List<Integer> bestSellingProducts = productsService.getBestSellingProducts(productFilters.getWarehouseId(), Period.allTime, topN);
             Page<ProductSearchEndpointDto> dtos = productsWithInventory.map(product -> productMapper.mapToDto(
                     product,
                     lowStockProductIds,

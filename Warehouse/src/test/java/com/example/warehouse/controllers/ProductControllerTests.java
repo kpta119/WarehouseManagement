@@ -33,7 +33,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsAllProducts() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
@@ -53,7 +53,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsByName() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("name", "Laptop")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
@@ -74,7 +74,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsByCategoryId() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("categoryId", "1")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
@@ -95,7 +95,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsInCorrectPriceBracket() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("minPrice", "30")
                         .param("maxPrice", "800")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +117,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsInCorrectSizeBracket() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("minSize", "0")
                         .param("maxSize", "0.5")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +139,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsByWarehouseId() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("warehouseId", "2")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
@@ -168,7 +168,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsWithCorrectInventoryCountBrackets() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("minInventory", "5")
                         .param("maxInventory", "10")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,7 +194,7 @@ public class ProductControllerTests {
     @Test
     public void testReturnsProductsWithCorrectTransactionCountBrackets() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("minTransactions", "2")
                         .param("maxTransactions", "2")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -429,7 +429,7 @@ public class ProductControllerTests {
 
         // Verify that the product was created in the database
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("name", "New Product")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
