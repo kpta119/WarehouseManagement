@@ -28,11 +28,11 @@ public class WarehousesMapper {
         dto.setCapacity((Double) warehouse[2]);
         dto.setOccupiedCapacity((double) warehouse[3]);
         dto.setAddress(
-                warehouse[4] + " " + warehouse[5] + ", " + warehouse[6]
+                warehouse[4] + " " + warehouse[5] + " " + warehouse[6] + ", " + warehouse[7]
         );
-        dto.setEmployeesCount(((Number) warehouse[7]).intValue());
-        dto.setProductsSum(((Number) warehouse[8]).intValue());
-        dto.setTransactionsCount(((Number) warehouse[9]).intValue());
+        dto.setEmployeesCount(((Number) warehouse[8]).intValue());
+        dto.setProductsSum(((Number) warehouse[9]).intValue());
+        dto.setTransactionsCount(((Number) warehouse[10]).intValue());
         return dto;
     }
 

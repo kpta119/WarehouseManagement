@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WarehousesSearchFilters {
+    private String name;
     private Double minCapacity;
     private Double maxCapacity;
     private Double minOccupied;

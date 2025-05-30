@@ -36,7 +36,7 @@ public class WarehousesControllerTests {
         ).andExpect(
                 jsonPath("$.content[0].occupiedCapacity").value(500.0)
         ).andExpect(
-                jsonPath("$.content[0].address").value("Champs-Élysées 101, Paris")
+                jsonPath("$.content[0].address").value("Champs-Élysées 101 Paris, France")
         ).andExpect(
                 jsonPath("$.content[0].employeesCount").value(2)
         ).andExpect(
