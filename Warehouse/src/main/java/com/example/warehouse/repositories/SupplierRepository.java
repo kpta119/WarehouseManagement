@@ -16,21 +16,22 @@ public interface SupplierRepository extends CrudRepository<Supplier, Integer>, J
     @Query(value = """
     SELECT s, COUNT(t)
     FROM Supplier s
-    LEFT JOIN Transaction t ON t.supplier.id = s.id AND (:warehouseId IS NULL OR t.fromWarehouse.id = :warehouseId)
+    LEFT JOIN Transaction t ON t.supplier.id = s.id AND (:warehouseId IS NULL OR t.toWarehouse.id = :warehouseId)
     WHERE (:regionName IS NULL OR s.address.city.country.region.name = :regionName)
     GROUP BY s
-    HAVING (:minTransactions IS NULL OR 
-            (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.supplier.id = s.id) >= :minTransactions)
-       AND (:maxTransactions IS NULL OR 
-            (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.supplier.id = s.id) <= :maxTransactions)
+    HAVING (:minTransactions IS NULL OR COUNT(t) >= :minTransactions)
+    AND (:maxTransactions IS NULL OR COUNT(t) <= :maxTransactions)
     """,
             countQuery = """
-    SELECT COUNT(*) FROM Supplier s
-    WHERE (:regionName IS NULL OR s.address.city.country.region.name = :regionName)
-      AND (:minTransactions IS NULL OR 
-           (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.supplier.id = s.id) >= :minTransactions)
-      AND (:maxTransactions IS NULL OR 
-           (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.supplier.id = s.id) <= :maxTransactions)
+    SELECT COUNT(*) FROM (
+    SELECT s.id as supplier_id
+      FROM Supplier s
+      LEFT JOIN Transaction t ON t.supplier.id = s.id AND (:warehouseId IS NULL OR t.toWarehouse.id = :warehouseId)
+      WHERE (:regionName IS NULL OR s.address.city.country.region.name = :regionName)
+      GROUP BY s
+      HAVING (:minTransactions IS NULL OR COUNT(t) >= :minTransactions)
+         AND (:maxTransactions IS NULL OR COUNT(t) <= :maxTransactions)
+                ) AS counted
     """)
     Page<Object[]> findAllSuppliersWithTransactionCounts(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable);
 

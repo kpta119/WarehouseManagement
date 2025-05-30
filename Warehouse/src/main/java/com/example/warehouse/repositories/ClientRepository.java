@@ -18,18 +18,20 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
     LEFT JOIN Transaction t ON t.client.id = c.id AND (:warehouseId IS NULL OR t.fromWarehouse.id = :warehouseId)
     WHERE (:regionName IS NULL OR c.address.city.country.region.name = :regionName)
     GROUP BY c
-    HAVING (:minTransactions IS NULL OR 
-            (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.client.id = c.id) >= :minTransactions)
-       AND (:maxTransactions IS NULL OR 
-            (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.client.id = c.id) <= :maxTransactions)
+    HAVING (:minTransactions IS NULL OR COUNT(t) >= :minTransactions)
+    AND (:maxTransactions IS NULL OR COUNT(t) <= :maxTransactions)
+    
     """,
         countQuery = """
-    SELECT COUNT(*) FROM Client c
-    WHERE (:regionName IS NULL OR c.address.city.country.region.name = :regionName)
-      AND (:minTransactions IS NULL OR 
-           (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.client.id = c.id) >= :minTransactions)
-      AND (:maxTransactions IS NULL OR 
-           (SELECT COUNT(tAll) FROM Transaction tAll WHERE tAll.client.id = c.id) <= :maxTransactions)
+    SELECT COUNT(*) FROM (
+      SELECT c.id as client_id
+      FROM Client c
+      LEFT JOIN Transaction t ON t.client.id = c.id AND (:warehouseId IS NULL OR t.fromWarehouse.id = :warehouseId)
+      WHERE (:regionName IS NULL OR c.address.city.country.region.name = :regionName)
+      GROUP BY c
+      HAVING (:minTransactions IS NULL OR COUNT(t) >= :minTransactions)
+         AND (:maxTransactions IS NULL OR COUNT(t) <= :maxTransactions)
+                ) AS counted
     """)
     Page<Object[]> findAllClientsWithTransactionCounts(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable);
 
