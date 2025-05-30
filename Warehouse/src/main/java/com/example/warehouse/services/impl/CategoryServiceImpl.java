@@ -4,9 +4,10 @@ import com.example.warehouse.domain.Category;
 import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
 import com.example.warehouse.repositories.CategoryRepository;
 import com.example.warehouse.services.CategoryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -18,8 +19,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public Page<Category> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
     }
 
     @Override
@@ -36,10 +37,10 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new NoSuchElementException("Category not found with id: " + categoryId));
 
-        if(categoryDto.getName() != null) {
+        if (categoryDto.getName() != null) {
             category.setName(categoryDto.getName());
         }
-        if(categoryDto.getDescription() != null) {
+        if (categoryDto.getDescription() != null) {
             category.setDescription(categoryDto.getDescription());
         }
 

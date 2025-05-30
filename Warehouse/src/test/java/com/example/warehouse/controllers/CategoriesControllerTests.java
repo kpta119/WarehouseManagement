@@ -28,13 +28,13 @@ public class CategoriesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(5)
+                jsonPath("$.content.length()").value(5)
         ).andExpect(
-                jsonPath("$[0].name").value("Electronics")
+                jsonPath("$.content[0].name").value("Electronics")
         ).andExpect(
-                jsonPath("$[0].description").value("Gadgets and devices")
+                jsonPath("$.content[0].description").value("Gadgets and devices")
         ).andExpect(
-                jsonPath("$[0].categoryId").value(1)
+                jsonPath("$.content[0].categoryId").value(1)
         );
     }
 
@@ -68,13 +68,13 @@ public class CategoriesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(6)
+                jsonPath("$.content.length()").value(6)
         ).andExpect(
-                jsonPath("$[5].name").value("New Category")
+                jsonPath("$.content[5].name").value("New Category")
         ).andExpect(
-                jsonPath("$[5].description").value("Description of new category")
+                jsonPath("$.content[5].description").value("Description of new category")
         ).andExpect(
-                jsonPath("$[5].categoryId").value(6)
+                jsonPath("$.content[5].categoryId").value(6)
         );
     }
 
@@ -129,11 +129,11 @@ public class CategoriesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$[0].name").value("Updated Category")
+                jsonPath("$.content[0].name").value("Updated Category")
         ).andExpect(
-                jsonPath("$[0].description").value("Updated description")
+                jsonPath("$.content[0].description").value("Updated description")
         ).andExpect(
-                jsonPath("$[0].categoryId").value(1)
+                jsonPath("$.content[0].categoryId").value(1)
         );
     }
 
@@ -187,11 +187,11 @@ public class CategoriesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$[0].name").value("New name")
+                jsonPath("$.content[0].name").value("New name")
         ).andExpect(
-                jsonPath("$[0].description").value("Gadgets and devices")
+                jsonPath("$.content[0].description").value("Gadgets and devices")
         ).andExpect(
-                jsonPath("$[0].categoryId").value(1)
+                jsonPath("$.content[0].categoryId").value(1)
         );
     }
 
@@ -223,13 +223,13 @@ public class CategoriesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(5)
+                jsonPath("$.content.length()").value(5)
         ).andExpect(
-                jsonPath("$[0].name").value("Electronics")
+                jsonPath("$.content[0].name").value("Electronics")
         ).andExpect(
-                jsonPath("$[0].description").value("Gadgets and devices")
+                jsonPath("$.content[0].description").value("Gadgets and devices")
         ).andExpect(
-                jsonPath("$[0].categoryId").value(1)
+                jsonPath("$.content[0].categoryId").value(1)
         );
     }
 
@@ -257,7 +257,7 @@ public class CategoriesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(5)
+                jsonPath("$.content.length()").value(5)
         );
     }
 }
