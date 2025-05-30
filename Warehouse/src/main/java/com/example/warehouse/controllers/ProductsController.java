@@ -5,6 +5,7 @@ import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
+import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import com.example.warehouse.mappers.ProductMapper;
 import com.example.warehouse.services.ProductsService;
@@ -20,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -70,7 +70,7 @@ public class ProductsController {
     public ResponseEntity<?> getProduct(@PathVariable Integer productId) {
         try {
             Product product = productsService.getProductByIdWithProductInventory(productId);
-            Map<Integer, Integer> inventory = productsService.getInventoryMap(product);
+            List<ProductsInventoryDto> inventory = productsService.getProductsInventory(product);
             List<ProductTransactionInfoDto> transactions = productsService.getTransactionsDto(productId);
             return ResponseEntity.ok(productMapper.mapToDto(product, inventory, transactions));
         } catch (NoSuchElementException e) {

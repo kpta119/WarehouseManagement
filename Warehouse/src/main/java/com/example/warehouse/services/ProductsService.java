@@ -4,13 +4,13 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
+import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ProductsService {
 
@@ -18,7 +18,7 @@ public interface ProductsService {
 
     Product getProductByIdWithProductInventory(Integer productId);
 
-    Map<Integer, Integer> getInventoryMap(Product product);
+    List<ProductsInventoryDto> getProductsInventory(Product product);
 
     List<ProductTransactionInfoDto> getTransactionsDto(Integer productId);
 

@@ -223,9 +223,13 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.inventory.length()").value(2)
         ).andExpect(
-                jsonPath("$.inventory['1']").value(2)
+                jsonPath("$.inventory[0].quantity").value(2)
         ).andExpect(
-                jsonPath("$.inventory['2']").value(3)
+                jsonPath("$.inventory[0].warehouseId").value(1)
+        ).andExpect(
+                jsonPath("$.inventory[1].quantity").value(3)
+        ).andExpect(
+                jsonPath("$.inventory[1].warehouseId").value(2)
         ).andExpect(
                 jsonPath("$.transactions.length()").value(2)
         ).andExpect(
@@ -236,6 +240,10 @@ public class ProductControllerTests {
                 jsonPath("$.transactions[1].transactionId").value(2)
         ).andExpect(
                 jsonPath("$.transactions[1].quantity").value(5)
+        ).andExpect(
+                jsonPath("$.transactions[0].employeeName").value("John Doe")
+        ).andExpect(
+                jsonPath("$.transactions[1].employeeName").value("Jane Smith")
         );
     }
 

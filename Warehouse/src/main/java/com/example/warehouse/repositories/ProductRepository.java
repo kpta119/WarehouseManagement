@@ -45,8 +45,9 @@ public interface ProductRepository extends CrudRepository<Product, Integer>, Jpa
     Optional<Product> findByIdWithProductInventory(@Param("productId") Integer productId);
 
     @EntityGraph(attributePaths = {
+            "productTransactions",
             "productTransactions.transaction",
-            "productTransactions"
+            "productTransactions.transaction.employee"
     })
     @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Optional<Product> findByIdWithTransactionProduct(@Param("productId") Integer productId);

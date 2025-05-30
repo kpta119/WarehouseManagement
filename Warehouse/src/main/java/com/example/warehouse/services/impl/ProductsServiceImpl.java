@@ -1,12 +1,10 @@
 package com.example.warehouse.services.impl;
 
-import com.example.warehouse.domain.Category;
-import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.ProductInventory;
-import com.example.warehouse.domain.TransactionProduct;
+import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
+import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import com.example.warehouse.repositories.CategoryRepository;
 import com.example.warehouse.repositories.ProductInventoryRepository;
@@ -23,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -56,14 +53,19 @@ public class ProductsServiceImpl implements ProductsService {
     }
 
     @Override
-    public Map<Integer, Integer> getInventoryMap(Product product) {
+    public List<ProductsInventoryDto> getProductsInventory(Product product) {
         List<ProductInventory> productInventories = product.getProductInventories();
         return productInventories.stream()
-                .collect(Collectors.toMap(
-                        pi -> pi.getWarehouse().getId(),
-                        ProductInventory::getQuantity,
-                        Integer::sum
-                ));
+                .map(productInventory -> {
+                    Warehouse warehouse = productInventory.getWarehouse();
+                    ProductsInventoryDto inventoryDto = new ProductsInventoryDto();
+
+                    inventoryDto.setWarehouseId(warehouse.getId());
+                    inventoryDto.setWarehouseName(warehouse.getName());
+                    inventoryDto.setQuantity(productInventory.getQuantity());
+                    return inventoryDto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -73,12 +75,17 @@ public class ProductsServiceImpl implements ProductsService {
 
         List<TransactionProduct> transactions = product.getProductTransactions();
         return transactions.stream().map(transactionProduct -> {
+            Employee employee = transactionProduct.getTransaction().getEmployee();
+            Transaction transaction = transactionProduct.getTransaction();
             ProductTransactionInfoDto transactionInfoDto = new ProductTransactionInfoDto();
-            transactionInfoDto.setTransactionId(transactionProduct.getTransaction().getId());
-            transactionInfoDto.setDate(simpleDateFormat.format(transactionProduct.getTransaction().getDate()));
-            transactionInfoDto.setType(transactionProduct.getTransaction().getTransactionType().name());
+
+            transactionInfoDto.setTransactionId(transaction.getId());
+            transactionInfoDto.setDate(simpleDateFormat.format(transaction.getDate()));
+            transactionInfoDto.setType(transaction.getTransactionType().name());
             transactionInfoDto.setPrice(transactionProduct.getTransactionPrice());
             transactionInfoDto.setQuantity(transactionProduct.getQuantity());
+            transactionInfoDto.setEmployeeId(employee.getId());
+            transactionInfoDto.setEmployeeName(employee.getName() + " " + employee.getSurname());
             return transactionInfoDto;
         }).collect(Collectors.toList());
     }

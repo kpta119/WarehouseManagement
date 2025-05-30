@@ -13,4 +13,6 @@ public class ProductTransactionInfoDto {
     private String type;
     private Double price;
     private Integer quantity;
+    private Integer employeeId;
+    private String employeeName;
 }

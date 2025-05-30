@@ -5,11 +5,11 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductGetSingleProductDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
+import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class ProductMapper {
@@ -31,7 +31,7 @@ public class ProductMapper {
         return dto;
     }
 
-    public ProductGetSingleProductDto mapToDto(Product product, Map<Integer, Integer> inventory, List<ProductTransactionInfoDto> transactions) {
+    public ProductGetSingleProductDto mapToDto(Product product, List<ProductsInventoryDto> inventory, List<ProductTransactionInfoDto> transactions) {
         ProductGetSingleProductDto dto = new ProductGetSingleProductDto();
         dto.setProductId(product.getId());
         dto.setName(product.getName());
@@ -40,6 +40,7 @@ public class ProductMapper {
         dto.setUnitSize(product.getUnitSize());
         if (product.getCategory() != null) {
             dto.setCategoryName(product.getCategory().getName());
+            dto.setCategoryId(product.getCategory().getId());
         }
         dto.setInventory(inventory);
         dto.setTransactions(transactions);
