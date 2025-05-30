@@ -1,5 +1,7 @@
 package com.example.warehouse.mappers;
 
+import com.example.warehouse.domain.Address;
+import com.example.warehouse.domain.City;
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
@@ -24,7 +26,11 @@ public class BusinesEntityWithHistoryMapper {
     public ClientWithHistoryDto mapToDto(Client client) {
         ClientWithHistoryDto dto = new ClientWithHistoryDto();
         dto.setClientId(client.getId());
-        dto.setAddress(addressMapper.mapToDto(client.getAddress()));
+        Address address = client.getAddress();
+        City city = address.getCity();
+        dto.setAddress(
+                address.getStreet() + " " + address.getStreetNumber() + " " + city.getName() + ", " + city.getCountry().getName()
+        );
         dto.setEmail(client.getEmail());
         dto.setName(client.getName());
         dto.setPhoneNumber(client.getPhoneNumber());

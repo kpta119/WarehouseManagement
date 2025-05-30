@@ -8,6 +8,7 @@ import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
+import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
 import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
 import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.repositories.AddressRepository;
@@ -78,8 +79,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Page<ClientSummaryDto> getClientsWithTransactionCount(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable){
-        Page<Object[]> results = clientRepository.findAllClientsWithTransactionCounts(regionName, minTransactions, maxTransactions, warehouseId, pageable);
+    public Page<ClientSummaryDto> getClientsWithTransactionCount(ClientSearchFilters filters, Pageable pageable){
+        Page<Object[]> results = clientRepository.findAllClientsWithTransactionCounts(filters, pageable);
         return results.map(businessEntitySummaryMapper::mapToClientDto);
     }
 
