@@ -7,12 +7,16 @@ import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { FaChevronDown, FaExchangeAlt, FaPlus, FaTrash } from "react-icons/fa";
 import Spinner from "../helper/Spinner";
 import { Link } from "react-router-dom";
+import { currencyFormatter } from "../../utils/helpers";
 
 const TransferPage = () => {
   const dispatch = useDispatch();
-  const { list: warehouses } = useSelector((s) => s.warehouses);
-  const { list: products } = useSelector((s) => s.products);
-  const { list: employees } = useSelector((s) => s.employees);
+  const { list: dataWarehouses } = useSelector((s) => s.warehouses);
+  const { content: warehouses } = dataWarehouses;
+  const { list: dataProducts } = useSelector((s) => s.products);
+  const { content: products } = dataProducts;
+  const { list: dataEmployees } = useSelector((s) => s.employees);
+  const { content: employees } = dataEmployees;
   const { status, error, transaction } = useSelector(
     (s) => s.inventory.transfer
   );
@@ -181,7 +185,7 @@ const TransferPage = () => {
           <label className="text-sm font-medium">Produkty oraz ich ilość</label>
           {form.items.map((item, idx) => (
             <div key={idx} className="grid grid-cols-5 gap-2 items-end">
-              <div className="col-span-3">
+              <div className="col-span-2">
                 <div className="relative">
                   <select
                     required
@@ -213,6 +217,19 @@ const TransferPage = () => {
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
                 />
+              </div>{" "}
+              <div className="text-gray-800 flex items-center justify-center h-full">
+                {products.find(
+                  (product) => product.productId === +item.productId
+                ) && (
+                  <p>
+                    {currencyFormatter(
+                      products.find(
+                        (product) => product.productId === +item.productId
+                      )?.unitPrice * item.quantity
+                    )}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
@@ -232,6 +249,21 @@ const TransferPage = () => {
           </button>
         </div>
         <div className="pt-4 border-t">
+          <h3 className="text-lg font-semibold mb-2">
+            Łącznie:{" "}
+            <span className="text-pink-600">
+              {currencyFormatter(
+                form.items.reduce((total, item) => {
+                  const product = products.find(
+                    (p) => p.productId === +item.productId
+                  );
+                  return (
+                    total + (product ? product.unitPrice * item.quantity : 0)
+                  );
+                }, 0)
+              )}
+            </span>
+          </h3>
           <button
             type="submit"
             disabled={status === "loading"}

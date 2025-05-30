@@ -11,12 +11,13 @@ import FormList from "../Layout/FormList";
 
 const CategoryList = () => {
   const dispatch = useDispatch();
-  const { list: categories, status, error } = useSelector((s) => s.categories);
+  const { list: data, status, error } = useSelector((s) => s.categories);
+  const { content: categories, page: pageInfo, formStatus } = data;
+  const { totalPages } = pageInfo;
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
-  const totalPages = 10;
   useEffect(() => {
     setPage(1);
   }, [debouncedSearchTerm]);
@@ -77,25 +78,28 @@ const CategoryList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-red-500">Nie znaleziono kategorii</p>
       ) : (
-        <ItemsList
-          pagination={{ page, setPage, totalPages }}
-          labels={[
-            { name: "Nazwa", type: "Link" },
-            { name: "Opis", type: "Text-Long" },
-          ]}
-          data={filtered.map((item) => ({
-            id: item.categoryId,
-            name: item.name,
-            description: item.description,
-          }))}
-          actions={{
-            get: true,
-            put: true,
-            delete: true,
-          }}
-          path="categories"
-          handleDelete={handleDelete}
-        />
+        <>
+          {error && <p className="text-red-500">Błąd: {error}</p>}
+          <ItemsList
+            pagination={{ page, setPage, totalPages }}
+            labels={[
+              { name: "Nazwa", type: "Link" },
+              { name: "Opis", type: "Text-Long" },
+            ]}
+            data={filtered.map((item) => ({
+              id: item.categoryId,
+              name: item.name,
+              description: item.description,
+            }))}
+            actions={{
+              get: true,
+              put: true,
+              delete: true,
+            }}
+            path="categories"
+            handleDelete={handleDelete}
+          />
+        </>
       )}
     </>
   );

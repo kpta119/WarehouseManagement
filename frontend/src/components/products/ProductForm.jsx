@@ -21,7 +21,8 @@ const ProductForm = () => {
     error: prodError,
     formStatus,
   } = useSelector((state) => state.products);
-  const { list: categories } = useSelector((state) => state.categories);
+  const { list: dataCategories } = useSelector((state) => state.categories);
+  const { content: categories } = dataCategories;
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -30,7 +31,7 @@ const ProductForm = () => {
     categoryId: "",
   });
   useEffect(() => {
-    dispatch(fetchCategories());
+    dispatch(fetchCategories({ all: true }));
     if (isEdit) dispatch(fetchProductById(id));
   }, [dispatch, id, isEdit]);
   useEffect(() => {

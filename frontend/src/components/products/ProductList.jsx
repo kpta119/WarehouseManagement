@@ -12,12 +12,11 @@ import FormList from "../Layout/FormList";
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const {
-    list: products,
-    status,
-    error,
-  } = useSelector((state) => state.products);
-  const { list: categories } = useSelector((state) => state.categories);
+  const { list: data, status, error } = useSelector((state) => state.products);
+  const { list: dataProducts } = useSelector((state) => state.categories);
+  const { content: categories } = dataProducts;
+  const { content: products, page: pageInfo } = data;
+  const { totalPages } = pageInfo;
   const selectedWarehouse = useSelector((state) => state.selectedWarehouse);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -41,7 +40,22 @@ const ProductList = () => {
   const [page, setPage] = useState(1);
   const [sortOption, setSortOption] = useState("");
   useEffect(() => {
-    dispatch(fetchCategories());
+    setPage(1);
+  }, [
+    debouncedSearchTerm,
+    categoryFilter,
+    debouncedMinPrice,
+    debouncedMaxPrice,
+    debouncedMinSize,
+    debouncedMaxSize,
+    debouncedMinInventory,
+    debouncedMaxInventory,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
+    selectedWarehouse,
+  ]);
+  useEffect(() => {
+    dispatch(fetchCategories({ all: true }));
   }, [dispatch]);
   useEffect(() => {
     dispatch(
@@ -89,10 +103,6 @@ const ProductList = () => {
         return a.name.localeCompare(b.name);
       case "name-reverse":
         return b.name.localeCompare(a.name);
-      case "description":
-        return a.description.localeCompare(b.description);
-      case "description-reverse":
-        return b.description.localeCompare(a.description);
       case "category":
         return a.categoryName.localeCompare(b.categoryName);
       case "category-reverse":
@@ -122,7 +132,6 @@ const ProductList = () => {
       dispatch(deleteProduct(id));
     }
   };
-  const totalPages = 10;
   return (
     <>
       <FormList
@@ -215,16 +224,14 @@ const ProductList = () => {
           options: [
             { value: "name", label: "Nazwa (od A do Z)" },
             { value: "name-reverse", label: "Nazwa (od Z do A)" },
-            { value: "capacity", label: "Pojemność (rosnąco)" },
-            { value: "capacity-reverse", label: "Pojemność (malejąco)" },
-            { value: "occupied", label: "Zajęte (rosnąco)" },
-            { value: "occupied-reverse", label: "Zajęte (malejąco)" },
-            { value: "address", label: "Adres (od A do Z)" },
-            { value: "address-reverse", label: "Adres (od Z do A)" },
-            { value: "employees", label: "Pracownicy (rosnąco)" },
-            { value: "employees-reverse", label: "Pracownicy (malejąco)" },
-            { value: "products", label: "Produkty (rosnąco)" },
-            { value: "products-reverse", label: "Produkty (malejąco)" },
+            { value: "category", label: "Kategoria (od A do Z)" },
+            { value: "category-reverse", label: "Kategoria (od Z do A)" },
+            { value: "price", label: "Cena (rosnąco)" },
+            { value: "price-reverse", label: "Cena (malejąco)" },
+            { value: "size", label: "Wielkość (rosnąco)" },
+            { value: "size-reverse", label: "Wielkość (malejąco)" },
+            { value: "inventory", label: "Stan (rosnąco)" },
+            { value: "inventory-reverse", label: "Stan (malejąco)" },
             { value: "transactions", label: "Transakcje (rosnąco)" },
             { value: "transactions-reverse", label: "Transakcje (malejąco)" },
           ],
@@ -237,35 +244,54 @@ const ProductList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-red-500">Nie znaleziono produktu</p>
       ) : (
-        <ItemsList
-          pagination={{ page, setPage, totalPages }}
-          labels={[
-            { name: "Nazwa", type: "Link" },
-            { name: "Opis", type: "Text-Long" },
-            { name: "Kategoria", type: "Text" },
-            { name: "Cena", type: "Currency", className: "text-right" },
-            { name: "Wielkość", type: "Number", className: "text-right" },
-            { name: "Stan", type: "Number", className: "text-right" },
-            { name: "Transakcje", type: "Number", className: "text-right" },
-          ]}
-          data={filtered.map((item) => ({
-            id: item.productId,
-            name: item.name,
-            description: item.description,
-            categoryName: item.categoryName,
-            unitPrice: item.unitPrice,
-            unitSize: item.unitSize,
-            inventoryCount: item.inventoryCount,
-            transactionCount: item.transactionCount,
-          }))}
-          actions={{
-            get: true,
-            put: true,
-            delete: true,
-          }}
-          path="products"
-          handleDelete={handleDelete}
-        />
+        <>
+          {error && <p className="text-red-500">Błąd: {error}</p>}
+          <ItemsList
+            pagination={{ page, setPage, totalPages }}
+            labels={[
+              { name: "Nazwa", type: "Link" },
+              { name: "Opis", type: "Text-Long" },
+              { name: "Kategoria", type: "Text" },
+              { name: "Cena", type: "Currency", className: "text-right" },
+              { name: "Wielkość", type: "Number", className: "text-right" },
+              { name: "Stan", type: "Number", className: "text-right" },
+              { name: "Transakcje", type: "Number", className: "text-right" },
+            ]}
+            data={filtered.map((item) => ({
+              id: item.productId,
+              name: item.name,
+              description: item.description,
+              categoryName: item.categoryName,
+              unitPrice: item.unitPrice,
+              unitSize: item.unitSize,
+              inventoryCount: item.inventoryCount,
+              transactionCount: item.transactionCount,
+              extra: {
+                bestSelling: item.bestSelling,
+                lowStock: item.lowStock,
+              },
+            }))}
+            actions={{
+              get: true,
+              put: true,
+              delete: true,
+            }}
+            path="products"
+            handleDelete={handleDelete}
+            extra={{
+              6: {
+                key: "bestSelling",
+                label: "Bestseller!",
+                classes: "bg-green-500 text-white",
+              },
+              5: {
+                key: "lowStock",
+                label: "Niski stan!",
+                classes: "bg-orange-500 text-white",
+              },
+            }}
+          />
+        </>
       )}
     </>
   );

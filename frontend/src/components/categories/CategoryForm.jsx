@@ -15,15 +15,16 @@ const CategoryForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
-    list: categories,
+    list: data,
     status,
     error,
     formStatus,
   } = useSelector((state) => state.categories);
+  const { content: categories } = data;
   const [form, setForm] = useState({ name: "", description: "" });
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchCategories());
+      dispatch(fetchCategories({ all: true }));
     }
   }, [dispatch, status]);
   const cat = categories.find((c) => String(c.categoryId) === String(id));

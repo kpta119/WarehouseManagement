@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchProductById } from "../../features/products/productsSlice";
-import { format } from "date-fns";
 import { FaEdit, FaChevronLeft, FaEye } from "react-icons/fa";
 import {
   currencyFormatter,
@@ -10,6 +9,18 @@ import {
   numberFormatter,
 } from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as BarTooltip,
+  LineChart,
+  Line,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -42,6 +53,26 @@ const ProductDetail = () => {
     inventory,
     transactions,
   } = product;
+  const inventoryData = inventory.map(({ warehouseId, quantity }) => ({
+    warehouseId,
+    quantity,
+  }));
+  const dateMap = new Map();
+  transactions.forEach((tx) => {
+    const d = new Date(tx.date);
+    d.setHours(0, 0, 0, 0);
+    const ts = d.getTime();
+    dateMap.set(ts, {
+      quantity: (dateMap.get(ts)?.quantity || 0) + tx.quantity,
+      price: tx.price,
+    });
+  });
+  const transactionData = Array.from(dateMap.entries())
+    .map(([date, data]) => ({ date, quantity: data.quantity }))
+    .sort((a, b) => a.date - b.date);
+  const histogramData = Array.from(dateMap.entries())
+    .map(([date, data]) => ({ date, price: data.price }))
+    .sort((a, b) => a.date - b.date);
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow space-y-6">
       <div className="flex items-center justify-between">
@@ -77,33 +108,107 @@ const ProductDetail = () => {
         <strong>Jednostkowy Rozmiar: </strong>
         {numberFormatter(unitSize)}
       </p>
-      {inventory && Object.keys(inventory).length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Zasoby na Magazyn</h2>
-          <div className="grid grid-cols-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
-            <div>ID Magazynu</div>
-            <div className="text-right">Ilość</div>
-          </div>
-          <div className="divide-y divide-gray-200">
-            {Object.entries(inventory).map(([warehouseId, qty]) => (
-              <div
-                key={warehouseId}
-                className="grid grid-cols-2 p-2 text-sm text-gray-700"
-              >
-                <div className="text-pink-600">
-                  <Link
-                    to={`/warehouses/${warehouseId}`}
-                    className="hover:underline"
-                  >
-                    {warehouseId}
-                  </Link>
+      {inventory.length > 0 && (
+        <div className="flex gap-4 w-full">
+          <div className="w-1/2">
+            <h2 className="text-xl font-semibold mb-2">Zasoby na Magazyn</h2>
+            <div className="grid grid-cols-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
+              <div>Magazyn</div>
+              <div className="text-right">Ilość</div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {inventory.map(({ warehouseId, warehouseName, quantity }) => (
+                <div
+                  key={warehouseId}
+                  className="grid grid-cols-2 p-2 text-sm text-gray-700"
+                >
+                  <div className="text-pink-600">
+                    <Link
+                      to={`/warehouses/${warehouseId}`}
+                      className="hover:underline"
+                    >
+                      {warehouseName}
+                    </Link>
+                  </div>
+                  <div className="text-right">{numberFormatter(quantity)}</div>
                 </div>
-                <div className="text-right">{numberFormatter(qty)}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+          {inventoryData.length > 0 && (
+            <div className="w-1/2">
+              <h2 className="text-xl font-semibold mb-2">Zapas na magazyn</h2>
+              <ResponsiveContainer
+                width="100%"
+                height={(Object.keys(inventory).length + 1) * 40}
+              >
+                <BarChart data={inventoryData}>
+                  <XAxis dataKey="warehouseId" tick={{ fill: "#6B7280" }} />
+                  <YAxis tick={{ fill: "#6B7280" }} />
+                  <BarTooltip />
+                  <Bar dataKey="quantity" name="Ilość sztuk" fill="#3B82F6" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       )}
+      <div className="space-y-8">
+        {transactionData.length > 0 && (
+          <div>
+            <h2 className="text-xl font-semibold mb-2">
+              Wolumen transakcji w czasie
+            </h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={transactionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  type="number"
+                  scale="time"
+                  domain={["dataMin", "dataMax"]}
+                  tickFormatter={(ts) => dateFormatter(ts)}
+                  tick={{ fill: "#6B7280" }}
+                />
+                <YAxis tick={{ fill: "#6B7280" }} />
+                <Tooltip labelFormatter={(ts) => dateFormatter(ts)} />
+                <Line
+                  type="monotone"
+                  dataKey="quantity"
+                  name="Ilość sztuk"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Historia ceny produktu</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={histogramData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                type="number"
+                scale="time"
+                domain={["dataMin", "dataMax"]}
+                tickFormatter={(ts) => dateFormatter(ts)}
+                tick={{ fill: "#6B7280" }}
+              />
+              <YAxis tick={{ fill: "#6B7280" }} />
+              <Tooltip labelFormatter={(ts) => dateFormatter(ts)} />
+              <Line
+                type="monotone"
+                dataKey="price"
+                name="Cena jednostkowa"
+                stroke="#10B981"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
       {transactions.length === 0 ? (
         <p className="text-red-500">Brak transakcji.</p>
       ) : (

@@ -47,14 +47,19 @@ export const deleteCategory = createAsyncThunk(
 
 const categoriesSlice = createSlice({
   name: "categories",
-  initialState: { list: [], status: "idle", error: null, formStatus: "idle" },
+  initialState: {
+    list: { content: [], page: {} },
+    status: "idle",
+    error: null,
+    formStatus: "idle",
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCategories.pending, (state) => {
         state.status = "loading";
         state.formStatus = "idle";
-        state.list = [];
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
@@ -71,7 +76,7 @@ const categoriesSlice = createSlice({
       })
       .addCase(createCategory.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        state.list.push(action.payload);
+        state.list.content.push(action.payload);
       })
       .addCase(createCategory.rejected, (state, action) => {
         state.formStatus = "failed";
@@ -83,10 +88,10 @@ const categoriesSlice = createSlice({
       })
       .addCase(updateCategory.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        const idx = state.list.findIndex(
+        const idx = state.list.content.findIndex(
           (c) => c.categoryId === action.payload.categoryId
         );
-        if (idx !== -1) state.list[idx] = action.payload;
+        if (idx !== -1) state.list.content[idx] = action.payload;
       })
       .addCase(updateCategory.rejected, (state, action) => {
         state.formStatus = "failed";
@@ -98,7 +103,9 @@ const categoriesSlice = createSlice({
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        state.list = state.list.filter((c) => c.categoryId !== action.payload);
+        state.list.content = state.list.content.filter(
+          (c) => c.categoryId !== action.payload
+        );
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.formStatus = "failed";

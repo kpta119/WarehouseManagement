@@ -10,7 +10,8 @@ const EmployeeForm = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { list: warehouses } = useSelector((state) => state.warehouses);
+  const { list: data } = useSelector((state) => state.warehouses);
+  const { content: warehouses } = data;
   const { error, formStatus } = useSelector((state) => state.employees);
   const [form, setForm] = useState({
     name: "",
@@ -21,7 +22,7 @@ const EmployeeForm = () => {
     warehouseId: "",
   });
   useEffect(() => {
-    dispatch(fetchWarehouses());
+    dispatch(fetchWarehouses({ all: true }));
   }, [dispatch, id]);
   const handleChange = (e) => {
     const { name, value } = e.target;

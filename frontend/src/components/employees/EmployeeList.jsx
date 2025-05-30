@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaChevronDown } from "react-icons/fa";
 import { fetchEmployees } from "../../features/employees/employeesSlice";
 import { fetchRegions } from "../../features/geography/geographySlice";
-import TextInput from "../helper/TextInput";
-import SelectInput from "../helper/SelectInput";
-import NumberInput from "../helper/NumberInput";
 import Spinner from "../helper/Spinner";
 import useDebounce from "../../hooks/useDebounce";
 import ItemsList from "../Layout/ItemsList";
@@ -122,7 +118,6 @@ const EmployeeList = () => {
           sortOption,
           setSortOption,
           options: [
-            { value: "", label: "Sortuj przez" },
             { value: "name", label: "Nazwa (od A do Z)" },
             { value: "name-reverse", label: "Nazwa (od Z do A)" },
             { value: "email", label: "E-mail (od A do Z)" },
@@ -158,7 +153,7 @@ const EmployeeList = () => {
           ]}
           data={filtered.map((item) => ({
             id: item.employeeId,
-            name: item.name,
+            name: `${item.name} ${item.surname}`,
             email: item.email,
             phoneNumber: item.phoneNumber,
             position: item.position,

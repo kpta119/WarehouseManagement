@@ -12,7 +12,7 @@ export const fetchEmployees = createAsyncThunk(
 export const fetchEmployeeById = createAsyncThunk(
   "employees/fetchById",
   async (id) => {
-    const response = await employeesAPI.get(id);
+    const response = await employeesAPI.getId(id);
     return response.data;
   }
 );

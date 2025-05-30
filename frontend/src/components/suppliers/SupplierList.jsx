@@ -121,7 +121,6 @@ const SupplierList = () => {
           sortOption,
           setSortOption,
           options: [
-            { value: "", label: "Sortuj przez" },
             { value: "name", label: "Nazwa (od A do Z)" },
             { value: "name-reverse", label: "Nazwa (od Z do A)" },
             { value: "email", label: "E-mail (od A do Z)" },

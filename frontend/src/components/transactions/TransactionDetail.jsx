@@ -3,8 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchTransactionById } from "../../features/transactions/transactionsSlice";
 import { FaChevronLeft } from "react-icons/fa";
-import { format } from "date-fns";
-import { currencyFormatter, numberFormatter } from "../../utils/helpers";
+import {
+  currencyFormatter,
+  dateFormatter,
+  numberFormatter,
+} from "../../utils/helpers";
 import Spinner from "../helper/Spinner";
 
 const TransactionDetail = () => {
@@ -57,7 +60,7 @@ const TransactionDetail = () => {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <strong>Data:</strong> {format(new Date(date), "yyyy-MM-dd")}
+          <strong>Data:</strong> {dateFormatter(date)}
         </div>
         <div>
           <strong>Typ:</strong>{" "}

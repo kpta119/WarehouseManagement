@@ -10,12 +10,16 @@ import Spinner from "../helper/Spinner";
 const CategoryDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { list: categories, status, error } = useSelector((s) => s.categories);
-  const { list: products, status: prodStatus } = useSelector((s) => s.products);
+  const { list: data, status, error } = useSelector((s) => s.categories);
+  const { content: categories } = data;
+  const { list: dataProducts, status: prodStatus } = useSelector(
+    (s) => s.products
+  );
+  const { content: products } = dataProducts;
   const [productsShown, setProductsShown] = useState(25);
   useEffect(() => {
-    if (status === "idle") dispatch(fetchCategories());
-    dispatch(fetchProducts({ categoryId: id }));
+    if (status === "idle") dispatch(fetchCategories({ all: true }));
+    dispatch(fetchProducts({ categoryId: id, all: true }));
   }, [dispatch, status]);
   const cat = categories.find((c) => String(c.categoryId) === String(id));
   if (status === "loading" || status === "idle") return <Spinner />;

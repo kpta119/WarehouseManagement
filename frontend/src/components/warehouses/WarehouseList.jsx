@@ -13,10 +13,12 @@ import FormList from "../Layout/FormList";
 const WarehouseList = () => {
   const dispatch = useDispatch();
   const {
-    list: warehouses,
+    list: data,
     status,
     error,
   } = useSelector((state) => state.warehouses);
+  const { content: warehouses, page: pageInfo } = data;
+  const { totalPages } = pageInfo;
   const { regions } = useSelector((state) => state.geography);
   const [searchTerm, setSearchTerm] = useState("");
   const [regionFilter, setRegionFilter] = useState("");
@@ -43,14 +45,29 @@ const WarehouseList = () => {
   const debouncedMaxTransactions = useDebounce(maxTransactions);
   const [sortOption, setSortOption] = useState("");
   const [page, setPage] = useState(1);
-  const totalPages = 10;
+  useEffect(() => {
+    setPage(1);
+  }, [
+    debouncedSearchTerm,
+    regionFilter,
+    debouncedMinCapacity,
+    debouncedMaxCapacity,
+    debouncedMinOccupied,
+    debouncedMaxOccupied,
+    debouncedMinEmployees,
+    debouncedMaxEmployees,
+    debouncedMinProducts,
+    debouncedMaxProducts,
+    debouncedMinTransactions,
+    debouncedMaxTransactions,
+  ]);
   useEffect(() => {
     dispatch(fetchRegions());
   }, [dispatch]);
   useEffect(() => {
     dispatch(
       fetchWarehouses({
-        searchTerm: debouncedSearchTerm || undefined,
+        name: debouncedSearchTerm || undefined,
         regionId: regionFilter || undefined,
         minCapacity: debouncedMinCapacity
           ? Number(debouncedMinCapacity)
@@ -124,9 +141,9 @@ const WarehouseList = () => {
       case "employees-reverse":
         return b.employeesCount - a.employeesCount;
       case "products":
-        return a.productsCount - b.productsCount;
+        return a.productsSum - b.productsSum;
       case "products-reverse":
-        return b.productsCount - a.productsCount;
+        return b.productsSum - a.productsSum;
       case "transactions":
         return a.transactionsCount - b.transactionsCount;
       case "transactions-reverse":
@@ -270,35 +287,38 @@ const WarehouseList = () => {
       ) : filtered.length === 0 ? (
         <p className="text-red-500">Nie znaleziono magazynu</p>
       ) : (
-        <ItemsList
-          pagination={{ page, setPage, totalPages }}
-          labels={[
-            { name: "Nazwa", type: "Link" },
-            { name: "Adres", type: "Text" },
-            { name: "Pojemność", type: "Number", className: "text-right" },
-            { name: "Zajęte", type: "Number", className: "text-right" },
-            { name: "Pracownicy", type: "Number", className: "text-right" },
-            { name: "Produkty", type: "Number", className: "text-right" },
-            { name: "Transakcje", type: "Number", className: "text-right" },
-          ]}
-          data={filtered.map((item) => ({
-            id: item.warehouseId,
-            name: item.name,
-            address: item.address,
-            capacity: item.capacity,
-            occupiedCapacity: item.occupiedCapacity,
-            employeesCount: item.employeesCount,
-            productsCount: item.productsCount,
-            transactionsCount: item.transactionsCount,
-          }))}
-          actions={{
-            get: true,
-            put: true,
-            delete: true,
-          }}
-          path="warehouses"
-          handleDelete={handleDelete}
-        />
+        <>
+          {error && <p className="text-red-500">Błąd: {error}</p>}
+          <ItemsList
+            pagination={{ page, setPage, totalPages }}
+            labels={[
+              { name: "Nazwa", type: "Link" },
+              { name: "Adres", type: "Text" },
+              { name: "Pojemność", type: "Number", className: "text-right" },
+              { name: "Zajęte", type: "Number", className: "text-right" },
+              { name: "Pracownicy", type: "Number", className: "text-right" },
+              { name: "Produkty", type: "Number", className: "text-right" },
+              { name: "Transakcje", type: "Number", className: "text-right" },
+            ]}
+            data={filtered.map((item) => ({
+              id: item.warehouseId,
+              name: item.name,
+              address: item.address,
+              capacity: item.capacity,
+              occupiedCapacity: item.occupiedCapacity,
+              employeesCount: item.employeesCount,
+              productsSum: item.productsSum,
+              transactionsCount: item.transactionsCount,
+            }))}
+            actions={{
+              get: true,
+              put: true,
+              delete: true,
+            }}
+            path="warehouses"
+            handleDelete={handleDelete}
+          />
+        </>
       )}
     </>
   );

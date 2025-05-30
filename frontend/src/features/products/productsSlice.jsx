@@ -4,7 +4,7 @@ import productsAPI from "../../api/products";
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
   async (params) => {
-    const response = await productsAPI.get(params);
+    const response = await productsAPI.list(params);
     return response.data;
   }
 );
@@ -53,7 +53,7 @@ export const deleteProduct = createAsyncThunk("products/delete", async (id) => {
 const productsSlice = createSlice({
   name: "products",
   initialState: {
-    list: [],
+    list: { content: [], page: {} },
     current: null,
     status: "idle",
     error: null,
@@ -65,7 +65,7 @@ const productsSlice = createSlice({
       .addCase(fetchProducts.pending, (state) => {
         state.status = "loading";
         state.formStatus = "idle";
-        state.list = [];
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
@@ -91,7 +91,7 @@ const productsSlice = createSlice({
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        state.list.push(action.payload);
+        state.list.content.push(action.payload);
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.formStatus = "failed";
@@ -103,10 +103,10 @@ const productsSlice = createSlice({
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        const idx = state.list.findIndex(
+        const idx = state.list.content.findIndex(
           (p) => p.productId === action.payload.productId
         );
-        if (idx !== -1) state.list[idx] = action.payload;
+        if (idx !== -1) state.list.content[idx] = action.payload;
       })
       .addCase(updateProduct.rejected, (state, action) => {
         state.formStatus = "failed";
@@ -118,7 +118,9 @@ const productsSlice = createSlice({
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        state.list = state.list.filter((p) => p.productId !== action.payload);
+        state.list.content = state.list.content.filter(
+          (p) => p.productId !== action.payload
+        );
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.formStatus = "failed";

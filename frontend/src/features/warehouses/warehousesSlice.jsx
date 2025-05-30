@@ -56,7 +56,7 @@ export const deleteWarehouse = createAsyncThunk(
 const warehousesSlice = createSlice({
   name: "warehouses",
   initialState: {
-    list: [],
+    list: { content: [], page: {} },
     current: null,
     status: "idle",
     error: null,
@@ -68,7 +68,7 @@ const warehousesSlice = createSlice({
       .addCase(fetchWarehouses.pending, (state) => {
         state.status = "loading";
         state.formStatus = "idle";
-        state.list = [];
+        state.list = { content: [], page: {} };
         state.error = null;
       })
       .addCase(fetchWarehouses.fulfilled, (state, action) => {
@@ -94,7 +94,7 @@ const warehousesSlice = createSlice({
       })
       .addCase(createWarehouse.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        state.list.push(action.payload);
+        state.list.content.push(action.payload);
       })
       .addCase(createWarehouse.rejected, (state, action) => {
         state.formStatus = "failed";
@@ -106,10 +106,10 @@ const warehousesSlice = createSlice({
       })
       .addCase(updateWarehouse.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        const idx = state.list.findIndex(
+        const idx = state.list.content.findIndex(
           (w) => w.warehouseId === action.payload.warehouseId
         );
-        if (idx !== -1) state.list[idx] = action.payload;
+        if (idx !== -1) state.list.content[idx] = action.payload;
       })
       .addCase(updateWarehouse.rejected, (state, action) => {
         state.formStatus = "failed";
@@ -121,7 +121,9 @@ const warehousesSlice = createSlice({
       })
       .addCase(deleteWarehouse.fulfilled, (state, action) => {
         state.formStatus = "succeeded";
-        state.list = state.list.filter((w) => w.warehouseId !== action.payload);
+        state.list.content = state.list.content.filter(
+          (w) => w.warehouseId !== action.payload
+        );
       })
       .addCase(deleteWarehouse.rejected, (state, action) => {
         state.formStatus = "failed";
