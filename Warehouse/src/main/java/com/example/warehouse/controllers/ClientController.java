@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -40,15 +39,13 @@ public class ClientController {
             @RequestParam(defaultValue = "false") boolean all
     ) {
         try {
+            Page<ClientSummaryDto> response;
             if (all){
-                List<ClientSummaryDto> allResults = clientService
-                        .getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, Pageable.unpaged())
-                        .getContent();
-                return ResponseEntity.status(HttpStatus.OK).body(allResults);
+                response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, Pageable.unpaged());
             } else {
-                Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
-                return ResponseEntity.status(HttpStatus.OK).body(response);
+                response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
             }
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
