@@ -7,6 +7,7 @@ import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class CategoriesController {
             if (all) {
                 pageable = Pageable.unpaged();
             } else {
-                pageable = Pageable.ofSize(size).withPage(page);
+                pageable = PageRequest.of(page, size);
             }
             Page<Category> categories = categoryService.getAllCategories(pageable);
             Page<CategoryDto> dtos = categories.map(categoryMapper::mapToDto);

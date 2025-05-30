@@ -52,8 +52,3 @@ public interface ProductRepository extends CrudRepository<Product, Integer>, Jpa
     @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Optional<Product> findByIdWithTransactionProduct(@Param("productId") Integer productId);
 }
-
-//HAVING (:#{#filter.minInventory} IS NULL OR SUM(pi.quantity) >= :#{#filter.minInventory})
-//AND (:#{#filter.maxInventory} IS NULL OR SUM(pi.quantity) <= :#{#filter.maxInventory})
-//AND (:#{#filter.minTransactions} IS NULL OR COUNT(tp) >= :#{#filter.minTransactions})
-//AND (:#{#filter.maxTransactions} IS NULL OR COUNT(tp) <= :#{#filter.maxTransactions})

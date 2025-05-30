@@ -31,7 +31,7 @@ public class WarehousesMapper {
                 warehouse[4] + " " + warehouse[5] + ", " + warehouse[6]
         );
         dto.setEmployeesCount(((Number) warehouse[7]).intValue());
-        dto.setProductsCount(((Number) warehouse[8]).intValue());
+        dto.setProductsSum(((Number) warehouse[8]).intValue());
         dto.setTransactionsCount(((Number) warehouse[9]).intValue());
         return dto;
     }

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WarehouseGetAllEndpointDto extends WarehouseBase {
     private Integer employeesCount;
-    private Integer productsCount;
+    private Integer productsSum;
     private Integer transactionsCount;
 }

@@ -2,6 +2,7 @@ package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
+import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
@@ -12,6 +13,8 @@ import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.repositories.WarehouseRepository;
 import com.example.warehouse.services.AddressService;
 import com.example.warehouse.services.WarehousesService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,9 +43,9 @@ public class WarehousesServiceImpl implements WarehousesService {
     }
 
     @Override
-    public List<WarehouseGetAllEndpointDto> getAllWarehouses() {
-        List<Object[]> warehouses = warehouseRepository.findAllWithDetails();
-        return warehouses.stream().map(warehousesMapper::mapToDto).toList();
+    public Page<WarehouseGetAllEndpointDto> getAllWarehouses(WarehousesSearchFilters filters, Pageable pageable) {
+        Page<Object[]> warehouses = warehouseRepository.findAllWithDetails(filters, pageable);
+        return warehouses.map(warehousesMapper::mapToDto);
     }
 
     @Override
