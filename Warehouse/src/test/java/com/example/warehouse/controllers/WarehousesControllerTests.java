@@ -28,21 +28,130 @@ public class WarehousesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(5)
+                jsonPath("$.content.length()").value(5)
         ).andExpect(
-                jsonPath("$[0].name").value("Warehouse Paris")
+                jsonPath("$.content[0].name").value("Warehouse Paris")
         ).andExpect(
-                jsonPath("$[0].capacity").value(1000.0)
+                jsonPath("$.content[0].capacity").value(1000.0)
         ).andExpect(
-                jsonPath("$[0].occupiedCapacity").value(500.0)
+                jsonPath("$.content[0].occupiedCapacity").value(500.0)
         ).andExpect(
-                jsonPath("$[0].address").value("Champs-Élysées 101, Paris")
+                jsonPath("$.content[0].address").value("Champs-Élysées 101, Paris")
         ).andExpect(
-                jsonPath("$[0].employeesCount").value(2)
+                jsonPath("$.content[0].employeesCount").value(2)
         ).andExpect(
-                jsonPath("$[0].productsCount").value(1)
+                jsonPath("$.content[0].productsSum").value(2)
         ).andExpect(
-                jsonPath("$[0].transactionsCount").value(2)
+                jsonPath("$.content[0].transactionsCount").value(2)
+        );
+    }
+
+    @Test
+    public void testGetAllWarehousesInCorrectCapacityBracketsa() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses")
+                        .param("minCapacity", "1000")
+                        .param("maxCapacity", "1400")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(2)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Warehouse Paris")
+        ).andExpect(
+                jsonPath("$.content[0].productsSum").value(2)
+        ).andExpect(
+                jsonPath("$.content[0].transactionsCount").value(2)
+        ).andExpect(
+                jsonPath("$.content[1].name").value("Warehouse Lagos")
+        ).andExpect(
+                jsonPath("$.content[1].productsSum").value(1)
+        ).andExpect(
+                jsonPath("$.content[1].transactionsCount").value(2)
+        );
+    }
+
+    @Test
+    public void testGetAllWarehousesInCorrectOccupiedCapacityBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses")
+                        .param("minOccupied", "400")
+                        .param("maxOccupied", "600")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(2)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Warehouse Paris")
+        ).andExpect(
+                jsonPath("$.content[0].occupiedCapacity").value(500.0)
+        ).andExpect(
+                jsonPath("$.content[1].name").value("Warehouse Lagos")
+        ).andExpect(
+                jsonPath("$.content[1].occupiedCapacity").value(600.0)
+        );
+    }
+
+    @Test
+    public void testGetAllWarehousesWithRegionFilter() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses")
+                        .param("regionId", "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(1)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Warehouse Paris")
+        );
+    }
+
+    @Test
+    public void testGetAllWarehousesWithCorrectEmployeesBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses")
+                        .param("minEmployees", "2")
+                        .param("maxEmployees", "2")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(1)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Warehouse Paris")
+        );
+    }
+
+    @Test
+    public void testGetAllWarehousesWithCorrectProductsBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses")
+                        .param("minProducts", "2")
+                        .param("maxProducts", "6")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(2)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Warehouse Paris")
+        );
+    }
+
+    @Test
+    public void testGetAllWarehousesWithCorrectTransactionsBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/warehouses")
+                        .param("minTransactions", "3")
+                        .param("maxTransactions", "4")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(0)
         );
     }
 
@@ -71,6 +180,10 @@ public class WarehousesControllerTests {
                 jsonPath("$.name").value("Warehouse Paris")
         ).andExpect(
                 jsonPath("$.capacity").value(1000.0)
+        ).andExpect(
+                jsonPath("$.totalItems").value(2)
+        ).andExpect(
+                jsonPath("$.totalValue").value(1999.98)
         ).andExpect(
                 jsonPath("$.occupiedCapacity").value(500.0)
         ).andExpect(
@@ -266,87 +379,17 @@ public class WarehousesControllerTests {
     }
 
     @Test
-    public void testUpdateWarehouseChangeOfNameCapacityAndStreet() throws Exception {
-        String updateWarehouseJson = """
-                {
-                    "name": "Updated Warehouse",
-                    "capacity": 2000.0,
-                    "street": "Champs-Élysées",
-                    "streetNumber": "103"
-                }
-                """;
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateWarehouseJson)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.warehouseId").value(1)
-        ).andExpect(
-                jsonPath("$.name").value("Updated Warehouse")
-        ).andExpect(
-                jsonPath("$.capacity").value(2000.0)
-        ).andExpect(
-                jsonPath("$.addressId").value(1)
-        );
-
-        // Verify the warehouse was updated in the database
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.name").value("Updated Warehouse")
-        ).andExpect(
-                jsonPath("$.capacity").value(2000.0)
-        ).andExpect(
-                jsonPath("$.address").value("Champs-Élysées 103, Paris")
-        );
-    }
-
-    @Test
-    public void testUpdateWarehouseChangeAddressNewCityNameAndPostCode() throws Exception {
-        String updateWarehouseJson = """
-                {
-                    "city": "Lyon",
-                    "postalCode": "69001",
-                    "countryId": 1
-                }
-                """;
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.put("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateWarehouseJson)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.warehouseId").value(1)
-        ).andExpect(
-                jsonPath("$.addressId").value(1)
-        );
-
-        // Verify the address was updated in the database
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/warehouses/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(
-                status().isOk()
-        ).andExpect(
-                jsonPath("$.address").value("Champs-Élysées 101, Lyon")
-        );
-    }
-
-    @Test
     public void testUpdateWarehouseChangeAddressCityExists() throws Exception {
         String updateWarehouseJson = """
                 {
+                    "name": "Ale cool",
+                    "capacity": 2000.0,
+                    "regionId": 3,
+                    "countryId": 3,
                     "city": "New York",
                     "postalCode": "10001",
-                    "countryId": 3
+                    "street": "Champs-Élysées",
+                    "streetNumber": "102"
                 }
                 """;
 
@@ -369,7 +412,7 @@ public class WarehousesControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.address").value("Champs-Élysées 101, New York")
+                jsonPath("$.address").value("Champs-Élysées 102, New York")
         );
     }
 

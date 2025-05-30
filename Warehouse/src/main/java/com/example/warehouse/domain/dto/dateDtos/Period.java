@@ -4,4 +4,5 @@ public enum Period {
     week,
     month,
     year,
+    allTime
 }

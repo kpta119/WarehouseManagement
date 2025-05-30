@@ -1,6 +1,7 @@
 package com.example.warehouse.domain.dto.productDtos;
 
 import com.example.warehouse.validation.OnCreate;
+import com.example.warehouse.validation.OnUpdate;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductDataBaseDto extends ProductDto {
 
-    @NotNull(message = "Category ID cannot be null", groups = OnCreate.class)
+    @NotNull(message = "Category ID cannot be null", groups = {OnCreate.class, OnUpdate.class})
     private Integer categoryId;
 }

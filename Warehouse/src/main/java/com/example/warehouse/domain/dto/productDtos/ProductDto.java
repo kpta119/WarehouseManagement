@@ -15,17 +15,17 @@ import jakarta.validation.constraints.Positive;
 public class ProductDto {
     private Integer productId;
 
-    @NotBlank(message = "Name cannot be empty", groups = OnCreate.class)
+    @NotBlank(message = "Name cannot be empty", groups = {OnCreate.class, OnUpdate.class})
     private String name;
 
-    @NotBlank(message = "Description cannot be empty", groups = OnCreate.class)
+    @NotBlank(message = "Description cannot be empty", groups = {OnCreate.class, OnUpdate.class})
     private String description;
 
-    @NotNull(message = "Unit price cannot be null", groups = OnCreate.class)
+    @NotNull(message = "Unit price cannot be null", groups = {OnCreate.class, OnUpdate.class})
     @Positive(message = "Unit price must be positive", groups = {OnCreate.class, OnUpdate.class})
     private Double unitPrice;
 
-    @NotNull(message = "Unit size cannot be null", groups = OnCreate.class)
+    @NotNull(message = "Unit size cannot be null", groups = {OnCreate.class, OnUpdate.class})
     @Positive(message = "Unit size must be positive", groups = {OnCreate.class, OnUpdate.class})
     private Double unitSize;
 }

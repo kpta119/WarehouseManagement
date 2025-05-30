@@ -1,12 +1,15 @@
 package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Warehouse;
+import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
 import com.example.warehouse.mappers.WarehousesMapper;
 import com.example.warehouse.services.WarehousesService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,9 +30,20 @@ public class WarehousesController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllWarehouses() {
+    public ResponseEntity<?> getAllWarehouses(
+            @ModelAttribute WarehousesSearchFilters filters,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "25") Integer size,
+            @RequestParam(defaultValue = "false") boolean all
+    ) {
         try {
-            return ResponseEntity.ok(warehousesService.getAllWarehouses());
+            Pageable pageable;
+            if (all) {
+                pageable = Pageable.unpaged();
+            } else {
+                pageable = PageRequest.of(page, size);
+            }
+            return ResponseEntity.ok(warehousesService.getAllWarehouses(filters, pageable));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

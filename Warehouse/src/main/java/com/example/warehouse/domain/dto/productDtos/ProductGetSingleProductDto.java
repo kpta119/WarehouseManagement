@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -15,7 +14,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class ProductGetSingleProductDto extends ProductDto {
     private String categoryName;
-    private Map<Integer, Integer> inventory;
+    private Integer categoryId;
+    private List<ProductsInventoryDto> inventory;
     private List<ProductTransactionInfoDto> transactions;
 
 }

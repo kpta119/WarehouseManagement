@@ -2,11 +2,11 @@ package com.example.warehouse.services;
 
 import com.example.warehouse.domain.Category;
 import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CategoryService {
-    List<Category> getAllCategories();
+    Page<Category> getAllCategories(Pageable pageable);
 
     Category createCategory(CategoryDto categoryDto);
 

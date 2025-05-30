@@ -2,23 +2,26 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
+import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
+import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import com.example.warehouse.mappers.ProductMapper;
 import com.example.warehouse.services.ProductsService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -26,6 +29,8 @@ public class ProductsController {
 
     private final ProductsService productsService;
     private final ProductMapper productMapper;
+    private final int lowStockThreshold = 5;
+    private final int topN = 3;
 
 
     public ProductsController(ProductsService productsService, ProductMapper productMapper) {
@@ -33,21 +38,28 @@ public class ProductsController {
         this.productMapper = productMapper;
     }
 
-    @GetMapping("/search")
+    @GetMapping()
     public ResponseEntity<?> getAllProducts(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) Double minSize,
-            @RequestParam(required = false) Double maxSize,
-            @RequestParam(required = false) Integer warehouseId
+            @ModelAttribute ProductSearchFilterDto productFilters,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size,
+            @RequestParam(defaultValue = "false") boolean all
     ) {
         try {
-            List<Object[]> productsWithInventory = productsService.getAllProducts(name, categoryId, minPrice, maxPrice, minSize, maxSize, warehouseId);
-            List<ProductSearchEndpointDto> dtos = productsWithInventory.stream()
-                    .map(productMapper::mapToDto)
-                    .collect(Collectors.toList());
+            Pageable pageable;
+            if (all) {
+                pageable = Pageable.unpaged();
+            } else {
+                pageable = PageRequest.of(page, size);
+            }
+            Page<Object[]> productsWithInventory = productsService.getAllProducts(productFilters, pageable);
+            List<Integer> lowStockProductIds = productsService.getLowStockProductIds(productFilters.getWarehouseId(), lowStockThreshold);
+            List<Integer> bestSellingProducts = productsService.getBestSellingProducts(productFilters.getWarehouseId(), Period.allTime, topN);
+            Page<ProductSearchEndpointDto> dtos = productsWithInventory.map(product -> productMapper.mapToDto(
+                    product,
+                    lowStockProductIds,
+                    bestSellingProducts
+            ));
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
@@ -58,7 +70,7 @@ public class ProductsController {
     public ResponseEntity<?> getProduct(@PathVariable Integer productId) {
         try {
             Product product = productsService.getProductByIdWithProductInventory(productId);
-            Map<Integer, Integer> inventory = productsService.getInventoryMap(product);
+            List<ProductsInventoryDto> inventory = productsService.getProductsInventory(product);
             List<ProductTransactionInfoDto> transactions = productsService.getTransactionsDto(productId);
             return ResponseEntity.ok(productMapper.mapToDto(product, inventory, transactions));
         } catch (NoSuchElementException e) {
@@ -71,7 +83,6 @@ public class ProductsController {
     @GetMapping("/low-stock")
     public ResponseEntity<?> getLowStockProducts(@RequestParam(required = false) Integer warehouseId) {
         try {
-            int lowStockThreshold = 5;
             List<Integer> lowStockProductIds = productsService.getLowStockProductIds(warehouseId, lowStockThreshold);
             return ResponseEntity.ok(lowStockProductIds);
         } catch (Exception e) {
@@ -82,8 +93,7 @@ public class ProductsController {
     @GetMapping("/best-selling")
     public ResponseEntity<?> getTop3BestSellingProducts(@RequestParam(required = false) Integer warehouseId, @RequestParam String period) {
         try {
-            Period parsedPeriod = Period.valueOf(period.toLowerCase());
-            int topN = 3;
+            Period parsedPeriod = Period.valueOf(period);
             List<Integer> products = productsService.getBestSellingProducts(warehouseId, parsedPeriod, topN);
             return ResponseEntity.ok(products);
         } catch (IllegalArgumentException | NullPointerException e) {

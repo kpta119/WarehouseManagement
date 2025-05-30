@@ -33,135 +33,179 @@ public class ProductControllerTests {
     @Test
     public void testReturnsAllProducts() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(6)
+                jsonPath("$.content.length()").value(6)
         ).andExpect(
-                jsonPath("$[0].name").value("Laptop")
+                jsonPath("$.content[0].name").value("Laptop")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(999.99)
+                jsonPath("$.content[0].unitPrice").value(999.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(5)
+                jsonPath("$.content[0].inventoryCount").value(5)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(2)
+                jsonPath("$.content[0].transactionCount").value(2)
         );
     }
 
     @Test
     public void testReturnsProductsByName() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("name", "Laptop")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(1)
+                jsonPath("$.content.length()").value(1)
         ).andExpect(
-                jsonPath("$[0].name").value("Laptop")
+                jsonPath("$.content[0].name").value("Laptop")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(999.99)
+                jsonPath("$.content[0].unitPrice").value(999.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(5)
+                jsonPath("$.content[0].inventoryCount").value(5)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(2)
+                jsonPath("$.content[0].transactionCount").value(2)
         );
     }
 
     @Test
     public void testReturnsProductsByCategoryId() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("categoryId", "1")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(2)
+                jsonPath("$.content.length()").value(2)
         ).andExpect(
-                jsonPath("$[1].name").value("Smartphone")
+                jsonPath("$.content[1].name").value("Smartphone")
         ).andExpect(
-                jsonPath("$[1].unitPrice").value(799.99)
+                jsonPath("$.content[1].unitPrice").value(799.99)
         ).andExpect(
-                jsonPath("$[1].inventoryCount").value(0)
+                jsonPath("$.content[1].inventoryCount").value(0)
         ).andExpect(
-                jsonPath("$[1].transactionCount").value(0)
+                jsonPath("$.content[1].transactionCount").value(0)
         );
     }
 
     @Test
     public void testReturnsProductsInCorrectPriceBracket() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("minPrice", "30")
                         .param("maxPrice", "800")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(2)
+                jsonPath("$.content.length()").value(2)
         ).andExpect(
-                jsonPath("$[0].name").value("Chair")
+                jsonPath("$.content[0].name").value("Chair")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(49.99)
+                jsonPath("$.content[0].unitPrice").value(49.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(3)
+                jsonPath("$.content[0].inventoryCount").value(3)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
+                jsonPath("$.content[0].transactionCount").value(1)
         );
     }
 
     @Test
     public void testReturnsProductsInCorrectSizeBracket() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("minSize", "0")
                         .param("maxSize", "0.5")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(3)
+                jsonPath("$.content.length()").value(3)
         ).andExpect(
-                jsonPath("$[0].name").value("T-Shirt")
+                jsonPath("$.content[0].name").value("T-Shirt")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(19.99)
+                jsonPath("$.content[0].unitPrice").value(19.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(10)
+                jsonPath("$.content[0].inventoryCount").value(10)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
+                jsonPath("$.content[0].transactionCount").value(1)
         );
     }
 
     @Test
     public void testReturnsProductsByWarehouseId() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("warehouseId", "2")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(2)
+                jsonPath("$.content.length()").value(2)
         ).andExpect(
-                jsonPath("$[1].name").value("T-Shirt")
+                jsonPath("$.content[1].name").value("T-Shirt")
         ).andExpect(
-                jsonPath("$[1].unitPrice").value(19.99)
+                jsonPath("$.content[1].unitPrice").value(19.99)
         ).andExpect(
-                jsonPath("$[1].inventoryCount").value(6)
+                jsonPath("$.content[1].inventoryCount").value(6)
         ).andExpect(
-                jsonPath("$[1].transactionCount").value(1)
+                jsonPath("$.content[1].transactionCount").value(1)
         ).andExpect(
-                jsonPath("$[0].name").value("Laptop")
+                jsonPath("$.content[0].name").value("Laptop")
         ).andExpect(
-                jsonPath("$[0].unitPrice").value(999.99)
+                jsonPath("$.content[0].unitPrice").value(999.99)
         ).andExpect(
-                jsonPath("$[0].inventoryCount").value(3)
+                jsonPath("$.content[0].inventoryCount").value(3)
         ).andExpect(
-                jsonPath("$[0].transactionCount").value(1)
+                jsonPath("$.content[0].transactionCount").value(1)
+        );
+    }
+
+    @Test
+    public void testReturnsProductsWithCorrectInventoryCountBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products")
+                        .param("minInventory", "5")
+                        .param("maxInventory", "10")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(3)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Laptop")
+        ).andExpect(
+                jsonPath("$.content[0].inventoryCount").value(5)
+        ).andExpect(
+                jsonPath("$.content[1].name").value("T-Shirt")
+        ).andExpect(
+                jsonPath("$.content[1].inventoryCount").value(10)
+        ).andExpect(
+                jsonPath("$.content[2].name").value("Apple")
+        ).andExpect(
+                jsonPath("$.content[2].inventoryCount").value(5)
+        );
+    }
+
+    @Test
+    public void testReturnsProductsWithCorrectTransactionCountBrackets() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products")
+                        .param("minTransactions", "2")
+                        .param("maxTransactions", "2")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.content.length()").value(1)
+        ).andExpect(
+                jsonPath("$.content[0].name").value("Laptop")
+        ).andExpect(
+                jsonPath("$.content[0].transactionCount").value(2)
         );
     }
 
@@ -179,9 +223,13 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.inventory.length()").value(2)
         ).andExpect(
-                jsonPath("$.inventory['1']").value(2)
+                jsonPath("$.inventory[0].quantity").value(2)
         ).andExpect(
-                jsonPath("$.inventory['2']").value(3)
+                jsonPath("$.inventory[0].warehouseId").value(1)
+        ).andExpect(
+                jsonPath("$.inventory[1].quantity").value(3)
+        ).andExpect(
+                jsonPath("$.inventory[1].warehouseId").value(2)
         ).andExpect(
                 jsonPath("$.transactions.length()").value(2)
         ).andExpect(
@@ -192,6 +240,10 @@ public class ProductControllerTests {
                 jsonPath("$.transactions[1].transactionId").value(2)
         ).andExpect(
                 jsonPath("$.transactions[1].quantity").value(5)
+        ).andExpect(
+                jsonPath("$.transactions[0].employeeName").value("John Doe")
+        ).andExpect(
+                jsonPath("$.transactions[1].employeeName").value("Jane Smith")
         );
     }
 
@@ -339,6 +391,25 @@ public class ProductControllerTests {
     }
 
     @Test
+    public void testGetTop3BestSellingAllTheTime() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/products/best-selling")
+                        .param("period", "allTime")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andExpect(
+                jsonPath("$.length()").value(3)
+        ).andExpect(
+                jsonPath("$[0]").value(3)
+        ).andExpect(
+                jsonPath("$[1]").value(5)
+        ).andExpect(
+                jsonPath("$[2]").value(4)
+        );
+    }
+
+    @Test
     public void testCreateProduct() throws Exception {
         String newProductJson = """
                 {
@@ -366,15 +437,15 @@ public class ProductControllerTests {
 
         // Verify that the product was created in the database
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/products/search")
+                MockMvcRequestBuilders.get("/api/products")
                         .param("name", "New Product")
                         .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(
                 status().isOk()
         ).andExpect(
-                jsonPath("$.length()").value(1)
+                jsonPath("$.content.length()").value(1)
         ).andExpect(
-                jsonPath("$[0].name").value("New Product")
+                jsonPath("$.content[0].name").value("New Product")
         );
     }
 
@@ -435,6 +506,7 @@ public class ProductControllerTests {
     public void testUpdateProduct() throws Exception {
         String updatedProductJson = """
                 {
+                    "name": "LaptopV2",
                     "description": "Ola Boga",
                     "unitPrice": 99.4,
                     "unitSize": 2.0,
@@ -449,6 +521,8 @@ public class ProductControllerTests {
         ).andExpect(
                 status().isOk()
         ).andExpect(
+                jsonPath("$.name").value("LaptopV2")
+        ).andExpect(
                 jsonPath("$.description").value("Ola Boga")
         ).andExpect(
                 jsonPath("$.unitPrice").value(99.4)
@@ -457,7 +531,7 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.categoryId").value(4)
         ).andExpect(
-                jsonPath("$.name").value("Laptop")
+                jsonPath("$.name").value("LaptopV2")
         );
 
         // Verify that the product was updated in the database
@@ -475,7 +549,7 @@ public class ProductControllerTests {
         ).andExpect(
                 jsonPath("$.categoryName").value("Furniture")
         ).andExpect(
-                jsonPath("$.name").value("Laptop")
+                jsonPath("$.name").value("LaptopV2")
         );
     }
 
@@ -507,6 +581,7 @@ public class ProductControllerTests {
     public void testUpdateProductNotFound() throws Exception {
         String updatedProductJson = """
                 {
+                    "name": "Nonexistent Product",
                     "description": "Updated Description",
                     "unitPrice": 99.99,
                     "unitSize": 1.5,

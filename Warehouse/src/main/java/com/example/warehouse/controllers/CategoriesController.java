@@ -5,13 +5,16 @@ import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
 import com.example.warehouse.mappers.CategoryMapper;
 import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
+import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -27,12 +30,20 @@ public class CategoriesController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllCategories() {
+    public ResponseEntity<?> getAllCategories(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "25") Integer size,
+            @RequestParam(defaultValue = "false") boolean all
+    ) {
         try {
-            List<Category> categories = categoryService.getAllCategories();
-            List<CategoryDto> dtos = categories.stream()
-                    .map(categoryMapper::mapToDto)
-                    .toList();
+            Pageable pageable;
+            if (all) {
+                pageable = Pageable.unpaged();
+            } else {
+                pageable = PageRequest.of(page, size);
+            }
+            Page<Category> categories = categoryService.getAllCategories(pageable);
+            Page<CategoryDto> dtos = categories.map(categoryMapper::mapToDto);
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
@@ -50,7 +61,7 @@ public class CategoriesController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<?> updateCategory(@PathVariable Integer categoryId, @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<?> updateCategory(@PathVariable Integer categoryId, @Validated(OnUpdate.class) @RequestBody CategoryDto categoryDto) {
         try {
             Category updatedCategory = categoryService.updateCategory(categoryId, categoryDto);
             return ResponseEntity.ok(categoryMapper.mapToDto(updatedCategory));

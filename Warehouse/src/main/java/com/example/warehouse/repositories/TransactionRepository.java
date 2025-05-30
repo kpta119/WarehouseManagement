@@ -42,6 +42,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 
     @EntityGraph(attributePaths = {
             "products",
+            "employee",
     })
     @Query("""
             SELECT t FROM Transaction t

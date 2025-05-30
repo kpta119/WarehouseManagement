@@ -2,6 +2,7 @@ package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
+import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
@@ -12,6 +13,8 @@ import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.repositories.WarehouseRepository;
 import com.example.warehouse.services.AddressService;
 import com.example.warehouse.services.WarehousesService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,9 +43,9 @@ public class WarehousesServiceImpl implements WarehousesService {
     }
 
     @Override
-    public List<WarehouseGetAllEndpointDto> getAllWarehouses() {
-        List<Object[]> warehouses = warehouseRepository.findAllWithDetails();
-        return warehouses.stream().map(warehousesMapper::mapToDto).toList();
+    public Page<WarehouseGetAllEndpointDto> getAllWarehouses(WarehousesSearchFilters filters, Pageable pageable) {
+        Page<Object[]> warehouses = warehouseRepository.findAllWithDetails(filters, pageable);
+        return warehouses.map(warehousesMapper::mapToDto);
     }
 
     @Override
@@ -51,7 +54,23 @@ public class WarehousesServiceImpl implements WarehousesService {
                 .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
         List<Transaction> transactions = transactionRepository.findAllByWarehouseId(warehouseId);
         List<Employee> employees = warehouse.getEmployees();
-        return warehousesMapper.mapToDto(warehouse, transactions, employees);
+        Integer totalItems = countTotalItemsInWarehouse(warehouse);
+        Double totalValue = calculateTotalValueInWarehouse(warehouse);
+        return warehousesMapper.mapToDto(warehouse, transactions, employees, totalItems, totalValue);
+    }
+
+    @Override
+    public Integer countTotalItemsInWarehouse(Warehouse warehouse) {
+        return warehouse.getProductInventories().stream()
+                .mapToInt(ProductInventory::getQuantity)
+                .sum();
+    }
+
+    @Override
+    public Double calculateTotalValueInWarehouse(Warehouse warehouse) {
+        return warehouse.getProductInventories().stream()
+                .mapToDouble(productInventory -> productInventory.getQuantity() * productInventory.getProduct().getUnitPrice())
+                .sum();
     }
 
     @Override
@@ -77,32 +96,22 @@ public class WarehousesServiceImpl implements WarehousesService {
         Warehouse existingWarehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
         Address Address = existingWarehouse.getAddress();
-        if (warehouseDto.getName() != null) {
-            existingWarehouse.setName(warehouseDto.getName());
-        }
-        if (warehouseDto.getCapacity() != null) {
-            existingWarehouse.setCapacity(warehouseDto.getCapacity());
-        }
-        if (warehouseDto.getStreetNumber() != null) {
-            Address.setStreetNumber(Integer.valueOf(warehouseDto.getStreetNumber()));
-        }
-        if (warehouseDto.getStreet() != null) {
-            Address.setStreet(warehouseDto.getStreet());
-        }
-        if (warehouseDto.getCity() != null && warehouseDto.getPostalCode() != null && warehouseDto.getCountryId() != null) {
-            Optional<City> foundCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
-                    warehouseDto.getPostalCode(), warehouseDto.getCity(), warehouseDto.getCountryId());
-            Country foundCountry = countryRepository.findById(warehouseDto.getCountryId())
-                    .orElseThrow(() -> new NoSuchElementException("Country not found with ID: " + warehouseDto.getCountryId()));
-            City city = foundCity.orElseGet(() -> {
-                City newCity = new City();
-                newCity.setName(warehouseDto.getCity());
-                newCity.setPostalCode(warehouseDto.getPostalCode());
-                newCity.setCountry(foundCountry);
-                return cityRepository.save(newCity);
-            });
-            Address.setCity(city);
-        }
+        existingWarehouse.setName(warehouseDto.getName());
+        existingWarehouse.setCapacity(warehouseDto.getCapacity());
+        Address.setStreetNumber(Integer.valueOf(warehouseDto.getStreetNumber()));
+        Address.setStreet(warehouseDto.getStreet());
+        Optional<City> foundCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
+                warehouseDto.getPostalCode(), warehouseDto.getCity(), warehouseDto.getCountryId());
+        Country foundCountry = countryRepository.findById(warehouseDto.getCountryId())
+                .orElseThrow(() -> new NoSuchElementException("Country not found with ID: " + warehouseDto.getCountryId()));
+        City city = foundCity.orElseGet(() -> {
+            City newCity = new City();
+            newCity.setName(warehouseDto.getCity());
+            newCity.setPostalCode(warehouseDto.getPostalCode());
+            newCity.setCountry(foundCountry);
+            return cityRepository.save(newCity);
+        });
+        Address.setCity(city);
         return warehouseRepository.save(existingWarehouse);
     }
 

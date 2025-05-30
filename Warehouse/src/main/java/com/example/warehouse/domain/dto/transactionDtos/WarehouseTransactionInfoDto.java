@@ -13,5 +13,7 @@ public class WarehouseTransactionInfoDto {
     private String description;
     private String type;
     private Double totalPrice;
+    private Integer employeeId;
+    private String employeeName;
 
 }
