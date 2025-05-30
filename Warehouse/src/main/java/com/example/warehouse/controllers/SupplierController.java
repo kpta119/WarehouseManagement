@@ -2,6 +2,7 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
 import com.example.warehouse.mappers.BusinessEntityMapper;
@@ -67,7 +68,7 @@ public class SupplierController {
     public ResponseEntity<?> createSupplier(@Valid @RequestBody BusinessEntityDto request) {
         try {
             Supplier savedSupplier = supplierService.createSupplier(request);
-            BusinessEntityDto responseDto = businessEntityMapper.mapToDto(savedSupplier);
+            SupplierDto responseDto = businessEntityMapper.mapToDto(savedSupplier);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());

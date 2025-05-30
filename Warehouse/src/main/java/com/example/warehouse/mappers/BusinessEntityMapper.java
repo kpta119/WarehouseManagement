@@ -3,7 +3,8 @@ package com.example.warehouse.mappers;
 import com.example.warehouse.domain.Address;
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.Supplier;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,10 +16,10 @@ public class BusinessEntityMapper {
         this.addressMapper = addressMapper;
     }
 
-    public BusinessEntityDto mapToDto(Client client) {
-        BusinessEntityDto dto = new BusinessEntityDto();
+    public ClientDto mapToDto(Client client) {
+        ClientDto dto = new ClientDto();
 
-        dto.setId(client.getId());
+        dto.setClientId(client.getId());
         dto.setName(client.getName());
         dto.setEmail(client.getEmail());
         dto.setPhoneNumber(client.getPhoneNumber());
@@ -28,10 +29,10 @@ public class BusinessEntityMapper {
         return dto;
     }
 
-    public BusinessEntityDto mapToDto(Supplier supplier) {
-        BusinessEntityDto dto = new BusinessEntityDto();
+    public SupplierDto mapToDto(Supplier supplier) {
+        SupplierDto dto = new SupplierDto();
 
-        dto.setId(supplier.getId());
+        dto.setSupplierId(supplier.getId());
         dto.setName(supplier.getName());
         dto.setEmail(supplier.getEmail());
         dto.setPhoneNumber(supplier.getPhoneNumber());

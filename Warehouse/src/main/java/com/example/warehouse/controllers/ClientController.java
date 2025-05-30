@@ -2,6 +2,7 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
 import com.example.warehouse.mappers.BusinessEntityMapper;
@@ -67,7 +68,7 @@ public class ClientController {
     public ResponseEntity<?> createClient(@Valid @RequestBody BusinessEntityDto request) {
         try {
             Client savedClient = clientService.createClient(request);
-            BusinessEntityDto responseDto = businessEntityMapper.mapToDto(savedClient);
+            ClientDto responseDto = businessEntityMapper.mapToDto(savedClient);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
