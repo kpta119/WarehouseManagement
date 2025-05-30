@@ -16,11 +16,9 @@ import java.util.stream.Collectors;
 public class BusinesEntityWithHistoryMapper {
 
     private final TransactionMapper transactionMapper;
-    private final AddressMapper addressMapper;
 
-    public BusinesEntityWithHistoryMapper(TransactionMapper transactionMapper, AddressMapper addressMapper) {
+    public BusinesEntityWithHistoryMapper(TransactionMapper transactionMapper) {
         this.transactionMapper = transactionMapper;
-        this.addressMapper = addressMapper;
     }
 
     public ClientWithHistoryDto mapToDto(Client client) {
@@ -46,7 +44,11 @@ public class BusinesEntityWithHistoryMapper {
     public SupplierWithHistoryDto mapToDto(Supplier supplier) {
         SupplierWithHistoryDto dto = new SupplierWithHistoryDto();
         dto.setSupplierId(supplier.getId());
-        dto.setAddress(addressMapper.mapToDto(supplier.getAddress()));
+        Address address = supplier.getAddress();
+        City city = address.getCity();
+        dto.setAddress(
+                address.getStreet() + " " + address.getStreetNumber() + " " + city.getName() + ", " + city.getCountry().getName()
+        );
         dto.setEmail(supplier.getEmail());
         dto.setName(supplier.getName());
         dto.setPhoneNumber(supplier.getPhoneNumber());

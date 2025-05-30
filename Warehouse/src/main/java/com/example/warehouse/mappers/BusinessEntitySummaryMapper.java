@@ -39,7 +39,11 @@ public class BusinessEntitySummaryMapper {
         dto.setName(supplier.getName());
         dto.setEmail(supplier.getEmail());
         dto.setPhoneNumber(supplier.getPhoneNumber());
-        dto.setAddress(String.valueOf(supplier.getAddress()));
+        Address address = supplier.getAddress();
+        City city = address.getCity();
+        dto.setAddress(
+                address.getStreet() + " " + address.getStreetNumber() + " " + city.getName() + ", " + city.getCountry().getName()
+        );
         dto.setTransactionsCount(transactionCount);
         return dto;
     }

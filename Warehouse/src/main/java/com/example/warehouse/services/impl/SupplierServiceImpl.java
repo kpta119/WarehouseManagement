@@ -8,6 +8,7 @@ import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
+import com.example.warehouse.domain.dto.filtersDto.SupplierSearchFilter;
 import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
 import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
 import com.example.warehouse.repositories.AddressRepository;
@@ -76,8 +77,8 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public Page<SupplierSummaryDto> getSuppliersWithTransactionCount(String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId,Pageable pageable) {
-        Page<Object[]> results = supplierRepository.findAllSuppliersWithTransactionCounts(regionName, minTransactions, maxTransactions, warehouseId, pageable);
+    public Page<SupplierSummaryDto> getSuppliersWithTransactionCount(SupplierSearchFilter filter, Pageable pageable) {
+        Page<Object[]> results = supplierRepository.findAllSuppliersWithTransactionCounts(filter, pageable);
         return results.map(businessEntitySummaryMapper::mapToSupplierDto);
     }
 
