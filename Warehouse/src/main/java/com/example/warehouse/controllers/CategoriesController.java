@@ -2,6 +2,7 @@ package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Category;
 import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
+import com.example.warehouse.domain.dto.filtersDto.CategorySearchFilters;
 import com.example.warehouse.mappers.CategoryMapper;
 import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
@@ -31,6 +32,7 @@ public class CategoriesController {
 
     @GetMapping()
     public ResponseEntity<?> getAllCategories(
+            @ModelAttribute CategorySearchFilters filters,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "25") Integer size,
             @RequestParam(defaultValue = "false") boolean all
@@ -42,7 +44,7 @@ public class CategoriesController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<Category> categories = categoryService.getAllCategories(pageable);
+            Page<Category> categories = categoryService.getAllCategories(filters, pageable);
             Page<CategoryDto> dtos = categories.map(categoryMapper::mapToDto);
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {

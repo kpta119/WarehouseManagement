@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface WarehouseRepository extends CrudRepository<Warehouse, Integer>, JpaRepository<Warehouse, Integer> {
 
     @Query("""
-            SELECT w.id, w.name, w.capacity, w.occupiedCapacity, a.street, a.streetNumber ,w.address.city.name,
+            SELECT w.id, w.name, w.capacity, w.occupiedCapacity, a.street, a.streetNumber , c.name, co.name,
                         Count(distinct e.id) AS employeesCount, COALESCE(Sum(distinct pi.quantity), 0) AS productsSum,
                         Count(distinct t.id) AS transactionsCount
             FROM Warehouse w
@@ -29,6 +29,7 @@ public interface WarehouseRepository extends CrudRepository<Warehouse, Integer>,
             LEFT JOIN c.country co
             LEFT JOIN co.region r
             WHERE (:#{#filter.minCapacity} IS NULL OR w.capacity >= :#{#filter.minCapacity})
+            AND (:#{#filter.name} IS NULL OR w.name LIKE CONCAT('%', :#{#filter.name}, '%'))
             AND (:#{#filter.maxCapacity} IS NULL OR w.capacity <= :#{#filter.maxCapacity})
             AND (:#{#filter.minOccupied} IS NULL OR w.occupiedCapacity >= :#{#filter.minOccupied})
             AND (:#{#filter.maxOccupied} IS NULL OR w.occupiedCapacity <= :#{#filter.maxOccupied})

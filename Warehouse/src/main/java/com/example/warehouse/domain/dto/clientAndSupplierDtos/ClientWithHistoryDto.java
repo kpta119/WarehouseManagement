@@ -1,6 +1,5 @@
 package com.example.warehouse.domain.dto.clientAndSupplierDtos;
 
-import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +19,6 @@ public class ClientWithHistoryDto {
     @Email(message = "Wrong email format")
     private String email;
     private String phoneNumber;
-    private AddressDto address;
+    private String address;
     private List<TransactionWithProductsDto> history;
 }

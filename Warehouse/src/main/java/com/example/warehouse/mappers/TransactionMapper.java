@@ -23,7 +23,7 @@ public class TransactionMapper {
         dto.setDescription(transaction.getDescription());
 
         if (transaction.getEmployee() != null) {
-            dto.setEmployeeId(transaction.getEmployee().getId());
+            dto.setEmployeeName(transaction.getEmployee().getName() + " " + transaction.getEmployee().getSurname());
         }
 
         if (transaction.getFromWarehouse() != null) {

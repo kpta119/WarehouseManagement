@@ -5,6 +5,7 @@ import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
+import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
@@ -31,21 +32,19 @@ public class ClientController {
 
     @GetMapping()
     public ResponseEntity<?> getAllClients(
-            @RequestParam(required = false) String regionName,
-            @RequestParam(required = false) Integer minTransactions,
-            @RequestParam(required = false) Integer maxTransactions,
-            @RequestParam(required = false) Integer warehouseId,
+            @ModelAttribute ClientSearchFilters filters,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(defaultValue = "false") boolean all
     ) {
         try {
-            Page<ClientSummaryDto> response;
-            if (all){
-                response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, Pageable.unpaged());
+            Pageable pageable;
+            if (all) {
+                pageable = Pageable.unpaged();
             } else {
-                response = clientService.getClientsWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
+                pageable = PageRequest.of(page, size);
             }
+            Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(filters, pageable);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());

@@ -12,10 +12,11 @@ public class TransactionSummaryDto {
     private String date;
     private String description;
     private String type;
-    private Integer employeeId;
-    private Integer fromWarehouseId;
-    private Integer toWarehouseId;
-    private Integer clientId;
-    private Integer supplierId;
+    private String employeeName;
+    private String fromWarehouseName;
+    private String toWarehouseName;
+    private String clientName;
+    private String supplierName;
     private Double totalPrice;
+    private Double totalSize;
 }

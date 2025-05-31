@@ -1,6 +1,7 @@
 package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.Transaction;
+import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
 import com.example.warehouse.repositories.TransactionRepository;
 import com.example.warehouse.services.TransactionService;
 import org.springframework.data.domain.Page;
@@ -28,18 +29,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<Transaction> getAllTransactions(Double minTotalPrice, Double maxTotalPrice, Double minTotalSize, Double maxTotalSize, Date fromDate, Date toDate, Transaction.TransactionType type, Integer employeeId, Pageable pageable) {
-        Date normalizedFromDate = (fromDate != null) ? startOfDay(fromDate) : null;
-        return transactionRepository.findAllWithFilters(
-                minTotalPrice,
-                maxTotalPrice,
-                minTotalSize,
-                maxTotalSize,
-                normalizedFromDate,
-                toDate,
-                type,
-                employeeId,
-                pageable);
+    public Page<Object[]> getAllTransactions(TransactionsSearchFilters filters, Pageable pageable) {
+        Date normalizedFromDate = (filters.getFromDate() != null) ? startOfDay(filters.getFromDate()) : null;
+        return transactionRepository.findAllWithFilters(filters, normalizedFromDate, pageable);
     }
 
     private Date startOfDay(Date date) {

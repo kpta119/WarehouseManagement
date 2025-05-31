@@ -1,14 +1,13 @@
 package com.example.warehouse.services;
 
 import com.example.warehouse.domain.Transaction;
+import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.Date;
 
 public interface TransactionService {
 
     Transaction getTransactionById(Integer transactionId);
 
-    Page<Transaction> getAllTransactions(Double minTotalPrice, Double maxTotalPrice, Double minTotalSize, Double maxTotalSize, Date fromDate, Date toDate, Transaction.TransactionType transactionType, Integer employeeId, Pageable pageable);
+    Page<Object[]> getAllTransactions(TransactionsSearchFilters filters, Pageable pageable);
 }

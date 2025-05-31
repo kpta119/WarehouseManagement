@@ -5,6 +5,7 @@ import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeWithHistoryDto;
+import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
 import com.example.warehouse.mappers.EmployeeSummaryMapper;
 import com.example.warehouse.mappers.EmployeeWithHistoryMapper;
 import com.example.warehouse.repositories.*;
@@ -37,8 +38,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(String partOfNameOrSurname, String regionName, Integer minTransactions, Integer maxTransactions, Integer warehouseId, Pageable pageable) {
-        Page<Object[]> results = employeeRepository.findAllEmployeesWithTransactionCounts(partOfNameOrSurname, regionName, minTransactions, maxTransactions, warehouseId, pageable);
+    public Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(EmployeeSearchFilter filters, Pageable pageable) {
+        Page<Object[]> results = employeeRepository.findAllEmployeesWithTransactionCounts(filters, pageable);
         return results.map(employeeSummaryMapper::mapToDto);
     }
 
