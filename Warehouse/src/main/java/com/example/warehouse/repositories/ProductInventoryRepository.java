@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductInventoryRepository extends CrudRepository<ProductInventory, Integer>, JpaRepository<ProductInventory, Integer> {
-    @Query("SELECT COALESCE(SUM(pi.quantity), 0) FROM ProductInventory pi " +
+    @Query("SELECT Count(pi) FROM ProductInventory pi " +
             "WHERE (:warehouseId IS NULL OR pi.warehouse.id = :warehouseId)")
     Integer countByWarehouse(Integer warehouseId);
 
