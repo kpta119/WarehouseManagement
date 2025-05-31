@@ -7,9 +7,12 @@ import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenD
 import com.example.warehouse.repositories.*;
 import com.example.warehouse.services.InventoryOperationsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -83,14 +86,22 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
         String description = "Warehouse " + fromWarehouse.getName() + " supplied warehouse: " +
                 toWarehouse.getName() + " by: " + employee.getName() + " " + employee.getSurname();
 
-        transactionRepository.exchangeBetweenWarehouses(
-                LocalDate.now(),
-                description,
-                transferDto.getEmployeeId(),
-                transferDto.getFromWarehouseId(),
-                transferDto.getToWarehouseId(),
-                productsJson
-        );
+        try {
+            transactionRepository.exchangeBetweenWarehouses(
+                    LocalDate.now(),
+                    description,
+                    transferDto.getEmployeeId(),
+                    transferDto.getFromWarehouseId(),
+                    transferDto.getToWarehouseId(),
+                    productsJson
+            );
+        } catch (DataAccessException ex) {
+            Throwable root = ex.getRootCause();
+            if (root instanceof SQLException sqlEx && "45000".equals(sqlEx.getSQLState())) {
+                throw new NonTransientDataAccessException(
+                        "Transfer failed due to insufficient stock in the source warehouse: " + fromWarehouse.getName(), sqlEx) {};
+            }
+        }
 
         return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getToWarehouseId(), PageRequest.of(0, 1))
                 .stream().findFirst().orElse(null);
@@ -110,14 +121,22 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
         String description = "Warehouse " + warehouse.getName() + " sold items to: " + client.getName() +
                 " by: " + employee.getName() + " " + employee.getSurname();
 
-        transactionRepository.sellToClient(
-                LocalDate.now(),
-                description,
-                transferDto.getEmployeeId(),
-                transferDto.getWarehouseId(),
-                transferDto.getClientId(),
-                productsJson
-        );
+        try {
+            transactionRepository.sellToClient(
+                    LocalDate.now(),
+                    description,
+                    transferDto.getEmployeeId(),
+                    transferDto.getWarehouseId(),
+                    transferDto.getClientId(),
+                    productsJson
+            );
+        } catch (DataAccessException ex) {
+            Throwable root = ex.getRootCause();
+            if (root instanceof SQLException sqlEx && "45000".equals(sqlEx.getSQLState())) {
+                throw new NonTransientDataAccessException(
+                        "Transfer failed due to insufficient stock in the source warehouse: " + warehouse.getName(), sqlEx) {};
+            }
+        }
 
         return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getWarehouseId(), PageRequest.of(0, 1))
                 .stream().findFirst().orElse(null);
