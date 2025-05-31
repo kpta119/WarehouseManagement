@@ -24,7 +24,7 @@ const CategoryList = () => {
   useEffect(() => {
     dispatch(
       fetchCategories({
-        searchTerm: debouncedSearchTerm || undefined,
+        name: debouncedSearchTerm || undefined,
         page: page - 1 || 0,
       })
     );

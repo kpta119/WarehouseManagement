@@ -8,7 +8,7 @@ export const receiveInventory = createAsyncThunk(
       const response = await inventoryAPI.receive(data);
       return response.data;
     } catch (err) {
-      throw new Error(err.response?.data?.description || err.message);
+      throw new Error(err.response?.data || err.message);
     }
   }
 );

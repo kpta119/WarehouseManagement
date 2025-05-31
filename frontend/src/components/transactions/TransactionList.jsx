@@ -80,24 +80,36 @@ const TransactionList = () => {
         return a.type.localeCompare(b.type);
       case "type-reverse":
         return b.type.localeCompare(a.type);
+      case "employee":
+        return (a.employeeName || "").localeCompare(b.employeeName || "");
+      case "employee-reverse":
+        return (b.employeeName || "").localeCompare(a.employeeName || "");
       case "from":
-        return (a.fromWarehouseId || "").localeCompare(b.fromWarehouseId || "");
+        return (a.fromWarehouseName || "").localeCompare(
+          b.fromWarehouseName || ""
+        );
       case "from-reverse":
-        return (b.fromWarehouseId || "").localeCompare(a.fromWarehouseId || "");
+        return (b.fromWarehouseName || "").localeCompare(
+          a.fromWarehouseName || ""
+        );
       case "to":
         return (
-          a.toWarehouseId ||
-          a.clientId ||
-          a.supplierId ||
+          a.toWarehouseName ||
+          a.clientName ||
+          a.supplierName ||
           ""
-        ).localeCompare(b.toWarehouseId || b.clientId || b.supplierId || "");
+        ).localeCompare(
+          b.toWarehouseName || b.clientName || b.supplierName || ""
+        );
       case "to-reverse":
         return (
-          b.toWarehouseId ||
-          b.clientId ||
-          b.supplierId ||
+          b.toWarehouseName ||
+          b.clientName ||
+          b.supplierName ||
           ""
-        ).localeCompare(a.toWarehouseId || a.clientId || a.supplierId || "");
+        ).localeCompare(
+          a.toWarehouseName || a.clientName || a.supplierName || ""
+        );
       case "total":
         return a.totalPrice - b.totalPrice;
       case "total-reverse":
@@ -189,6 +201,8 @@ const TransactionList = () => {
             { value: "description-reverse", label: "Opis (od Z do A)" },
             { value: "type", label: "Typ (od A do Z)" },
             { value: "type-reverse", label: "Typ (od Z do A)" },
+            { value: "employee", label: "Pracownik (od A do Z)" },
+            { value: "employee-reverse", label: "Pracownik (od Z do A)" },
             { value: "from", label: "Z Miejsca (od A do Z)" },
             { value: "from-reverse", label: "Z Miejsca (od Z do A)" },
             { value: "to", label: "Do Miejsca (od A do Z)" },
@@ -211,9 +225,9 @@ const TransactionList = () => {
             { name: "Data", type: "Date" },
             { name: "Opis", type: "Text-Long" },
             { name: "Typ", type: "Type" },
-            { name: "Pracownik", type: "Number" },
-            { name: "Od miejsca", type: "Number" },
-            { name: "Do miejsca", type: "Number" },
+            { name: "Pracownik", type: "Text" },
+            { name: "Od miejsca", type: "Text" },
+            { name: "Do miejsca", type: "Text" },
             { name: "Kwota", type: "Currency" },
             { name: "Rozmiar", type: "Number" },
           ]}
@@ -222,11 +236,12 @@ const TransactionList = () => {
             date: item.date,
             description: item.description,
             type: item.type,
-            employeeId: item.employeeId,
-            ["fromWarehouseId" in item ? "fromWarehouseId" : "supplierId"]:
-              item.fromWarehouseId || item.supplierId,
-            ["toWarehouseId" in item ? "toWarehouseId" : "clientId"]:
-              item.toWarehouseId || item.clientId,
+            employeeName: item.employeeName,
+            ["fromWarehouseName" in item
+              ? "fromWarehouseName"
+              : "supplierName"]: item.fromWarehouseName || item.supplierName,
+            ["toWarehouseName" in item ? "toWarehouseName" : "clientName"]:
+              item.toWarehouseName || item.clientName,
             totalPrice: item.totalPrice,
             totalSize: item.totalSize,
           }))}

@@ -26,7 +26,7 @@ const EmployeeList = () => {
   useEffect(() => {
     dispatch(
       fetchEmployees({
-        name: debouncedSearchTerm || undefined,
+        partOfNameOrSurname: debouncedSearchTerm || undefined,
         regionId: selectedRegion || undefined,
         minTransactions: debouncedMinTransactions
           ? parseInt(debouncedMinTransactions)

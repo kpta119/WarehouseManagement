@@ -91,10 +91,12 @@ const TransferPage = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center space-x-2">
-        <FaExchangeAlt className="text-pink-500 w-6 h-6" />
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Przeniesienie towaru
-        </h1>
+        <div className="flex items-center w-1/2 space-x-2">
+          <FaExchangeAlt className="text-pink-500 w-6 h-6" />
+          <h1 className="text-2xl font-semibold text-gray-800">
+            Przeniesienie towaru
+          </h1>
+        </div>
         {status === "failed" && (
           <p className="text-red-500 ml-4">Błąd: {error}</p>
         )}
