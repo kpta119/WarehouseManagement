@@ -39,7 +39,6 @@ const WarehouseDetail = () => {
   } = useSelector((state) => state.warehouses);
   const { list: data } = useSelector((state) => state.products);
   const { content: productsData } = data;
-  console.log(data);
   useEffect(() => {
     dispatch(fetchWarehouseById(id));
   }, [dispatch, id]);
@@ -89,6 +88,12 @@ const WarehouseDetail = () => {
   }));
   const PIE_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444"];
   const empCounts = warehouse.transactions.reduce((acc, tx) => {
+    if (
+      !employees
+        .map((emp) => `${emp.name} ${emp.surname}`)
+        .includes(tx.employeeName)
+    )
+      return acc;
     acc[tx.employeeName] = (acc[tx.employeeName] || 0) + 1;
     return acc;
   }, {});
@@ -96,7 +101,6 @@ const WarehouseDetail = () => {
     employeeName: employeeName.split(" ")[0],
     count,
   }));
-  console.log(pieData);
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
