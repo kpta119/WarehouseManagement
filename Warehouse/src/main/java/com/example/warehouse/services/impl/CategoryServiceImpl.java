@@ -2,6 +2,7 @@ package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.Category;
 import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
+import com.example.warehouse.domain.dto.filtersDto.CategorySearchFilters;
 import com.example.warehouse.repositories.CategoryRepository;
 import com.example.warehouse.services.CategoryService;
 import org.springframework.data.domain.Page;
@@ -19,8 +20,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Page<Category> getAllCategories(Pageable pageable) {
-        return categoryRepository.findAll(pageable);
+    public Page<Category> getAllCategories(CategorySearchFilters filters, Pageable pageable) {
+        return categoryRepository.findAll(filters, pageable);
     }
 
     @Override

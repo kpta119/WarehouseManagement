@@ -5,6 +5,7 @@ import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
+import com.example.warehouse.domain.dto.filtersDto.SupplierSearchFilter;
 import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.SupplierService;
 import jakarta.validation.Valid;
@@ -30,21 +31,19 @@ public class SupplierController {
 
     @GetMapping()
     public ResponseEntity<?> getAllSuppliers(
-            @RequestParam(required = false) String regionName,
-            @RequestParam(required = false) Integer minTransactions,
-            @RequestParam(required = false) Integer maxTransactions,
-            @RequestParam(required = false) Integer warehouseId,
+            @ModelAttribute SupplierSearchFilter filters,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(defaultValue = "false") boolean all
     ) {
         try {
-            Page<SupplierSummaryDto> response;
+            Pageable pageable;
             if (all) {
-                response = supplierService.getSuppliersWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, Pageable.unpaged());
+                pageable = Pageable.unpaged();
             } else {
-                response = supplierService.getSuppliersWithTransactionCount(regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
+                pageable = PageRequest.of(page, size);
             }
+            Page<SupplierSummaryDto> response = supplierService.getSuppliersWithTransactionCount(filters, pageable);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());

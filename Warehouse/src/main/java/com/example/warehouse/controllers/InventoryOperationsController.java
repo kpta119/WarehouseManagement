@@ -7,6 +7,7 @@ import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenD
 import com.example.warehouse.mappers.InventoryOperationsMapper;
 import com.example.warehouse.services.InventoryOperationsService;
 import com.example.warehouse.validation.OnCreate;
+import org.springframework.dao.NonTransientDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +44,8 @@ public class InventoryOperationsController {
         try {
             Transaction transaction = inventoryOperationsService.transferBetweenWarehouses(transferDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
+        } catch (NonTransientDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Server error: " + e.getMessage());
         }
@@ -53,6 +56,8 @@ public class InventoryOperationsController {
         try {
             Transaction transaction = inventoryOperationsService.sellToClient(transferDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
+        } catch (NonTransientDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }

@@ -1,6 +1,7 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Transaction;
+import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -83,45 +84,27 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
     List<Transaction> findLastAddedTransactionByWarehouseId(Integer warehouseId, Pageable pageable);
 
 
-    @Query(
-            value = """
-            SELECT t
+    @Query("""
+            SELECT t.id, t.date, t.description, t.transactionType, t.employee.name, t.employee.surname, fw.name, tw.name,
+                  c.name, s.name, SUM(tp.transactionPrice * tp.quantity) AS totalPrice, SUM(p.unitSize * tp.quantity) AS totalSize
             FROM Transaction t
+            LEFT JOIN t.client   c
+            LEFT JOIN t.supplier s
+            Left Join t.fromWarehouse fw
+            LEFT JOIN t.toWarehouse tw
             JOIN t.products tp
             JOIN tp.product p
-            WHERE (:fromDate IS NULL OR t.date >= :fromDate)
-              AND (:toDate IS NULL OR t.date <= :toDate)
-              AND (:type IS NULL OR t.transactionType = :type)
-              AND (:employeeId IS NULL OR t.employee.id = :employeeId)
-            GROUP BY t
-            HAVING (:minTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) >= :minTotalPrice)
-               AND (:maxTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) <= :maxTotalPrice)
-               AND (:minTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) >= :minTotalSize)
-               AND (:maxTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) <= :maxTotalSize)
-    """,
-            countQuery = """
-            SELECT COUNT(t)
-            FROM Transaction t
-            JOIN t.products tp
-            JOIN tp.product p
-            WHERE (:fromDate IS NULL OR t.date >= :fromDate)
-              AND (:toDate IS NULL OR t.date <= :toDate)
-              AND (:type IS NULL OR t.transactionType = :type)
-              AND (:employeeId IS NULL OR t.employee.id = :employeeId)
-            GROUP BY t
-            HAVING (:minTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) >= :minTotalPrice)
-               AND (:maxTotalPrice IS NULL OR SUM(tp.transactionPrice * tp.quantity) <= :maxTotalPrice)
-               AND (:minTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) >= :minTotalSize)
-               AND (:maxTotalSize IS NULL OR SUM(p.unitSize * tp.quantity) <= :maxTotalSize)
+            WHERE (:#{#filters.fromDate} IS NULL OR t.date >= :#{#filters.fromDate})
+              AND (:#{#filters.toDate} IS NULL OR t.date <= :#{#filters.toDate})
+              AND (:#{#filters.type} IS NULL OR t.transactionType = :#{#filters.type})
+              AND (:#{#filters.employeeId} IS NULL OR t.employee.id = :#{#filters.employeeId})
+                AND (:#{#filters.warehouseId} IS NULL OR (t.fromWarehouse.id = :#{#filters.warehouseId} OR t.toWarehouse.id = :#{#filters.warehouseId}))
+            GROUP BY t.id
+            HAVING (:#{#filters.minTotalPrice} IS NULL OR SUM(tp.transactionPrice * tp.quantity) >= :#{#filters.minTotalPrice})
+               AND (:#{#filters.maxTotalPrice} IS NULL OR SUM(tp.transactionPrice * tp.quantity) <= :#{#filters.maxTotalPrice})
+               AND (:#{#filters.minTotalSize} IS NULL OR SUM(p.unitSize * tp.quantity) >= :#{#filters.minTotalSize})
+               AND (:#{#filters.maxTotalSize} IS NULL OR SUM(p.unitSize * tp.quantity) <= :#{#filters.maxTotalSize})
+            ORDER BY t.date DESC
     """)
-    Page<Transaction> findAllWithFilters(
-            @Param("minTotalPrice") Double minTotalPrice,
-            @Param("maxTotalPrice") Double maxTotalPrice,
-            @Param("minTotalSize") Double minTotalSize,
-            @Param("maxTotalSize") Double maxTotalSize,
-            @Param("fromDate") Date fromDate,
-            @Param("toDate") Date toDate,
-            @Param("type") Transaction.TransactionType type,
-            @Param("employeeId") Integer employeeId,
-            Pageable pageable);
+    Page<Object[]> findAllWithFilters(@Param("filters") TransactionsSearchFilters filters, @Param("fromDate") Date fromDate, Pageable pageable);
 }

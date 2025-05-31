@@ -1,51 +1,25 @@
 package com.example.warehouse.mappers;
 
-import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-
 @Component
 public class TransactionSummaryMapper {
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
-    public TransactionSummaryDto mapToDto(Transaction transaction) {
+    public TransactionSummaryDto mapToDto(Object[] transaction) {
         TransactionSummaryDto dto = new TransactionSummaryDto();
 
-        dto.setTransactionId(transaction.getId());
-        dto.setType(transaction.getTransactionType().name());
-        dto.setDate(transaction.getDate() != null ? simpleDateFormat.format(transaction.getDate()) : null);
-        dto.setDescription(transaction.getDescription());
-
-        if (transaction.getEmployee() != null) {
-            dto.setEmployeeId(transaction.getEmployee().getId());
-        }
-
-        if (transaction.getFromWarehouse() != null) {
-            dto.setFromWarehouseId(transaction.getFromWarehouse().getId());
-        }
-
-        if (transaction.getToWarehouse() != null) {
-            dto.setToWarehouseId(transaction.getToWarehouse().getId());
-        }
-
-        if (transaction.getClient() != null) {
-            dto.setClientId(transaction.getClient().getId());
-        }
-
-        if (transaction.getSupplier() != null) {
-            dto.setSupplierId(transaction.getSupplier().getId());
-        }
-
-        Double totalPrice = transaction.getProducts().stream()
-                .map(tp -> BigDecimal.valueOf(tp.getTransactionPrice()).multiply(BigDecimal.valueOf(tp.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .doubleValue();
-
-        dto.setTotalPrice(totalPrice);
+        dto.setTransactionId((Integer) transaction[0]);
+        dto.setType(String.valueOf(transaction[3]));
+        dto.setDate(String.valueOf(transaction[1]));
+        dto.setDescription((String) transaction[2]);
+        dto.setEmployeeName(transaction[4] + " " + transaction[5]);
+        dto.setFromWarehouseName(transaction[6] != null ? (String) transaction[6] : null);
+        dto.setToWarehouseName(transaction[7] != null ? (String) transaction[7] : null);
+        dto.setClientName(transaction[8] != null ? (String) transaction[8] : null);
+        dto.setSupplierName(transaction[9] != null ? (String) transaction[9] : null);
+        dto.setTotalPrice(((Number) transaction[10]).doubleValue());
+        dto.setTotalSize(((Number) transaction[11]).doubleValue());
 
         return dto;
 

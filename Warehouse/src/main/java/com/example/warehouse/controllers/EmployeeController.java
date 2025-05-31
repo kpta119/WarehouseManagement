@@ -4,6 +4,7 @@ import com.example.warehouse.domain.Employee;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeWithHistoryDto;
+import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
 import com.example.warehouse.mappers.EmployeeMapper;
 import com.example.warehouse.services.EmployeeService;
 import jakarta.validation.Valid;
@@ -30,22 +31,19 @@ public class EmployeeController {
 
     @GetMapping()
     public ResponseEntity<?> getAllEmployees(
-            @RequestParam(required = false) String partOfNameOrSurname,
-            @RequestParam(required = false) String regionName,
-            @RequestParam(required = false) Integer minTransactions,
-            @RequestParam(required = false) Integer maxTransactions,
-            @RequestParam(required = false) Integer warehouseId,
+            @ModelAttribute EmployeeSearchFilter filters,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
             @RequestParam(defaultValue = "false") boolean all
     ) {
         try {
-            Page<EmployeeSummaryDto> response;
+            Pageable pageable;
             if (all) {
-                response = employeeService.getEmployeesWithTransactionCount(partOfNameOrSurname, regionName, minTransactions, maxTransactions, warehouseId, Pageable.unpaged());
+                pageable = Pageable.unpaged();
             } else {
-                response = employeeService.getEmployeesWithTransactionCount(partOfNameOrSurname, regionName, minTransactions, maxTransactions, warehouseId, PageRequest.of(page, size));
+                pageable = PageRequest.of(page, size);
             }
+            Page<EmployeeSummaryDto> response = employeeService.getEmployeesWithTransactionCount(filters, pageable);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
