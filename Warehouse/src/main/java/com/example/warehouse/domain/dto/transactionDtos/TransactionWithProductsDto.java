@@ -16,6 +16,7 @@ public class TransactionWithProductsDto {
     private String date;
     private String description;
     private String employeeName;
+    private Integer employeeId;
     private Integer fromWarehouseId;
     private String fromWarehouseName;
     private Integer toWarehouseId;
