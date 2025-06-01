@@ -20,8 +20,7 @@ def insert_data_to_database(data: dict, config: dict):
     logical_order = [
         "region", "country", "city", "address",
         "client", "supplier", "warehouse", "employee",
-        "category", "product", "productinventory",
-        "report", "transaction", "transactionproduct"
+        "category", "product", "productinventory", "transaction", "transactionproduct"
     ]
 
     table_name_map = {
@@ -36,7 +35,6 @@ def insert_data_to_database(data: dict, config: dict):
         "category": "Category",
         "product": "Product",
         "productinventory": "ProductInventory",
-        "report": "Report",
         "transaction": "Transaction",
         "transactionproduct": "TransactionProduct"
     }
