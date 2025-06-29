@@ -88,8 +88,8 @@ public class WarehousesServiceImpl implements WarehousesService {
         newWarehouse.setCapacity(warehouse.getCapacity());
         newWarehouse.setOccupiedCapacity(0.0);
 
-        warehouseRepository.save(newWarehouse);
-        return warehousesMapper.mapToDto(newWarehouse);
+        Warehouse createdWarehouse = warehouseRepository.save(newWarehouse);
+        return warehousesMapper.mapToDto(createdWarehouse);
     }
 
     @Override
@@ -113,8 +113,8 @@ public class WarehousesServiceImpl implements WarehousesService {
             return cityRepository.save(newCity);
         });
         Address.setCity(city);
-        warehouseRepository.save(existingWarehouse);
-        return warehousesMapper.mapToDto(existingWarehouse);
+        Warehouse updatedWarehouse = warehouseRepository.save(existingWarehouse);
+        return warehousesMapper.mapToDto(updatedWarehouse);
     }
 
     @Override

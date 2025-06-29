@@ -34,8 +34,8 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
 
-        categoryRepository.save(category);
-        return categoryMapper.mapToDto(category);
+        Category createdCategory = categoryRepository.save(category);
+        return categoryMapper.mapToDto(createdCategory);
     }
 
     @Override
@@ -46,8 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
 
-        categoryRepository.save(category);
-        return categoryMapper.mapToDto(category);
+        Category updatedCategory = categoryRepository.save(category);
+        return categoryMapper.mapToDto(updatedCategory);
     }
 
     @Override

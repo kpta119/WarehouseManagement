@@ -139,8 +139,8 @@ public class ProductsServiceImpl implements ProductsService {
         product.setUnitSize(productDto.getUnitSize());
         product.setCategory(category);
 
-        productRepository.save(product);
-        return productMapper.mapToDto(product);
+        Product newProduct = productRepository.save(product);
+        return productMapper.mapToDto(newProduct);
     }
 
     @Override
@@ -156,8 +156,8 @@ public class ProductsServiceImpl implements ProductsService {
                 .orElseThrow(() -> new NoSuchElementException("Category not found with ID: " + product.getCategoryId()));
         existingProduct.setCategory(category);
 
-        productRepository.save(existingProduct);
-        return productMapper.mapToDto(existingProduct);
+        Product updatedProduct = productRepository.save(existingProduct);
+        return productMapper.mapToDto(updatedProduct);
     }
 
     @Override
