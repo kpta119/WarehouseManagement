@@ -2,6 +2,7 @@ package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Warehouse;
 import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
+import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,9 +18,10 @@ import java.util.Optional;
 public interface WarehouseRepository extends CrudRepository<Warehouse, Integer>, JpaRepository<Warehouse, Integer> {
 
     @Query("""
-            SELECT w.id, w.name, w.capacity, w.occupiedCapacity, a.street, a.streetNumber , c.name, co.name,
-                        Count(distinct e.id) AS employeesCount, COALESCE(Sum(distinct pi.quantity), 0) AS productsSum,
-                        Count(distinct t.id) AS transactionsCount
+            SELECT new com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllResponseDto(
+                        w.id, w.name, w.capacity, w.occupiedCapacity, Concat(a.street, ' ', a.streetNumber, ' ' , c.name, ', ', co.name),
+                        Count(distinct e.id), COALESCE(Sum(distinct pi.quantity), 0L), Count(distinct t.id)
+                        )
             FROM Warehouse w
             LEFT JOIN w.productInventories pi
             LEFT JOIN Transaction t ON t.fromWarehouse.id = w.id OR t.toWarehouse.id = w.id
@@ -42,7 +44,7 @@ public interface WarehouseRepository extends CrudRepository<Warehouse, Integer>,
             AND (:#{#filter.minTransactions} IS NULL OR Count(distinct t.id) >= :#{#filter.minTransactions})
             AND (:#{#filter.maxTransactions} IS NULL OR Count(distinct t.id) <= :#{#filter.maxTransactions})
             """)
-    Page<Object[]> findAllWithDetails(@Param("filter") WarehousesSearchFilters filter, Pageable pageable);
+    Page<WarehouseGetAllResponseDto> findAllWithDetails(@Param("filter") WarehousesSearchFilters filter, Pageable pageable);
 
     @EntityGraph(attributePaths = {
             "address.city",

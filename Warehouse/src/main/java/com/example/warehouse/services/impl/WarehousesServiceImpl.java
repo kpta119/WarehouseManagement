@@ -5,7 +5,7 @@ import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
 import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDataBaseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
-import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
+import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllResponseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
 import com.example.warehouse.mappers.WarehousesMapper;
 import com.example.warehouse.repositories.CityRepository;
@@ -44,9 +44,8 @@ public class WarehousesServiceImpl implements WarehousesService {
     }
 
     @Override
-    public Page<WarehouseGetAllEndpointDto> getAllWarehouses(WarehousesSearchFilters filters, Pageable pageable) {
-        Page<Object[]> warehouses = warehouseRepository.findAllWithDetails(filters, pageable);
-        return warehouses.map(warehousesMapper::mapToDto);
+    public Page<WarehouseGetAllResponseDto> getAllWarehouses(WarehousesSearchFilters filters, Pageable pageable) {
+        return warehouseRepository.findAllWithDetails(filters, pageable);
     }
 
     @Override

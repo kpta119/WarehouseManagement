@@ -9,7 +9,6 @@ import com.example.warehouse.domain.dto.transactionDtos.WarehouseTransactionInfo
 import com.example.warehouse.domain.dto.warehouseDto.ProductInWarehouseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDataBaseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
-import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -20,21 +19,6 @@ import java.util.List;
 public class WarehousesMapper {
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-    public WarehouseGetAllEndpointDto mapToDto(Object[] warehouse) {
-        WarehouseGetAllEndpointDto dto = new WarehouseGetAllEndpointDto();
-        dto.setWarehouseId(((Number) warehouse[0]).intValue());
-        dto.setName((String) warehouse[1]);
-        dto.setCapacity((Double) warehouse[2]);
-        dto.setOccupiedCapacity((double) warehouse[3]);
-        dto.setAddress(
-                warehouse[4] + " " + warehouse[5] + " " + warehouse[6] + ", " + warehouse[7]
-        );
-        dto.setEmployeesCount(((Number) warehouse[8]).intValue());
-        dto.setProductsSum(((Number) warehouse[9]).intValue());
-        dto.setTransactionsCount(((Number) warehouse[10]).intValue());
-        return dto;
-    }
 
     public WarehouseDetailsDto mapToDto(
             Warehouse warehouse, List<Transaction> transactions, List<Employee> employees, Integer totalItems, Double totalValue
