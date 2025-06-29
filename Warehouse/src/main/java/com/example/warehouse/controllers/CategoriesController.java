@@ -1,14 +1,11 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Category;
 import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
 import com.example.warehouse.domain.dto.filtersDto.CategorySearchFilters;
-import com.example.warehouse.mappers.CategoryMapper;
 import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,11 +20,9 @@ import java.util.NoSuchElementException;
 public class CategoriesController {
 
     private final CategoryService categoryService;
-    private final CategoryMapper categoryMapper;
 
-    public CategoriesController(CategoryService categoryService, CategoryMapper categoryMapper) {
+    public CategoriesController(CategoryService categoryService) {
         this.categoryService = categoryService;
-        this.categoryMapper = categoryMapper;
     }
 
     @GetMapping()
@@ -44,9 +39,7 @@ public class CategoriesController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<Category> categories = categoryService.getAllCategories(filters, pageable);
-            Page<CategoryDto> dtos = categories.map(categoryMapper::mapToDto);
-            return ResponseEntity.ok(dtos);
+            return ResponseEntity.status(HttpStatus.OK).body(categoryService.getAllCategories(filters, pageable));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -55,8 +48,7 @@ public class CategoriesController {
     @PostMapping()
     public ResponseEntity<?> createCategory(@Validated(OnCreate.class) @RequestBody CategoryDto categoryDto) {
         try {
-            Category savedCategory = categoryService.createCategory(categoryDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(categoryMapper.mapToDto(savedCategory));
+            return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryDto));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -65,8 +57,7 @@ public class CategoriesController {
     @PutMapping("/{categoryId}")
     public ResponseEntity<?> updateCategory(@PathVariable Integer categoryId, @Validated(OnUpdate.class) @RequestBody CategoryDto categoryDto) {
         try {
-            Category updatedCategory = categoryService.updateCategory(categoryId, categoryDto);
-            return ResponseEntity.ok(categoryMapper.mapToDto(updatedCategory));
+            return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(categoryId, categoryDto));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -77,8 +68,7 @@ public class CategoriesController {
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<?> deleteCategory(@PathVariable Integer categoryId) {
         try {
-            Category category = categoryService.deleteCategory(categoryId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(categoryMapper.mapToDto(category));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(categoryService.deleteCategory(categoryId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (DataIntegrityViolationException e) {
