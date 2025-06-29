@@ -2,6 +2,7 @@ package com.example.warehouse.services;
 
 import com.example.warehouse.domain.Warehouse;
 import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
+import com.example.warehouse.domain.dto.warehouseDto.WarehouseDataBaseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
@@ -17,9 +18,9 @@ public interface WarehousesService {
 
     Double calculateTotalValueInWarehouse(Warehouse warehouse);
 
-    Warehouse createWarehouse(WarehouseModifyDto warehouseDto);
+    WarehouseDataBaseDto createWarehouse(WarehouseModifyDto warehouseDto);
 
-    Warehouse updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId);
+    WarehouseDataBaseDto updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId);
 
-    Warehouse deleteWarehouse(Integer warehouseId);
+    WarehouseDataBaseDto deleteWarehouse(Integer warehouseId);
 }

@@ -3,6 +3,7 @@ package com.example.warehouse.services.impl;
 import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
 import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
+import com.example.warehouse.domain.dto.warehouseDto.WarehouseDataBaseDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllEndpointDto;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
@@ -74,7 +75,7 @@ public class WarehousesServiceImpl implements WarehousesService {
     }
 
     @Override
-    public Warehouse createWarehouse(WarehouseModifyDto warehouse) {
+    public WarehouseDataBaseDto createWarehouse(WarehouseModifyDto warehouse) {
         Warehouse newWarehouse = new Warehouse();
         AddressInfoDto addressInfoDto = new AddressInfoDto();
         addressInfoDto.setStreet(warehouse.getStreet());
@@ -88,11 +89,12 @@ public class WarehousesServiceImpl implements WarehousesService {
         newWarehouse.setCapacity(warehouse.getCapacity());
         newWarehouse.setOccupiedCapacity(0.0);
 
-        return warehouseRepository.save(newWarehouse);
+        warehouseRepository.save(newWarehouse);
+        return warehousesMapper.mapToDto(newWarehouse);
     }
 
     @Override
-    public Warehouse updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId) {
+    public WarehouseDataBaseDto updateWarehouse(WarehouseModifyDto warehouseDto, Integer warehouseId) {
         Warehouse existingWarehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
         Address Address = existingWarehouse.getAddress();
@@ -112,14 +114,15 @@ public class WarehousesServiceImpl implements WarehousesService {
             return cityRepository.save(newCity);
         });
         Address.setCity(city);
-        return warehouseRepository.save(existingWarehouse);
+        warehouseRepository.save(existingWarehouse);
+        return warehousesMapper.mapToDto(existingWarehouse);
     }
 
     @Override
-    public Warehouse deleteWarehouse(Integer warehouseId) {
+    public WarehouseDataBaseDto deleteWarehouse(Integer warehouseId) {
         Warehouse warehouse = warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new NoSuchElementException("Warehouse not found with ID: " + warehouseId));
         warehouseRepository.delete(warehouse);
-        return warehouse;
+        return warehousesMapper.mapToDto(warehouse);
     }
 }

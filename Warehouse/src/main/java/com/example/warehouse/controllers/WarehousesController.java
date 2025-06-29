@@ -1,9 +1,7 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Warehouse;
 import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
-import com.example.warehouse.mappers.WarehousesMapper;
 import com.example.warehouse.services.WarehousesService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;
@@ -22,11 +20,9 @@ import java.util.NoSuchElementException;
 public class WarehousesController {
 
     private final WarehousesService warehousesService;
-    private final WarehousesMapper warehousesMapper;
 
-    public WarehousesController(WarehousesService warehousesService, WarehousesMapper warehousesMapper) {
+    public WarehousesController(WarehousesService warehousesService) {
         this.warehousesService = warehousesService;
-        this.warehousesMapper = warehousesMapper;
     }
 
     @GetMapping()
@@ -63,8 +59,7 @@ public class WarehousesController {
     @PostMapping()
     public ResponseEntity<?> createWarehouse(@Validated(OnCreate.class) @RequestBody WarehouseModifyDto warehouseDto) {
         try {
-            Warehouse warehouse = warehousesService.createWarehouse(warehouseDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(warehousesMapper.mapToDto(warehouse));
+            return ResponseEntity.status(HttpStatus.CREATED).body(warehousesService.createWarehouse(warehouseDto));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -76,8 +71,7 @@ public class WarehousesController {
     public ResponseEntity<?> updateWarehouse(@Validated(OnUpdate.class) @RequestBody WarehouseModifyDto warehouseDto,
                                              @PathVariable Integer warehouseId) {
         try {
-            Warehouse warehouse = warehousesService.updateWarehouse(warehouseDto, warehouseId);
-            return ResponseEntity.ok(warehousesMapper.mapToDto(warehouse));
+            return ResponseEntity.ok(warehousesService.updateWarehouse(warehouseDto, warehouseId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Warehouse not found: " + e.getMessage());
         } catch (Exception e) {
@@ -88,8 +82,7 @@ public class WarehousesController {
     @DeleteMapping({"/{warehouseId}"})
     public ResponseEntity<?> deleteWarehouse(@PathVariable Integer warehouseId) {
         try {
-            Warehouse warehouse = warehousesService.deleteWarehouse(warehouseId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(warehousesMapper.mapToDto(warehouse));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(warehousesService.deleteWarehouse(warehouseId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Warehouse not found: " + e.getMessage());
         } catch (DataIntegrityViolationException e) {
