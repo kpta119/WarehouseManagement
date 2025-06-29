@@ -3,7 +3,7 @@ package com.example.warehouse.controllers;
 import com.example.warehouse.TestDataUtil;
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.addressDtos.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 import com.example.warehouse.repositories.CountryRepository;
 import com.example.warehouse.repositories.RegionRepository;
@@ -21,17 +21,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureMockMvc
 public class ClientControllerTests {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private RegionRepository regionRepository;
-
     @Autowired
     private CountryRepository countryRepository;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
 
     @Test
     public void testThatCreateClientReturnHttpStatus201Created() throws Exception {
@@ -39,7 +35,7 @@ public class ClientControllerTests {
         regionRepository.save(region);
         Country country = TestDataUtil.createCountry1(region);
         countryRepository.save(country);
-        AddressDto addressDto = TestDataUtil.createAddressDto1(country);
+        AddressInfoDto addressDto = TestDataUtil.createAddressDto1(country);
         BusinessEntityDto businessEntityDto = TestDataUtil.createClientDto1(addressDto);
 
         String createClientAsJson = objectMapper.writeValueAsString(businessEntityDto);

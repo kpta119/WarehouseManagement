@@ -2,32 +2,33 @@ package com.example.warehouse;
 
 import com.example.warehouse.domain.Country;
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.addressDtos.AddressDto;
+import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
 
 public class TestDataUtil {
 
-    private TestDataUtil(){}
+    private TestDataUtil() {
+    }
 
-    public static Region createRegion1(){
+    public static Region createRegion1() {
         Region region = new Region();
         region.setName("Asia");
         return region;
     }
 
-    public static Region createRegion2(){
+    public static Region createRegion2() {
         Region region = new Region();
         region.setName("Europe");
         return region;
     }
 
-    public static Region createRegion3(){
+    public static Region createRegion3() {
         Region region = new Region();
         region.setName("Australia");
         return region;
     }
 
-    public static Country createCountry1(Region region){
+    public static Country createCountry1(Region region) {
         Country country = new Country();
         country.setName("Poland");
         country.setRegion(region);
@@ -35,7 +36,7 @@ public class TestDataUtil {
         return country;
     }
 
-    public static Country createCountry2(Region region){
+    public static Country createCountry2(Region region) {
         Country country = new Country();
         country.setName("China");
         country.setRegion(region);
@@ -43,7 +44,7 @@ public class TestDataUtil {
         return country;
     }
 
-    public static Country createCountry3(Region region){
+    public static Country createCountry3(Region region) {
         Country country = new Country();
         country.setName("Germany");
         country.setRegion(region);
@@ -51,7 +52,7 @@ public class TestDataUtil {
         return country;
     }
 
-    public static BusinessEntityDto createClientDto1(AddressDto addressDto){
+    public static BusinessEntityDto createClientDto1(AddressInfoDto addressDto) {
         BusinessEntityDto businessEntityDto = new BusinessEntityDto();
         businessEntityDto.setAddress(addressDto);
         businessEntityDto.setName("ExampleName");
@@ -60,14 +61,13 @@ public class TestDataUtil {
         return businessEntityDto;
     }
 
-    public static AddressDto createAddressDto1(Country country){
-        AddressDto addressDto = new AddressDto();
-        addressDto.setCity("Pruszków");
+    public static AddressInfoDto createAddressDto1(Country country) {
+        AddressInfoDto addressDto = new AddressInfoDto();
+        addressDto.setCityName("Pruszków");
         addressDto.setCountryId(country.getId());
         addressDto.setPostalCode("06-900");
-        addressDto.setRegionId(country.getRegion().getId());
         addressDto.setStreet("Marynarska");
         addressDto.setStreetNumber(6);
-        return  addressDto;
+        return addressDto;
     }
 }

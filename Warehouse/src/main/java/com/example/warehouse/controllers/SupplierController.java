@@ -1,15 +1,9 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Supplier;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierWithHistoryDto;
 import com.example.warehouse.domain.dto.filtersDto.SupplierSearchFilter;
-import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.SupplierService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,11 +15,9 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/api/suppliers")
 public class SupplierController {
-    private final BusinessEntityMapper businessEntityMapper;
     private final SupplierService supplierService;
 
-    public SupplierController(BusinessEntityMapper businessEntityMapper, SupplierService supplierService) {
-        this.businessEntityMapper = businessEntityMapper;
+    public SupplierController(SupplierService supplierService) {
         this.supplierService = supplierService;
     }
 
@@ -43,8 +35,7 @@ public class SupplierController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<SupplierSummaryDto> response = supplierService.getSuppliersWithTransactionCount(filters, pageable);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(supplierService.getSuppliersWithTransactionCount(filters, pageable));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -53,8 +44,7 @@ public class SupplierController {
     @GetMapping("/{supplierId}")
     public ResponseEntity<?> getClientWithHistory(@PathVariable("supplierId") Integer supplierId) {
         try {
-            SupplierWithHistoryDto supplierWithHistory = supplierService.getSupplierWithHistory(supplierId);
-            return ResponseEntity.status(HttpStatus.OK).body(supplierWithHistory);
+            return ResponseEntity.status(HttpStatus.OK).body(supplierService.getSupplierWithHistory(supplierId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -66,9 +56,7 @@ public class SupplierController {
     @PostMapping()
     public ResponseEntity<?> createSupplier(@Valid @RequestBody BusinessEntityDto request) {
         try {
-            Supplier savedSupplier = supplierService.createSupplier(request);
-            SupplierDto responseDto = businessEntityMapper.mapToDto(savedSupplier);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(supplierService.createSupplier(request));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {

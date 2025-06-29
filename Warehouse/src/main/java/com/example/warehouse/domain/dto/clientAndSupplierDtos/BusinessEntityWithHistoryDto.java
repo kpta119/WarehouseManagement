@@ -1,28 +1,25 @@
 package com.example.warehouse.domain.dto.clientAndSupplierDtos;
 
-import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
-import jakarta.validation.Valid;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BusinessEntityDto {
-    private Integer id;
-
+public abstract class BusinessEntityWithHistoryDto {
     @NotBlank(message = "Name cannot be empty")
     private String name;
-
-    @Email(message = "Invalid email format")
+    @Email(message = "Wrong email format")
     private String email;
-
     private String phoneNumber;
+    private String address;
+    private List<TransactionWithProductsDto> history;
 
-    @Valid
-    private AddressInfoDto address;
+    public abstract void setId(Integer id);
 }
-

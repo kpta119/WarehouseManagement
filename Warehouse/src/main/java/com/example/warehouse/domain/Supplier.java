@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "Supplier")
-public class Supplier {
+public class Supplier implements BusinessEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +31,25 @@ public class Supplier {
 
     @OneToMany(mappedBy = "supplier")
     private List<Transaction> transactions;
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
+    @Override
+    public String getName() {
+        return name;
+    }
+    @Override
+    public String getEmail() {
+        return email;
+    }
+    @Override
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    @Override
+    public Address getAddress() {
+        return address;
+    }
 }

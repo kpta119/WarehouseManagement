@@ -1,15 +1,9 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
 import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
-import com.example.warehouse.mappers.BusinessEntityMapper;
 import com.example.warehouse.services.ClientService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,12 +16,10 @@ import java.util.NoSuchElementException;
 @RequestMapping("/api/clients")
 public class ClientController {
 
-    private final BusinessEntityMapper businessEntityMapper;
     private final ClientService clientService;
 
-    public ClientController(ClientService clientService, BusinessEntityMapper businessEntityMapper) {
+    public ClientController(ClientService clientService) {
         this.clientService = clientService;
-        this.businessEntityMapper = businessEntityMapper;
     }
 
     @GetMapping()
@@ -44,8 +36,7 @@ public class ClientController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<ClientSummaryDto> response = clientService.getClientsWithTransactionCount(filters, pageable);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(clientService.getClientsWithTransactionCount(filters, pageable));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -54,8 +45,7 @@ public class ClientController {
     @GetMapping("/{clientId}")
     public ResponseEntity<?> getClientWithHistory(@PathVariable("clientId") Integer clientId) {
         try {
-            ClientWithHistoryDto clientWithHistoryDto = clientService.getClientWithHistory(clientId);
-            return ResponseEntity.status(HttpStatus.OK).body(clientWithHistoryDto);
+            return ResponseEntity.status(HttpStatus.OK).body(clientService.getClientWithHistory(clientId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -66,9 +56,7 @@ public class ClientController {
     @PostMapping()
     public ResponseEntity<?> createClient(@Valid @RequestBody BusinessEntityDto request) {
         try {
-            Client savedClient = clientService.createClient(request);
-            ClientDto responseDto = businessEntityMapper.mapToDto(savedClient);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(clientService.createClient(request));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {

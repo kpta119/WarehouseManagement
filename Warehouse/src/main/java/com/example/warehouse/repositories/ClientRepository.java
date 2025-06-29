@@ -1,9 +1,11 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Client;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
 import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,9 +17,14 @@ import java.util.Optional;
 public interface ClientRepository extends CrudRepository<Client, Integer> {
 
     @Query("""
-    SELECT c, COUNT(t)
+    SELECT new com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto(
+        c.id, c.name, c.email, c.phoneNumber, Concat(a.street, ' ', a.streetNumber, ' ' , ci.name, ', ', co.name), Count(t)
+        )
     FROM Client c
       LEFT JOIN Transaction t ON t.client.id = c.id AND (:#{#filters.warehouseId} IS NULL OR t.fromWarehouse.id = :#{#filters.warehouseId})
+      LEFT JOIN c.address a
+      LEFT JOIN a.city ci
+      LEFT JOIN ci.country co
       WHERE (:#{#filters.regionId} IS NULL OR c.address.city.country.region.id = :#{#filters.regionId})
         AND (:#{#filters.name} IS NULL OR c.name LIKE CONCAT('%', :#{#filters.name}, '%'))
       GROUP BY c
@@ -25,8 +32,17 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
          AND (:#{#filters.maxTransactions} IS NULL OR COUNT(t) <= :#{#filters.maxTransactions})
     
     """)
-    Page<Object[]> findAllClientsWithTransactionCounts(@Param("filters")ClientSearchFilters filters, Pageable pageable);
+    Page<ClientSummaryDto> findAllClientsWithTransactionCounts(@Param("filters")ClientSearchFilters filters, Pageable pageable);
 
-    @Query("SELECT c FROM Client c LEFT JOIN FETCH c.transactions WHERE c.id = :clientId")
+    @EntityGraph(attributePaths = {
+        "address",
+        "address.city",
+        "address.city.country",
+        "transactions",
+        "transactions.fromWarehouse",
+        "transactions.toWarehouse",
+        "transactions.employee"
+    })
+    @Query("SELECT c FROM Client c WHERE c.id = :clientId")
     Optional<Client> findClientWithHistoryById(Integer clientId);
 }

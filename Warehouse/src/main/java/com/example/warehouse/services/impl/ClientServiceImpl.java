@@ -1,93 +1,74 @@
 package com.example.warehouse.services.impl;
 
 import com.example.warehouse.domain.Address;
-import com.example.warehouse.domain.City;
 import com.example.warehouse.domain.Client;
-import com.example.warehouse.domain.Country;
-import com.example.warehouse.domain.dto.addressDtos.AddressDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
 import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientWithHistoryDto;
 import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
-import com.example.warehouse.mappers.BusinesEntityWithHistoryMapper;
-import com.example.warehouse.mappers.BusinessEntitySummaryMapper;
-import com.example.warehouse.repositories.AddressRepository;
-import com.example.warehouse.repositories.CityRepository;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
+import com.example.warehouse.mappers.BusinessEntityMapper;
+import com.example.warehouse.mappers.BusinessEntityWithHistoryMapper;
 import com.example.warehouse.repositories.ClientRepository;
-import com.example.warehouse.repositories.CountryRepository;
+import com.example.warehouse.services.AddressService;
 import com.example.warehouse.services.ClientService;
+import com.example.warehouse.services.HistoryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 
 @Service
 public class ClientServiceImpl implements ClientService {
-    private final CityRepository cityRepository;
-    private final CountryRepository countryRepository;
-    private final AddressRepository addressRepository;
     private final ClientRepository clientRepository;
-    private final BusinessEntitySummaryMapper businessEntitySummaryMapper;
-    private final BusinesEntityWithHistoryMapper businessEntityWithHistoryMapper;
+    private final BusinessEntityWithHistoryMapper businessEntityWithHistoryMapper;
+    private final HistoryService historyService;
+    private final AddressService addressService;
+    private final BusinessEntityMapper businessEntityMapper;
 
-    public ClientServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, ClientRepository clientRepository, BusinessEntitySummaryMapper businessEntitySummaryMapper, BusinesEntityWithHistoryMapper businessEntityWithHistoryMapper) {
-        this.cityRepository = cityRepository;
-        this.countryRepository = countryRepository;
-        this.addressRepository = addressRepository;
+
+    public ClientServiceImpl(
+            ClientRepository clientRepository,
+            BusinessEntityWithHistoryMapper businessEntityWithHistoryMapper,
+            HistoryService historyService,
+            AddressService addressService,
+            BusinessEntityMapper businessEntityMapper
+    ) {
         this.clientRepository = clientRepository;
-        this.businessEntitySummaryMapper = businessEntitySummaryMapper;
         this.businessEntityWithHistoryMapper = businessEntityWithHistoryMapper;
+        this.historyService = historyService;
+        this.addressService = addressService;
+        this.businessEntityMapper = businessEntityMapper;
     }
 
     @Override
-    public Client createClient(BusinessEntityDto request) {
-        AddressDto addressDto = request.getAddress();
-        Optional<City> existingCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
-                addressDto.getPostalCode(), addressDto.getCity(), addressDto.getCountryId()
-        );
-        City city;
-        if (existingCity.isEmpty()){
-            Country country = countryRepository.findById(addressDto.getCountryId())
-                    .orElseThrow(() -> new NoSuchElementException("Country not found"));
-
-            city = new City();
-            city.setCountry(country);
-            city.setName(addressDto.getCity());
-            city.setPostalCode(addressDto.getPostalCode());
-            cityRepository.save(city);
-        } else {
-            city = existingCity.get();
-        }
-
-        Address address = new Address();
-        address.setCity(city);
-        address.setStreet(addressDto.getStreet());
-        address.setStreetNumber(addressDto.getStreetNumber());
-        Address addressSaved = addressRepository.save(address);
+    public ClientDto createClient(BusinessEntityDto request) {
+        Address newAddress = addressService.createAddress(request.getAddress());
 
         Client client = new Client();
         client.setName(request.getName());
         client.setEmail(request.getEmail());
         client.setPhoneNumber(request.getPhoneNumber());
-        client.setAddress(addressSaved);
+        client.setAddress(newAddress);
 
-        return clientRepository.save(client);
-
+        Client newClient = clientRepository.save(client);
+        return businessEntityMapper.mapToDto(newClient);
     }
 
     @Override
     public Page<ClientSummaryDto> getClientsWithTransactionCount(ClientSearchFilters filters, Pageable pageable){
-        Page<Object[]> results = clientRepository.findAllClientsWithTransactionCounts(filters, pageable);
-        return results.map(businessEntitySummaryMapper::mapToClientDto);
+        return clientRepository.findAllClientsWithTransactionCounts(filters, pageable);
     }
 
     @Override
     public ClientWithHistoryDto getClientWithHistory(Integer clientId) {
         Client client = clientRepository.findClientWithHistoryById(clientId)
                 .orElseThrow(() -> new NoSuchElementException("Client not found"));
-        return businessEntityWithHistoryMapper.mapToDto(client);
+        List<TransactionWithProductsDto> transactions = historyService.getTransactionHistory(client.getTransactions());
+        return businessEntityWithHistoryMapper.mapToDto(client, transactions);
     }
 }

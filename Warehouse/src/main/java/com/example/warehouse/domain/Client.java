@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "Client")
-public class Client {
+public class Client implements BusinessEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +31,28 @@ public class Client {
     @JoinColumn(name = "AddressID")
     private Address address;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Transaction> transactions;
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
+    @Override
+    public String getName() {
+        return name;
+    }
+    @Override
+    public String getEmail() {
+        return email;
+    }
+    @Override
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    @Override
+    public Address getAddress() {
+        return address;
+    }
 }
