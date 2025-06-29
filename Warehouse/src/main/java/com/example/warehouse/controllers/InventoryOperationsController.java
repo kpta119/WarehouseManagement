@@ -1,10 +1,8 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.ReceiveDeliveryDto;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.SellToClientDto;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenDto;
-import com.example.warehouse.mappers.InventoryOperationsMapper;
 import com.example.warehouse.services.InventoryOperationsService;
 import com.example.warehouse.validation.OnCreate;
 import org.springframework.dao.NonTransientDataAccessException;
@@ -21,19 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class InventoryOperationsController {
 
     private final InventoryOperationsService inventoryOperationsService;
-    private final InventoryOperationsMapper inventoryOperationsMapper;
 
-    public InventoryOperationsController(InventoryOperationsService inventoryOperationsService,
-                                         InventoryOperationsMapper inventoryOperationsMapper) {
+    public InventoryOperationsController(InventoryOperationsService inventoryOperationsService) {
         this.inventoryOperationsService = inventoryOperationsService;
-        this.inventoryOperationsMapper = inventoryOperationsMapper;
     }
 
     @PostMapping("/receive")
     public ResponseEntity<?> receiveDelivery(@Validated(OnCreate.class) @RequestBody ReceiveDeliveryDto receiveTransferDto) {
         try {
-            Transaction transaction = inventoryOperationsService.receiveDelivery(receiveTransferDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
+            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsService.receiveDelivery(receiveTransferDto));
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Server error: " + e.getMessage());
         }
@@ -42,8 +36,7 @@ public class InventoryOperationsController {
     @PostMapping("/transfer")
     public ResponseEntity<?> transferBetweenWarehouses(@Validated(OnCreate.class) @RequestBody TransferBetweenDto transferDto) {
         try {
-            Transaction transaction = inventoryOperationsService.transferBetweenWarehouses(transferDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
+            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsService.transferBetweenWarehouses(transferDto));
         } catch (NonTransientDataAccessException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
@@ -54,8 +47,7 @@ public class InventoryOperationsController {
     @PostMapping("/delivery")
     public ResponseEntity<?> sellToClient(@Validated(OnCreate.class) @RequestBody SellToClientDto transferDto) {
         try {
-            Transaction transaction = inventoryOperationsService.sellToClient(transferDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsMapper.mapToDto(transaction));
+            return ResponseEntity.status(HttpStatus.CREATED).body(inventoryOperationsService.sellToClient(transferDto));
         } catch (NonTransientDataAccessException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

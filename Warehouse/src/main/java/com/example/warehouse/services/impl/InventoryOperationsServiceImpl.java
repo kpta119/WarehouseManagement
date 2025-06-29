@@ -4,6 +4,8 @@ import com.example.warehouse.domain.*;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.ReceiveDeliveryDto;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.SellToClientDto;
 import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenDto;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionDataBaseDto;
+import com.example.warehouse.mappers.InventoryOperationsMapper;
 import com.example.warehouse.repositories.*;
 import com.example.warehouse.services.InventoryOperationsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,22 +29,28 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
     private final WarehouseRepository warehouseRepository;
     private final EmployeeRepository employeeRepository;
     private final ClientRepository clientRepository;
+    private final InventoryOperationsMapper inventoryOperationsMapper;
 
-    public InventoryOperationsServiceImpl(TransactionRepository transactionRepository,
-                                          SupplierRepository supplierRepository,
-                                          WarehouseRepository warehouseRepository,
-                                          EmployeeRepository employeeRepository,
-                                          ClientRepository clientRepository) {
+    public InventoryOperationsServiceImpl(
+            TransactionRepository transactionRepository,
+            SupplierRepository supplierRepository,
+            WarehouseRepository warehouseRepository,
+            EmployeeRepository employeeRepository,
+            ClientRepository clientRepository,
+            InventoryOperationsMapper inventoryOperationsMapper
+    ) {
         this.warehouseRepository = warehouseRepository;
         this.transactionRepository = transactionRepository;
         this.objectMapper = new ObjectMapper();
         this.supplierRepository = supplierRepository;
         this.employeeRepository = employeeRepository;
         this.clientRepository = clientRepository;
+        this.inventoryOperationsMapper = inventoryOperationsMapper;
+
     }
 
     @Override
-    public Transaction receiveDelivery(ReceiveDeliveryDto receiveTransferDto) throws Exception {
+    public TransactionDataBaseDto receiveDelivery(ReceiveDeliveryDto receiveTransferDto) throws Exception {
         List<Map<String, Integer>> items = this.transformItems(receiveTransferDto.getItems());
         String productsJson = objectMapper.writeValueAsString(items);
         Supplier supplier = supplierRepository.findById(receiveTransferDto.getSupplierId())
@@ -62,8 +70,9 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
                 productsJson
                 );
 
-        return transactionRepository.findLastAddedTransactionByWarehouseId(receiveTransferDto.getWarehouseId(), PageRequest.of(0, 1))
-                .stream().findFirst().orElse(null);
+        Transaction lastTransaction = transactionRepository.findLastAddedTransactionByWarehouseId(receiveTransferDto.getWarehouseId(), PageRequest.of(0, 1))
+                .stream().findFirst().orElseThrow(() -> new Exception("No transactions found for warehouse ID: " + receiveTransferDto.getWarehouseId()));
+        return inventoryOperationsMapper.mapToDto(lastTransaction);
     }
 
     @Override
@@ -74,7 +83,7 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
     }
 
     @Override
-    public Transaction transferBetweenWarehouses(TransferBetweenDto transferDto) throws Exception {
+    public TransactionDataBaseDto transferBetweenWarehouses(TransferBetweenDto transferDto) throws Exception {
         List<Map<String, Integer>> items = this.transformItems(transferDto.getItems());
         String productsJson = objectMapper.writeValueAsString(items);
         Employee employee = employeeRepository.findById(transferDto.getEmployeeId())
@@ -103,13 +112,14 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
             }
         }
 
-        return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getToWarehouseId(), PageRequest.of(0, 1))
-                .stream().findFirst().orElse(null);
+        Transaction lastTransaction = transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getToWarehouseId(), PageRequest.of(0, 1))
+                .stream().findFirst().orElseThrow(() -> new Exception("No transactions found for warehouse ID: " + transferDto.getToWarehouseId()));
+        return inventoryOperationsMapper.mapToDto(lastTransaction);
 
     }
 
     @Override
-    public Transaction sellToClient(SellToClientDto transferDto) throws Exception {
+    public TransactionDataBaseDto sellToClient(SellToClientDto transferDto) throws Exception {
         List<Map<String, Integer>> items = this.transformItems(transferDto.getItems());
         String productsJson = objectMapper.writeValueAsString(items);
         Employee employee = employeeRepository.findById(transferDto.getEmployeeId())
@@ -138,7 +148,8 @@ public class InventoryOperationsServiceImpl implements InventoryOperationsServic
             }
         }
 
-        return transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getWarehouseId(), PageRequest.of(0, 1))
-                .stream().findFirst().orElse(null);
+        Transaction lastTransaction = transactionRepository.findLastAddedTransactionByWarehouseId(transferDto.getWarehouseId(), PageRequest.of(0, 1))
+                .stream().findFirst().orElseThrow(() -> new Exception("No transactions found for warehouse ID: " + transferDto.getWarehouseId()));
+        return inventoryOperationsMapper.mapToDto(lastTransaction);
     }
 }
