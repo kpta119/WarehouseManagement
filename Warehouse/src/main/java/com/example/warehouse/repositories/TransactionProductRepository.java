@@ -4,6 +4,7 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.TransactionProduct;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,8 +60,11 @@ public interface TransactionProductRepository extends JpaRepository<TransactionP
     interface TopProductProjection {
         Product getProduct();
 
-        Long getTotalQuantity();
     }
 
-
+    @EntityGraph(attributePaths = {
+            "transaction.employee",
+    })
+    @Query("SELECT tp FROM TransactionProduct tp WHERE tp.product.id = :productId")
+    List<TransactionProduct> findByProductId(@Param("productId") Integer productId);
 }

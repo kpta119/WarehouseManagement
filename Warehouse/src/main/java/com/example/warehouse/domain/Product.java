@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +26,15 @@ public class Product {
     private Double unitPrice;
     private Double unitSize;
 
-    @ManyToOne(optional = false)
+    @ManyToOne()
     @JoinColumn(name = "CategoryID")
     private Category category;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<ProductInventory> productInventories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<TransactionProduct> productTransactions = new ArrayList<>();
 }

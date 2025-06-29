@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +28,18 @@ public class Warehouse {
 
     @OneToOne(
             optional = false,
-            cascade = CascadeType.ALL)
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
     @JoinColumn(name = "AddressID")
     private Address address;
 
-    @OneToMany(mappedBy = "warehouse")
+    @OneToMany(mappedBy = "warehouse", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<ProductInventory> productInventories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "warehouse")
+    @OneToMany(mappedBy = "warehouse", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Employee> employees = new ArrayList<>();
 
 }

@@ -4,6 +4,8 @@ import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
+import com.example.warehouse.domain.dto.productDtos.ProductDetailsResponseDto;
+import com.example.warehouse.domain.dto.productDtos.ProductsResponseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import jakarta.validation.Valid;
@@ -14,21 +16,21 @@ import java.util.List;
 
 public interface ProductsService {
 
-    Page<Object[]> getAllProducts(ProductSearchFilterDto productFilters, Pageable pageable);
+    Page<ProductsResponseDto> getAllProducts(ProductSearchFilterDto productFilters, Pageable pageable);
 
-    Product getProductByIdWithProductInventory(Integer productId);
+    ProductDetailsResponseDto getProductDetails(Integer productId);
 
     List<ProductsInventoryDto> getProductsInventory(Product product);
 
     List<ProductTransactionInfoDto> getTransactionsDto(Integer productId);
 
-    List<Integer> getLowStockProductIds(Integer warehouseId, int lowStockThreshold);
+    List<Integer> getLowStockProductIds(Integer warehouseId);
 
-    List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod, int topN);
+    List<Integer> getBestSellingProducts(Integer warehouseId, Period parsedPeriod);
 
-    Product createProduct(@Valid ProductDataBaseDto product);
+    ProductDataBaseDto createProduct(@Valid ProductDataBaseDto product);
 
-    Product updateProduct(Integer productId, ProductDataBaseDto product);
+    ProductDataBaseDto updateProduct(Integer productId, ProductDataBaseDto product);
 
-    Product deleteProduct(Integer productId);
+    ProductDataBaseDto deleteProduct(Integer productId);
 }

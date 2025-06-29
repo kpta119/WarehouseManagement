@@ -3,8 +3,7 @@ package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
-import com.example.warehouse.domain.dto.productDtos.ProductGetSingleProductDto;
-import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
+import com.example.warehouse.domain.dto.productDtos.ProductDetailsResponseDto;
 import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
 import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
 import org.springframework.stereotype.Component;
@@ -14,25 +13,8 @@ import java.util.List;
 @Component
 public class ProductMapper {
 
-    public ProductSearchEndpointDto mapToDto(Object[] product, List<Integer> lowStockProductIds, List<Integer> bestSellingProducts) {
-
-        ProductSearchEndpointDto dto = new ProductSearchEndpointDto();
-
-        dto.setProductId(((Number) product[0]).intValue());
-        dto.setName((String) product[1]);
-        dto.setDescription((String) product[2]);
-        dto.setUnitPrice((Double) product[3]);
-        dto.setUnitSize((Double) product[4]);
-        dto.setInventoryCount(((Number) product[5]).intValue());
-        dto.setTransactionCount(((Number) product[6]).intValue());
-        dto.setCategoryName((String) product[7]);
-        dto.setLowStock(lowStockProductIds.contains(dto.getProductId()));
-        dto.setBestSelling(bestSellingProducts.contains(dto.getProductId()));
-        return dto;
-    }
-
-    public ProductGetSingleProductDto mapToDto(Product product, List<ProductsInventoryDto> inventory, List<ProductTransactionInfoDto> transactions) {
-        ProductGetSingleProductDto dto = new ProductGetSingleProductDto();
+    public ProductDetailsResponseDto mapToDto(Product product, List<ProductsInventoryDto> inventory, List<ProductTransactionInfoDto> transactions) {
+        ProductDetailsResponseDto dto = new ProductDetailsResponseDto();
         dto.setProductId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());

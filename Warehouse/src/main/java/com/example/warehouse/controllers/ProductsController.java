@@ -1,18 +1,12 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Product;
 import com.example.warehouse.domain.dto.dateDtos.Period;
 import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
 import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
-import com.example.warehouse.domain.dto.productDtos.ProductSearchEndpointDto;
-import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
-import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
-import com.example.warehouse.mappers.ProductMapper;
 import com.example.warehouse.services.ProductsService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -20,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -28,14 +21,9 @@ import java.util.NoSuchElementException;
 public class ProductsController {
 
     private final ProductsService productsService;
-    private final ProductMapper productMapper;
-    private final int lowStockThreshold = 5;
-    private final int topN = 3;
 
-
-    public ProductsController(ProductsService productsService, ProductMapper productMapper) {
+    public ProductsController(ProductsService productsService) {
         this.productsService = productsService;
-        this.productMapper = productMapper;
     }
 
     @GetMapping()
@@ -52,15 +40,7 @@ public class ProductsController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<Object[]> productsWithInventory = productsService.getAllProducts(productFilters, pageable);
-            List<Integer> lowStockProductIds = productsService.getLowStockProductIds(productFilters.getWarehouseId(), lowStockThreshold);
-            List<Integer> bestSellingProducts = productsService.getBestSellingProducts(productFilters.getWarehouseId(), Period.allTime, topN);
-            Page<ProductSearchEndpointDto> dtos = productsWithInventory.map(product -> productMapper.mapToDto(
-                    product,
-                    lowStockProductIds,
-                    bestSellingProducts
-            ));
-            return ResponseEntity.ok(dtos);
+            return ResponseEntity.ok(productsService.getAllProducts(productFilters, pageable));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -69,10 +49,7 @@ public class ProductsController {
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProduct(@PathVariable Integer productId) {
         try {
-            Product product = productsService.getProductByIdWithProductInventory(productId);
-            List<ProductsInventoryDto> inventory = productsService.getProductsInventory(product);
-            List<ProductTransactionInfoDto> transactions = productsService.getTransactionsDto(productId);
-            return ResponseEntity.ok(productMapper.mapToDto(product, inventory, transactions));
+            return ResponseEntity.ok(productsService.getProductDetails(productId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -83,8 +60,7 @@ public class ProductsController {
     @GetMapping("/low-stock")
     public ResponseEntity<?> getLowStockProducts(@RequestParam(required = false) Integer warehouseId) {
         try {
-            List<Integer> lowStockProductIds = productsService.getLowStockProductIds(warehouseId, lowStockThreshold);
-            return ResponseEntity.ok(lowStockProductIds);
+            return ResponseEntity.ok(productsService.getLowStockProductIds(warehouseId));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -94,8 +70,7 @@ public class ProductsController {
     public ResponseEntity<?> getTop3BestSellingProducts(@RequestParam(required = false) Integer warehouseId, @RequestParam String period) {
         try {
             Period parsedPeriod = Period.valueOf(period);
-            List<Integer> products = productsService.getBestSellingProducts(warehouseId, parsedPeriod, topN);
-            return ResponseEntity.ok(products);
+            return ResponseEntity.ok(productsService.getBestSellingProducts(warehouseId, parsedPeriod));
         } catch (IllegalArgumentException | NullPointerException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid period argument: " + period);
         } catch (Exception e) {
@@ -106,8 +81,7 @@ public class ProductsController {
     @PostMapping()
     public ResponseEntity<?> createProduct(@Validated(OnCreate.class) @RequestBody ProductDataBaseDto product) {
         try {
-            Product savedProduct = productsService.createProduct(product);
-            return ResponseEntity.status(HttpStatus.CREATED).body(productMapper.mapToDto(savedProduct));
+            return ResponseEntity.status(HttpStatus.CREATED).body(productsService.createProduct(product));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -118,8 +92,7 @@ public class ProductsController {
     @PutMapping("/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Integer productId, @Validated(OnUpdate.class) @RequestBody ProductDataBaseDto product) {
         try {
-            Product updatedProduct = productsService.updateProduct(productId, product);
-            return ResponseEntity.status(HttpStatus.OK).body(productMapper.mapToDto(updatedProduct));
+            return ResponseEntity.status(HttpStatus.OK).body(productsService.updateProduct(productId, product));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -130,8 +103,7 @@ public class ProductsController {
     @DeleteMapping("/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable Integer productId) {
         try {
-            Product deletedProduct = productsService.deleteProduct(productId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(productMapper.mapToDto(deletedProduct));
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(productsService.deleteProduct(productId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (DataIntegrityViolationException e) {

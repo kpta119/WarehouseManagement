@@ -33,7 +33,7 @@ public class Transaction {
     private Date date;
     private String description;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "EmployeeID")
     private Employee employee;
 

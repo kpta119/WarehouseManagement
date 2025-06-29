@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductGetSingleProductDto extends ProductDto {
+public class ProductDetailsResponseDto extends ProductDto {
     private String categoryName;
     private Integer categoryId;
     private List<ProductsInventoryDto> inventory;
