@@ -18,21 +18,21 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query("""
             SELECT new com.example.warehouse.dtos.employeeDtos.EmployeeSummaryDto(
-                e.id, e.name, e.surname, e.email, e.phoneNumber, e.position, e.warehouse.name, COUNT(t)
+                e.id, e.name, e.surname, e.email, e.phoneNumber, e.position, e.warehouse.name, COUNT(distinct t)
                 )
             FROM Employee e
             LEFT JOIN e.transactions t
-            JOIN e.address a
-            JOIN a.city c
-            JOIN c.country co
-            JOIN co.region r
+            LEFT JOIN e.address a
+            LEFT JOIN a.city c
+            LEFT JOIN c.country co
+            LEFT JOIN co.region r
             WHERE (:#{#filters.warehouseId} IS NULL OR e.warehouse.id = :#{#filters.warehouseId})
             AND (:#{#filters.partOfNameOrSurname} IS NULL OR
                 LOWER(CONCAT(e.name, e.surname)) LIKE LOWER(CONCAT('%', :#{#filters.partOfNameOrSurname}, '%')))
             AND (:#{#filters.regionId} IS NULL OR r.id = :#{#filters.regionId})
-            GROUP BY e
-            HAVING (:#{#filters.minTransaction} IS NULL OR COUNT(t) >= :#{#filters.minTransaction})
-            AND (:#{#filters.maxTransactions} IS NULL OR COUNT(t) <= :#{#filters.maxTransactions})
+            GROUP BY e.id
+            HAVING (:#{#filters.minTransaction} IS NULL OR COUNT(distinct t) >= :#{#filters.minTransaction})
+            AND (:#{#filters.maxTransactions} IS NULL OR COUNT(distinct t) <= :#{#filters.maxTransactions})
     """)
     Page<EmployeeSummaryDto> findAllEmployeesWithTransactionCounts(@Param("filters") EmployeeSearchFilter filters, Pageable pageable);
 
