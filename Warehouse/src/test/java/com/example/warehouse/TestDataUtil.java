@@ -63,7 +63,7 @@ public class TestDataUtil {
 
     public static AddressInfoDto createAddressDto1(Country country) {
         AddressInfoDto addressDto = new AddressInfoDto();
-        addressDto.setCityName("Pruszków");
+        addressDto.setCity("Pruszków");
         addressDto.setCountryId(country.getId());
         addressDto.setPostalCode("06-900");
         addressDto.setStreet("Marynarska");

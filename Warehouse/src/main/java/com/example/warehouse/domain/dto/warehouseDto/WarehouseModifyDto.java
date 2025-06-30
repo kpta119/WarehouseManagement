@@ -1,44 +1,25 @@
 package com.example.warehouse.domain.dto.warehouseDto;
 
-import com.example.warehouse.validation.OnCreate;
-import com.example.warehouse.validation.OnUpdate;
+import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarehouseModifyDto {
+public class WarehouseModifyDto extends AddressInfoDto {
     private Integer warehouseId;
 
-    @NotBlank(message = "Name cannot be blank", groups = {OnCreate.class, OnUpdate.class})
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @NotNull(message = "Capacity cannot be null", groups = {OnCreate.class, OnUpdate.class})
-    @Positive(message = "Capacity must be positive", groups = {OnCreate.class, OnUpdate.class})
+    @NotNull(message = "Capacity cannot be null")
+    @Positive(message = "Capacity must be positive")
     private Double capacity;
-
-    @NotNull(message = "RegionId cannot be null", groups = {OnCreate.class, OnUpdate.class})
-    @Positive(message = "RegionId must be positive", groups = {OnCreate.class, OnUpdate.class})
-    private Integer regionId;
-
-    @NotNull(message = "CountryId cannot be null", groups = {OnCreate.class, OnUpdate.class})
-    @Positive(message = "CountryId must be positive", groups = {OnCreate.class, OnUpdate.class})
-    private Integer countryId;
-
-    @NotBlank(message = "City cannot be blank", groups = {OnCreate.class})
-    private String city;
-
-    @NotBlank(message = "Postal code cannot be blank", groups = {OnCreate.class})
-    private String postalCode;
-
-    @NotBlank(message = "Street cannot be blank", groups = {OnCreate.class})
-    private String street;
-
-    @NotBlank(message = "Street number cannot be blank", groups = {OnCreate.class})
-    private String streetNumber;
 }

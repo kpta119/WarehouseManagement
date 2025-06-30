@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class Employee {
     @JoinColumn(name = "WarehouseID")
     private Warehouse warehouse;
 
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Transaction> transactions;
 }

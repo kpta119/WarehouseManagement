@@ -1,93 +1,81 @@
 package com.example.warehouse.services.impl;
 
-import com.example.warehouse.domain.*;
-import com.example.warehouse.domain.dto.addressDtos.AddressDto;
+import com.example.warehouse.domain.Address;
+import com.example.warehouse.domain.Employee;
+import com.example.warehouse.domain.Warehouse;
+import com.example.warehouse.domain.dto.employeeDtos.CreateEmployeeDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeWithHistoryDto;
 import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
-import com.example.warehouse.mappers.EmployeeSummaryMapper;
-import com.example.warehouse.mappers.EmployeeWithHistoryMapper;
-import com.example.warehouse.repositories.*;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionWithProductsDto;
+import com.example.warehouse.mappers.EmployeeMapper;
+import com.example.warehouse.repositories.EmployeeRepository;
+import com.example.warehouse.repositories.WarehouseRepository;
+import com.example.warehouse.services.AddressService;
 import com.example.warehouse.services.EmployeeService;
+import com.example.warehouse.services.HistoryService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-    private final CityRepository cityRepository;
-    private final CountryRepository countryRepository;
-    private final AddressRepository addressRepository;
+    private final AddressService addressService;
     private final EmployeeRepository employeeRepository;
     private final WarehouseRepository warehouseRepository;
-    private final EmployeeSummaryMapper employeeSummaryMapper;
-    private final EmployeeWithHistoryMapper employeeWithHistoryMapper;
+    private final EmployeeMapper employeeMapper;
+    private final HistoryService historyService;
 
-    public EmployeeServiceImpl(CityRepository cityRepository, CountryRepository countryRepository, AddressRepository addressRepository, EmployeeRepository employeeRepository, WarehouseRepository warehouseRepository, EmployeeSummaryMapper employeeSummaryMapper, EmployeeWithHistoryMapper employeeWithHistoryMapper) {
-        this.cityRepository = cityRepository;
-        this.countryRepository = countryRepository;
-        this.addressRepository = addressRepository;
+    public EmployeeServiceImpl(
+            AddressService addressService,
+            EmployeeRepository employeeRepository,
+            WarehouseRepository warehouseRepository,
+            EmployeeMapper employeeMapper,
+            HistoryService historyService
+    ) {
         this.employeeRepository = employeeRepository;
         this.warehouseRepository = warehouseRepository;
-        this.employeeSummaryMapper = employeeSummaryMapper;
-        this.employeeWithHistoryMapper = employeeWithHistoryMapper;
+        this.employeeMapper = employeeMapper;
+        this.historyService = historyService;
+        this.addressService = addressService;
     }
 
     @Override
     public Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(EmployeeSearchFilter filters, Pageable pageable) {
-        Page<Object[]> results = employeeRepository.findAllEmployeesWithTransactionCounts(filters, pageable);
-        return results.map(employeeSummaryMapper::mapToDto);
+        return employeeRepository.findAllEmployeesWithTransactionCounts(filters, pageable);
     }
 
     @Override
-    public Employee createEmployee(EmployeeDto request) {
-        AddressDto addressDto = request.getAddress();
-        Optional<City> existingCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(
-                addressDto.getPostalCode(), addressDto.getCity(), addressDto.getCountryId()
-        );
-        City city;
-        if (existingCity.isEmpty()){
-            Country country = countryRepository.findById(addressDto.getCountryId())
-                    .orElseThrow(() -> new NoSuchElementException("Country not found"));
+    public EmployeeDto createEmployee(CreateEmployeeDto employeeDto) {
+        Address savedAddress = addressService.createAddress(employeeDto);
 
-            city = new City();
-            city.setCountry(country);
-            city.setName(addressDto.getCity());
-            city.setPostalCode(addressDto.getPostalCode());
-            cityRepository.save(city);
-        } else {
-            city = existingCity.get();
-        }
-        Address address = new Address();
-        address.setCity(city);
-        address.setStreet(addressDto.getStreet());
-        address.setStreetNumber(addressDto.getStreetNumber());
-        Address addressSaved = addressRepository.save(address);
-
-        Integer warehouseId = request.getWarehouseId();
+        Integer warehouseId = employeeDto.getWarehouseId();
         Optional<Warehouse> existingWarehouse = warehouseRepository.findById(warehouseId);
-        if (existingWarehouse.isEmpty()){
+        if (existingWarehouse.isEmpty()) {
             throw new NoSuchElementException("Warehouse with this id does not exist");
         }
         Employee employee = new Employee();
-        employee.setEmail(request.getEmail());
-        employee.setName(request.getName());
-        employee.setSurname(request.getSurname());
-        employee.setPhoneNumber(request.getPhoneNumber());
-        employee.setPosition(request.getPosition());
-        employee.setAddress(addressSaved);
+        employee.setEmail(employeeDto.getEmail());
+        employee.setName(employeeDto.getName());
+        employee.setSurname(employeeDto.getSurname());
+        employee.setPhoneNumber(employeeDto.getPhoneNumber());
+        employee.setPosition(employeeDto.getPosition());
+        employee.setAddress(savedAddress);
         employee.setWarehouse(existingWarehouse.get());
-        return employeeRepository.save(employee);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return employeeMapper.mapToDto(savedEmployee);
     }
 
     @Override
     public EmployeeWithHistoryDto getEmployeeWithHistory(Integer employeeId) {
         Employee employee = employeeRepository.findEmployeeWithHistoryById(employeeId)
-                .orElseThrow(()-> new NoSuchElementException("Employee not found"));
-        return employeeWithHistoryMapper.mapToDto(employee);
+                .orElseThrow(() -> new NoSuchElementException("Employee not found"));
+        List<TransactionWithProductsDto> transactions = historyService.getTransactionsHistory(employee.getTransactions());
+        return employeeMapper.mapToDto(employee, transactions);
     }
 }

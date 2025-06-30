@@ -1,6 +1,6 @@
 package com.example.warehouse.services;
 
-import com.example.warehouse.domain.Employee;
+import com.example.warehouse.domain.dto.employeeDtos.CreateEmployeeDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
 import com.example.warehouse.domain.dto.employeeDtos.EmployeeWithHistoryDto;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public interface EmployeeService {
     Page<EmployeeSummaryDto> getEmployeesWithTransactionCount(EmployeeSearchFilter filters, Pageable pageable);
 
-    Employee createEmployee(EmployeeDto request);
+    EmployeeDto createEmployee(CreateEmployeeDto employeeDto);
 
     EmployeeWithHistoryDto getEmployeeWithHistory(Integer employeeId);
 }

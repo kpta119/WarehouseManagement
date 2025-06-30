@@ -7,4 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface AddressService {
     Address createAddress(AddressInfoDto addressDto);
+
+    Address updateAddress(AddressInfoDto addressDto, Address oldAddress);
 }

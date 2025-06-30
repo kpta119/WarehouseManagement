@@ -32,13 +32,13 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new NoSuchElementException("Country not found with ID: " + addressDto.getCountryId()));
 
         String postalCode = addressDto.getPostalCode();
-        String cityName = addressDto.getCityName();
+        String cityName = addressDto.getCity();
         Integer countryId = addressDto.getCountryId();
         Optional<City> foundCity = cityRepository.findByPostalCodeAndNameAndCountry_Id(postalCode, cityName, countryId);
 
         City city = foundCity.orElseGet(() -> {
             City newCity = new City();
-            newCity.setName(addressDto.getCityName());
+            newCity.setName(addressDto.getCity());
             newCity.setPostalCode(addressDto.getPostalCode());
             newCity.setCountry(country);
             return cityRepository.save(newCity);
@@ -52,5 +52,10 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.save(address);
     }
 
-
+    @Override
+    public Address updateAddress(AddressInfoDto addressDto, Address oldAddress) {
+        Address newAddress = createAddress(addressDto);
+        addressRepository.delete(oldAddress);
+        return newAddress;
+    }
 }

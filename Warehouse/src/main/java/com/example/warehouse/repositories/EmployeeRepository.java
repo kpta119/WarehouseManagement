@@ -1,9 +1,11 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Employee;
+import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
 import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +17,10 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query("""
-            SELECT e, COUNT(t) FROM Employee e
+            SELECT new com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto(
+                e.id, e.name, e.surname, e.email, e.phoneNumber, e.position, e.warehouse.name, COUNT(t)
+                )
+            FROM Employee e
             LEFT JOIN e.transactions t
             JOIN e.address a
             JOIN a.city c
@@ -29,8 +34,19 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             HAVING (:#{#filters.minTransaction} IS NULL OR COUNT(t) >= :#{#filters.minTransaction})
             AND (:#{#filters.maxTransactions} IS NULL OR COUNT(t) <= :#{#filters.maxTransactions})
     """)
-    Page<Object[]> findAllEmployeesWithTransactionCounts(@Param("filters") EmployeeSearchFilter filters, Pageable pageable);
+    Page<EmployeeSummaryDto> findAllEmployeesWithTransactionCounts(@Param("filters") EmployeeSearchFilter filters, Pageable pageable);
 
-    @Query("SELECT e FROM Employee e LEFT JOIN FETCH e.transactions WHERE e.id = :employeeId")
+    @EntityGraph(attributePaths = {
+            "address",
+            "address.city",
+            "address.city.country",
+            "warehouse",
+            "transactions",
+            "transactions.supplier",
+            "transactions.toWarehouse",
+            "transactions.fromWarehouse",
+            "transactions.client",
+    })
+    @Query("SELECT e FROM Employee e WHERE e.id = :employeeId")
     Optional<Employee> findEmployeeWithHistoryById(Integer employeeId);
 }

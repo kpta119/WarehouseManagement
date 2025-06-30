@@ -1,14 +1,9 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Employee;
-import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
-import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
-import com.example.warehouse.domain.dto.employeeDtos.EmployeeWithHistoryDto;
+import com.example.warehouse.domain.dto.employeeDtos.CreateEmployeeDto;
 import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
-import com.example.warehouse.mappers.EmployeeMapper;
 import com.example.warehouse.services.EmployeeService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,11 +17,9 @@ import java.util.NoSuchElementException;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final EmployeeMapper employeeMapper;
 
-    public EmployeeController(EmployeeService employeeService, EmployeeMapper employeeMapper) {
+    public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
-        this.employeeMapper = employeeMapper;
     }
 
     @GetMapping()
@@ -43,8 +36,7 @@ public class EmployeeController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<EmployeeSummaryDto> response = employeeService.getEmployeesWithTransactionCount(filters, pageable);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeesWithTransactionCount(filters, pageable));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
         }
@@ -53,8 +45,7 @@ public class EmployeeController {
     @GetMapping("/{employeeId}")
     public ResponseEntity<?> getEmployeeWithHistory(@PathVariable("employeeId") Integer employeeId) {
         try {
-            EmployeeWithHistoryDto employeeWithHistory = employeeService.getEmployeeWithHistory(employeeId);
-            return ResponseEntity.status(HttpStatus.OK).body(employeeWithHistory);
+            return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeeWithHistory(employeeId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -63,11 +54,9 @@ public class EmployeeController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createEmployee(@Valid @RequestBody EmployeeDto request) {
+    public ResponseEntity<?> createEmployee(@Valid @RequestBody CreateEmployeeDto request) {
         try {
-            Employee savedEmployee = employeeService.createEmployee(request);
-            EmployeeDto responseDto = employeeMapper.mapToDto(savedEmployee);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(request));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {

@@ -245,7 +245,7 @@ public class WarehousesControllerTests {
         ).andExpect(
                 jsonPath("$.capacity").value("Capacity must be positive")
         ).andExpect(
-                jsonPath("$.street").value("Street cannot be blank")
+                jsonPath("$.street").value("Street cannot be empty")
         );
     }
 
@@ -348,7 +348,7 @@ public class WarehousesControllerTests {
         ).andExpect(
                 jsonPath("$.capacity").value("Capacity must be positive")
         ).andExpect(
-                jsonPath("$.countryId").value("CountryId must be positive")
+                jsonPath("$.countryId").value("CountryId cannot be negative or zero")
         );
     }
 
@@ -402,7 +402,7 @@ public class WarehousesControllerTests {
         ).andExpect(
                 jsonPath("$.warehouseId").value(1)
         ).andExpect(
-                jsonPath("$.addressId").value(1)
+                jsonPath("$.addressId").value(6)
         );
 
         // Verify the address was updated in the database

@@ -3,14 +3,12 @@ package com.example.warehouse.controllers;
 import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
 import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
 import com.example.warehouse.services.WarehousesService;
-import com.example.warehouse.validation.OnCreate;
-import com.example.warehouse.validation.OnUpdate;
+import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
@@ -57,7 +55,7 @@ public class WarehousesController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createWarehouse(@Validated(OnCreate.class) @RequestBody WarehouseModifyDto warehouseDto) {
+    public ResponseEntity<?> createWarehouse(@Valid @RequestBody WarehouseModifyDto warehouseDto) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(warehousesService.createWarehouse(warehouseDto));
         } catch (NoSuchElementException e) {
@@ -68,7 +66,7 @@ public class WarehousesController {
     }
 
     @PutMapping("/{warehouseId}")
-    public ResponseEntity<?> updateWarehouse(@Validated(OnUpdate.class) @RequestBody WarehouseModifyDto warehouseDto,
+    public ResponseEntity<?> updateWarehouse(@Valid @RequestBody WarehouseModifyDto warehouseDto,
                                              @PathVariable Integer warehouseId) {
         try {
             return ResponseEntity.ok(warehousesService.updateWarehouse(warehouseDto, warehouseId));
