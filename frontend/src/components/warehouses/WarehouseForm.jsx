@@ -94,10 +94,10 @@ const WarehousesForm = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (isEdit && !warehouse) {
-    return <p className="text-red-500">Nie znaleziono magazynu.</p>;
+    return <p className="text-red-500">Warehouse not found.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
@@ -105,7 +105,7 @@ const WarehousesForm = () => {
         to="/warehouses"
         className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
-        <FaChevronLeft className="inline mr-2" /> Powrót do Magazynów
+        <FaChevronLeft className="inline mr-2" /> Return to Warehouses
       </Link>
       <h1 className="text-2xl font-semibold mb-4">
         {isEdit ? "Edytuj Magazyn" : "Nowy Magazyn"}
@@ -116,20 +116,20 @@ const WarehousesForm = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
-            Nazwa
+            Name
           </label>
           <input
             id="name"
             name="name"
             value={form.name}
             onChange={handleChange}
-            // required
+            required
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300"
           />
         </div>
         <div>
           <label htmlFor="capacity" className="block text-sm font-medium">
-            Pojemność
+            Capacity
           </label>
           <input
             id="capacity"
@@ -154,7 +154,7 @@ const WarehousesForm = () => {
               required
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
             >
-              <option value="">Wybierz region</option>
+              <option value="">Choose Region</option>
               {regions.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
@@ -166,7 +166,7 @@ const WarehousesForm = () => {
         </div>
         <div>
           <label htmlFor="countryId" className="block text-sm font-medium">
-            Kraj
+            Country
           </label>
           <div className="relative">
             <select
@@ -178,7 +178,7 @@ const WarehousesForm = () => {
               disabled={!form.regionId}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
             >
-              <option value="">Wybierz region, a potem kraj</option>
+              <option value="">Choose Region and then Country</option>
               {countries.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -190,7 +190,7 @@ const WarehousesForm = () => {
         </div>
         <div>
           <label htmlFor="city" className="block text-sm font-medium">
-            Miasto
+            City
           </label>
           <input
             id="city"
@@ -203,7 +203,7 @@ const WarehousesForm = () => {
         </div>
         <div>
           <label htmlFor="postalCode" className="block text-sm font-medium">
-            Kod pocztowy
+            Postal Code
           </label>
           <input
             id="postalCode"
@@ -216,7 +216,7 @@ const WarehousesForm = () => {
         </div>
         <div>
           <label htmlFor="street" className="block text-sm font-medium">
-            Ulica
+            Street
           </label>
           <input
             id="street"
@@ -229,7 +229,7 @@ const WarehousesForm = () => {
         </div>
         <div>
           <label htmlFor="streetNumber" className="block text-sm font-medium">
-            Numer domu
+            Street Number
           </label>
           <input
             id="streetNumber"
@@ -248,9 +248,9 @@ const WarehousesForm = () => {
           {formStatus === "loading" ? (
             <Spinner color="white" />
           ) : isEdit ? (
-            "Zaktualizuj Magazyn"
+            "Update Warehouse"
           ) : (
-            "Stwórz Magazyn"
+            "Create Warehouse"
           )}
         </button>
       </form>

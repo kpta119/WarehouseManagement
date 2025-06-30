@@ -7,23 +7,23 @@ import { FaChevronDown, FaSignOutAlt } from "react-icons/fa";
 import { useEffect } from "react";
 
 const titles = {
-  "/": "Panel główny",
-  "/products": "Produkty",
-  "/products/new": "Nowy produkt",
-  "/categories": "Kategorie",
-  "/warehouses": "Magazyny",
-  "/warehouses/new": "Nowy magazyn",
-  "/inventory/receive": "Przyjęcie",
-  "/inventory/transfer": "Przeniesienie",
-  "/inventory/delivery": "Wydanie",
-  "/transactions": "Transakcje",
-  "/clients": "Klienci",
-  "/clients/new": "Nowy klient",
-  "/suppliers": "Dostawcy",
-  "/suppliers/new": "Nowy dostawca",
-  "/employees": "Pracownicy",
-  "/employees/new": "Nowy pracownik",
-  "/geography": "Geografia",
+  "/": "Main panel",
+  "/products": "Products",
+  "/products/new": "New Product",
+  "/categories": "Categories",
+  "/warehouses": "Warehouses",
+  "/warehouses/new": "New Warehouse",
+  "/inventory/receive": "Receive",
+  "/inventory/transfer": "Transfer",
+  "/inventory/delivery": "Delivery",
+  "/transactions": "Transactions",
+  "/clients": "Clients",
+  "/clients/new": "New Client",
+  "/suppliers": "Suppliers",
+  "/suppliers/new": "New Supplier",
+  "/employees": "Employees",
+  "/employees/new": "New Employee",
+  "/geography": "Geography",
 };
 
 export default function Navbar() {
@@ -81,7 +81,7 @@ export default function Navbar() {
               dispatch(setSelectedWarehouse(val === "" ? null : Number(val)));
             }}
           >
-            <option value="">Wszystkie Magazyny</option>
+            <option value="">All Warehouses</option>
             {warehouses.map((w) => (
               <option key={w.warehouseId} value={w.warehouseId}>
                 {w.name}
@@ -97,7 +97,7 @@ export default function Navbar() {
           onClick={handleLogout}
         >
           <FaSignOutAlt className="mr-2" />
-          Wyloguj Się
+          Log Out
         </button>
       </div>
     </header>

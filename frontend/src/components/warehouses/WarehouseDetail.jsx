@@ -49,10 +49,10 @@ const WarehouseDetail = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (!warehouse) {
-    return <p className="text-red-500">Nie znaleziono magazynu.</p>;
+    return <p className="text-red-500">Warehouse not found.</p>;
   }
   const {
     name,
@@ -108,43 +108,43 @@ const WarehouseDetail = () => {
           to="/warehouses"
           className="text-gray-600 hover:text-pink-500 transition duration-200"
         >
-          <FaChevronLeft className="inline mr-2" /> Powrót do Magazynów
+          <FaChevronLeft className="inline mr-2" /> Return to Warehouses
         </Link>
         <Link
           to={`/warehouses/${id}/edit`}
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition duration-200"
         >
-          <FaEdit className="mr-2" /> Edytuj Magazyn
+          <FaEdit className="mr-2" /> Edit Warehouse
         </Link>
       </div>
       <div className="bg-white rounded-lg shadow p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <h2 className="text-lg font-semibold mb-2">Nazwa</h2>
+          <h2 className="text-lg font-semibold mb-2">Name</h2>
           <p className="text-gray-800">{name}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Pojemność</h2>
+          <h2 className="text-lg font-semibold mb-2">Capacity</h2>
           <p className="text-gray-800">{capacity}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Zajęte</h2>
+          <h2 className="text-lg font-semibold mb-2">Occupied</h2>
           <p className="text-gray-800">{occupiedCapacity}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Adres</h2>
+          <h2 className="text-lg font-semibold mb-2">Address</h2>
           <p className="text-gray-800">{address}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Ilość przedmiotów</h2>
+          <h2 className="text-lg font-semibold mb-2">Items Amount</h2>
           <p className="text-gray-800">{numberFormatter(totalItems)}</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">Łączna wartość</h2>
+          <h2 className="text-lg font-semibold mb-2">Total Value</h2>
           <p className="text-gray-800">{currencyFormatter(totalValue)}</p>
         </div>
       </div>
       <section>
-        <h3 className="text-2xl font-semibold mb-4">Historia Zajętości</h3>
+        <h3 className="text-2xl font-semibold mb-4">Occupancy History</h3>
         <div className="bg-white rounded-lg shadow p-6">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={occupancyHistory}>
@@ -165,7 +165,7 @@ const WarehouseDetail = () => {
           {pieData.length > 0 && (
             <div className="w-1/2">
               <h3 className="text-xl font-semibold mb-2 text-center">
-                Wartość zapasów wg kategorii
+                Inventory Value by Category
               </h3>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -195,7 +195,7 @@ const WarehouseDetail = () => {
           {barData.length > 0 && (
             <div className="w-1/2">
               <h3 className="text-xl font-semibold mb-2 text-center">
-                Liczba transakcji przez pracownika
+                Transactions by Employee
               </h3>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart
@@ -215,17 +215,17 @@ const WarehouseDetail = () => {
       </section>
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Pracownicy</h3>
+          <h3 className="text-2xl font-semibold mb-4">Employees</h3>
           {employees.length === 0 ? (
-            <p className="text-red-500">Brak pracowników.</p>
+            <p className="text-red-500">No Employees.</p>
           ) : (
             <div className="bg-white rounded-lg shadow overflow-auto">
               <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-                <div>Imię i Nazwisko</div>
+                <div>Name and Surname</div>
                 <div className="text-right">E-mail</div>
-                <div className="text-right">Nr. telefonu</div>
-                <div className="text-right">Stanowisko</div>
-                <div className="text-right">Detale</div>
+                <div className="text-right">Phone No.</div>
+                <div className="text-right">Position</div>
+                <div className="text-right">Details</div>
               </div>
               <div className="divide-y divide-gray-200">
                 {employees.slice(0, employeesShown).map((emp) => (
@@ -260,22 +260,22 @@ const WarehouseDetail = () => {
               onClick={() => setEmployeesShown((prev) => prev + 25)}
               className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
             >
-              Pokaż więcej
+              Show More
             </button>
           )}
         </div>
         <div>
-          <h3 className="text-2xl font-semibold mb-4">Produkty</h3>
+          <h3 className="text-2xl font-semibold mb-4">Products</h3>
           {products.length === 0 ? (
-            <p className="text-red-500">Brak produktów.</p>
+            <p className="text-red-500">No Products.</p>
           ) : (
             <div className="bg-white rounded-lg shadow overflow-auto">
               <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-                <div>Nazwa</div>
-                <div className="text-right">Ilość</div>
-                <div className="text-right">Cena za szt.</div>
-                <div className="text-right">Wartość</div>
-                <div className="text-right">Detale</div>
+                <div>Name</div>
+                <div className="text-right">Amount</div>
+                <div className="text-right">Unit Price</div>
+                <div className="text-right">Value</div>
+                <div className="text-right">Details</div>
               </div>
               <div className="divide-y divide-gray-200">
                 {products.slice(0, productsShown).map((pr) => (
@@ -316,23 +316,23 @@ const WarehouseDetail = () => {
               onClick={() => setProductsShown((prev) => prev + 25)}
               className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
             >
-              Pokaż więcej
+              Show More
             </button>
           )}
         </div>
       </section>
       <section>
-        <h3 className="text-2xl font-semibold mb-4">Ostatnie Transakcje</h3>
+        <h3 className="text-2xl font-semibold mb-4">Recent Transactions</h3>
         {transactions.length === 0 ? (
-          <p className="text-red-500">Brak transakcji.</p>
+          <p className="text-red-500">No Transactions.</p>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-auto">
             <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2">
-              <div>Data</div>
-              <div>Typ</div>
-              <div className="text-right">Łącznie</div>
-              <div className="text-right">Przez pracownika</div>
-              <div className="text-right">Detale</div>
+              <div>Date</div>
+              <div>Type</div>
+              <div className="text-right">Total</div>
+              <div className="text-right">By Employee</div>
+              <div className="text-right">Details</div>
             </div>
             <div className="divide-y divide-gray-200">
               {[...transactions]
@@ -377,7 +377,7 @@ const WarehouseDetail = () => {
             onClick={() => setTransactionsShown((prev) => prev + 25)}
             className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
           >
-            Pokaż więcej
+            Show More
           </button>
         )}
       </section>

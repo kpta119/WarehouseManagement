@@ -138,14 +138,14 @@ const ProductList = () => {
         inputs={[
           {
             type: "text",
-            label: "Nazwa",
-            placeholder: "Wyszukaj po nazwie...",
+            label: "Name",
+            placeholder: "Search by Name...",
             value: searchTerm,
             setValue: setSearchTerm,
           },
           {
             type: "select",
-            label: "Kategoria",
+            label: "Category",
             value: categoryFilter,
             setValue: setCategoryFilter,
             options: categories.map((cat) => ({
@@ -155,64 +155,64 @@ const ProductList = () => {
           },
           {
             type: "number",
-            label: "Cena (min)",
-            placeholder: "Wybierz cenę...",
+            label: "Price (min)",
+            placeholder: "Choose price...",
             isMinus: true,
             value: minPrice,
             setValue: setMinPrice,
           },
           {
             type: "number",
-            label: "Cena (max)",
-            placeholder: "Wybierz cenę...",
+            label: "Price (max)",
+            placeholder: "Choose price...",
             isMinus: false,
             value: maxPrice,
             setValue: setMaxPrice,
           },
           {
             type: "number",
-            label: "Wielkość (min)",
-            placeholder: "Wybierz wielkość...",
+            label: "Size (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minSize,
             setValue: setMinSize,
           },
           {
             type: "number",
-            label: "Wielkość (max)",
-            placeholder: "Wybierz wielkość...",
+            label: "Size (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxSize,
             setValue: setMaxSize,
           },
           {
             type: "number",
-            label: "Stan (min)",
-            placeholder: "Wybierz stan...",
+            label: "Stock (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minInventory,
             setValue: setMinInventory,
           },
           {
             type: "number",
-            label: "Stan (max)",
-            placeholder: "Wybierz stan...",
+            label: "Stock (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxInventory,
             setValue: setMaxInventory,
           },
           {
             type: "number",
-            label: "Transakcje (min)",
-            placeholder: "Wybierz transacje...",
+            label: "Transactions (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minTransactions,
             setValue: setMinTransactions,
           },
           {
             type: "number",
-            label: "Transakcje (max)",
-            placeholder: "Wybierz transacje...",
+            label: "Transactions (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxTransactions,
             setValue: setMaxTransactions,
@@ -222,40 +222,40 @@ const ProductList = () => {
           sortOption,
           setSortOption,
           options: [
-            { value: "name", label: "Nazwa (od A do Z)" },
-            { value: "name-reverse", label: "Nazwa (od Z do A)" },
-            { value: "category", label: "Kategoria (od A do Z)" },
-            { value: "category-reverse", label: "Kategoria (od Z do A)" },
-            { value: "price", label: "Cena (rosnąco)" },
-            { value: "price-reverse", label: "Cena (malejąco)" },
-            { value: "size", label: "Wielkość (rosnąco)" },
-            { value: "size-reverse", label: "Wielkość (malejąco)" },
-            { value: "inventory", label: "Stan (rosnąco)" },
-            { value: "inventory-reverse", label: "Stan (malejąco)" },
-            { value: "transactions", label: "Transakcje (rosnąco)" },
-            { value: "transactions-reverse", label: "Transakcje (malejąco)" },
+            { value: "name", label: "Name (from A to Z)" },
+            { value: "name-reverse", label: "Name (from Z to A)" },
+            { value: "category", label: "Category (from A to Z)" },
+            { value: "category-reverse", label: "Category (from Z to A)" },
+            { value: "price", label: "Price (asc)" },
+            { value: "price-reverse", label: "Price (desc)" },
+            { value: "size", label: "Size (asc)" },
+            { value: "size-reverse", label: "Size (desc)" },
+            { value: "inventory", label: "Stock (asc)" },
+            { value: "inventory-reverse", label: "Stock (desc)" },
+            { value: "transactions", label: "Transactions (asc)" },
+            { value: "transactions-reverse", label: "Transactions (desc)" },
           ],
         }}
       />
       {status === "loading" || status === "idle" ? (
         <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Błąd: {error}</p>
+        <p className="text-red-500">Error: {error}</p>
       ) : filtered.length === 0 ? (
-        <p className="text-red-500">Nie znaleziono produktu</p>
+        <p className="text-red-500">No Products found</p>
       ) : (
         <>
-          {error && <p className="text-red-500">Błąd: {error}</p>}
+          {error && <p className="text-red-500">Error: {error}</p>}
           <ItemsList
             pagination={{ page, setPage, totalPages }}
             labels={[
-              { name: "Nazwa", type: "Link" },
-              { name: "Opis", type: "Text-Long" },
-              { name: "Kategoria", type: "Text" },
-              { name: "Cena", type: "Currency", className: "text-right" },
-              { name: "Wielkość", type: "Number", className: "text-right" },
-              { name: "Stan", type: "Number", className: "text-right" },
-              { name: "Transakcje", type: "Number", className: "text-right" },
+              { name: "Name", type: "Link" },
+              { name: "Description", type: "Text-Long" },
+              { name: "Category", type: "Text" },
+              { name: "Price", type: "Currency", className: "text-right" },
+              { name: "Size", type: "Number", className: "text-right" },
+              { name: "Stock", type: "Number", className: "text-right" },
+              { name: "Transactions", type: "Number", className: "text-right" },
             ]}
             data={filtered.map((item) => ({
               id: item.productId,
@@ -286,7 +286,7 @@ const ProductList = () => {
               },
               5: {
                 key: "lowStock",
-                label: "Niski stan!",
+                label: "Low Stock!",
                 classes: "bg-orange-500 text-white",
               },
             }}

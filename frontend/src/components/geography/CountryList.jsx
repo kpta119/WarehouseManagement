@@ -18,10 +18,12 @@ const CountryList = ({ regionId, regionName }) => {
   ) : (
     <div className="bg-white p-6 rounded-lg shadow">
       <h2 className="text-xl font-semibold mb-4">
-        Kraje {regionId ? `— wybrano region ${regionName}` : ""}
+        Countries {regionId ? `— region chosen ${regionName}` : ""}
       </h2>
       {!regionId ? (
-        <p className="text-gray-500">Wybierz region, aby zobaczyć kraje.</p>
+        <p className="text-gray-500">
+          Choose region in orded to see countries.
+        </p>
       ) : countries.length > 0 ? (
         <ul className="space-y-2">
           {countries.map((c) => (
@@ -34,7 +36,7 @@ const CountryList = ({ regionId, regionName }) => {
           ))}
         </ul>
       ) : (
-        <p className="text-red-500">Brak krajów w tym regionie.</p>
+        <p className="text-red-500">No countries in this region.</p>
       )}
     </div>
   );

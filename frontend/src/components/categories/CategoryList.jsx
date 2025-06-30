@@ -44,7 +44,7 @@ const CategoryList = () => {
     }
   });
   const handleDelete = (id) => {
-    if (window.confirm("Czy na pewno chcesz usunąć tę kategorię?")) {
+    if (window.confirm("Are you sure you want to delete this category?")) {
       dispatch(deleteCategory(id));
     }
   };
@@ -54,8 +54,8 @@ const CategoryList = () => {
         inputs={[
           {
             type: "text",
-            label: "Nazwa",
-            placeholder: "Wyszukaj po nazwie...",
+            label: "Name",
+            placeholder: "Search by name...",
             value: searchTerm,
             setValue: setSearchTerm,
           },
@@ -64,27 +64,30 @@ const CategoryList = () => {
           sortOption,
           setSortOption,
           options: [
-            { value: "name", label: "Nazwa (od A do Z)" },
-            { value: "name-reverse", label: "Nazwa (od Z do A)" },
-            { value: "description", label: "Opis (od A do Z)" },
-            { value: "description-reverse", label: "Opis (od Z do A)" },
+            { value: "name", label: "Name (from A to Z)" },
+            { value: "name-reverse", label: "Name (from Z to A)" },
+            { value: "description", label: "Description (from A to Z)" },
+            {
+              value: "description-reverse",
+              label: "Description (from Z to A)",
+            },
           ],
         }}
       />
       {status === "loading" || status === "idle" ? (
         <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Błąd: {error}</p>
+        <p className="text-red-500">Error: {error}</p>
       ) : filtered.length === 0 ? (
-        <p className="text-red-500">Nie znaleziono kategorii</p>
+        <p className="text-red-500">Category not found.</p>
       ) : (
         <>
-          {error && <p className="text-red-500">Błąd: {error}</p>}
+          {error && <p className="text-red-500">Error: {error}</p>}
           <ItemsList
             pagination={{ page, setPage, totalPages }}
             labels={[
-              { name: "Nazwa", type: "Link" },
-              { name: "Opis", type: "Text-Long" },
+              { name: "Name", type: "Link" },
+              { name: "Description", type: "Text-Long" },
             ]}
             data={filtered.map((item) => ({
               id: item.categoryId,

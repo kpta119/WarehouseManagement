@@ -100,15 +100,15 @@ const ReceivePage = () => {
         <div className="flex items-center w-1/2 space-x-2">
           <FaTruck className="text-pink-500 w-6 h-6" />
           <h1 className="text-2xl font-semibold text-gray-800">
-            Przyjęcie towaru
+            Goods Receipt
           </h1>
         </div>
         {status === "failed" && (
-          <p className="text-red-500 ml-4">Błąd: {error}</p>
+          <p className="text-red-500 ml-4">Error: {error}</p>
         )}
         {status === "succeeded" && (
           <p className="text-green-600 ml-4">
-            Towar został przyjęty pomyślnie! Transakcja ID:{" "}
+            Successfuly received goods! Transaction ID:{" "}
             <Link
               to={`/transactions/${transaction?.transactionId}`}
               className="text-pink-600 hover:underline"
@@ -124,7 +124,7 @@ const ReceivePage = () => {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Magazyn</label>
+            <label className="block text-sm font-medium mb-1">Warehouse</label>
             <div className="relative">
               <select
                 required
@@ -134,7 +134,7 @@ const ReceivePage = () => {
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz magazyn</option>
+                <option value="">Choose Warehouse</option>
                 {warehouses.map((w) => (
                   <option key={w.warehouseId} value={w.warehouseId}>
                     {w.name}
@@ -145,7 +145,7 @@ const ReceivePage = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Dostawca</label>
+            <label className="block text-sm font-medium mb-1">Supplier</label>
             <div className="relative">
               <select
                 required
@@ -155,7 +155,7 @@ const ReceivePage = () => {
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz dostawce</option>
+                <option value="">Choose Supplier</option>
                 {suppliers.map((s) => (
                   <option key={s.supplierId} value={s.supplierId}>
                     {s.name}
@@ -166,7 +166,7 @@ const ReceivePage = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <label className="block text-sm font-medium mb-1">Employee</label>
             <div className="relative">
               <select
                 required
@@ -176,7 +176,7 @@ const ReceivePage = () => {
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz pracownika</option>
+                <option value="">Choose Employee</option>
                 {employees.map((e) => (
                   <option key={e.employeeId} value={e.employeeId}>
                     {e.name} {e.surname}
@@ -188,7 +188,9 @@ const ReceivePage = () => {
           </div>
         </div>
         <div className="space-y-3">
-          <label className="text-sm font-medium">Produkty oraz ich ilość</label>
+          <label className="text-sm font-medium">
+            Products and their amounts
+          </label>
           {form.items.map((item, idx) => (
             <div key={idx} className="grid grid-cols-5 gap-2 items-end">
               <div className="col-span-2">
@@ -201,7 +203,7 @@ const ReceivePage = () => {
                     }
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
                   >
-                    <option value="">Wybierz produkt</option>
+                    <option value="">Choose Product</option>
                     {products.map((p) => (
                       <option key={p.productId} value={p.productId}>
                         {p.name}
@@ -216,7 +218,7 @@ const ReceivePage = () => {
                   type="number"
                   min="1"
                   required
-                  placeholder="Ilość"
+                  placeholder="Amount"
                   value={item.quantity}
                   onChange={(e) =>
                     handleItemChange(idx, "quantity", e.target.value)
@@ -251,12 +253,12 @@ const ReceivePage = () => {
             onClick={handleAddRow}
             className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transtion duration-200"
           >
-            <FaPlus className="mr-1" /> Dodaj następny produkt
+            <FaPlus className="mr-1" /> Add another Product
           </button>
         </div>
         <div className="pt-4 border-t">
           <h3 className="text-lg font-semibold mb-2">
-            Łącznie:{" "}
+            Total:{" "}
             <span className="text-pink-600">
               {currencyFormatter(
                 form.items.reduce((total, item) => {
@@ -275,11 +277,7 @@ const ReceivePage = () => {
             disabled={status === "loading"}
             className="w-full py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition disabled:opacity-50 duration-200"
           >
-            {status === "loading" ? (
-              <Spinner color="white" />
-            ) : (
-              "Przyjmij towar"
-            )}
+            {status === "loading" ? <Spinner color="white" /> : "Receive Goods"}
           </button>
         </div>
       </form>

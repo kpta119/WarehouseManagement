@@ -34,10 +34,10 @@ const ClientDetail = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (!client) {
-    return <p className="text-red-500">Nie znaleziono klienta.</p>;
+    return <p className="text-red-500">Client not found.</p>;
   }
   const { name, email, phoneNumber, address, history = [] } = client;
   const monthlyData = Object.values(
@@ -59,7 +59,7 @@ const ClientDetail = () => {
             to="/clients"
             className="text-gray-600 hover:text-pink-500 transition duration-200"
           >
-            <FaChevronLeft className="inline-block mr-2" /> Powrót do Klientów
+            <FaChevronLeft className="inline-block mr-2" /> Return to Clients
           </Link>
         </div>
         <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
@@ -69,19 +69,19 @@ const ClientDetail = () => {
             <p className="text-gray-800">{email}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Nr. telefonu</h2>
+            <h2 className="text-lg font-semibold mb-2">Phone No.</h2>
             <p className="text-gray-800">{phoneNumber}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Adres</h2>
+            <h2 className="text-lg font-semibold mb-2">Address</h2>
             <p className="text-gray-800">{address}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Ilość transakcji</h2>
+            <h2 className="text-lg font-semibold mb-2">Transactions Amt.</h2>
             <p className="text-gray-800">{numberFormatter(history.length)}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Zakupione przedmioty</h2>
+            <h2 className="text-lg font-semibold mb-2">Bought Items</h2>
             <p className="text-gray-800">
               {numberFormatter(
                 history.reduce((acc, tx) => acc + tx.totalItems, 0)
@@ -89,7 +89,7 @@ const ClientDetail = () => {
             </p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Łączne zarobki</h2>
+            <h2 className="text-lg font-semibold mb-2">Total Income</h2>
             <p className="text-gray-800">
               {currencyFormatter(
                 history.reduce((acc, tx) => acc + tx.totalPrice, 0)
@@ -102,7 +102,7 @@ const ClientDetail = () => {
             <div className="space-y-8 flex gap-4">
               <div className="w-1/2">
                 <h3 className="text-xl font-semibold mb-2 text-center">
-                  Zarobki na miesiąc
+                  Income per month
                 </h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart
@@ -121,7 +121,7 @@ const ClientDetail = () => {
                     <Line
                       type="monotone"
                       dataKey="totalPrice"
-                      name="Łączna kwota"
+                      name="Total Amount"
                       stroke="#3B82F6"
                       strokeWidth={2}
                     />
@@ -130,7 +130,7 @@ const ClientDetail = () => {
               </div>
               <div className="w-1/2">
                 <h3 className="text-xl font-semibold mb-2 text-center">
-                  Ilość przedmiotów na miesiąc
+                  Amount of items per month
                 </h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={monthlyData} margin={{ top: 5 }}>
@@ -139,7 +139,7 @@ const ClientDetail = () => {
                     <BarTooltip formatter={(v) => numberFormatter(v)} />
                     <Bar
                       dataKey="totalItems"
-                      name="Sztuk w miesiącu"
+                      name="Amount per Month"
                       fill="#10B981"
                     />
                   </BarChart>
@@ -147,18 +147,18 @@ const ClientDetail = () => {
               </div>
             </div>
           )}
-          <h2 className="text-2xl font-semibold mb-4">Historia transakcji</h2>
+          <h2 className="text-2xl font-semibold mb-4">Transaction History</h2>
           {history.length === 0 ? (
-            <p className="text-red-500">Brak historii transakcji.</p>
+            <p className="text-red-500">No transaction history.</p>
           ) : (
             <>
               <div className="bg-white rounded-lg shadow overflow-auto">
                 <div className="grid grid-cols-5 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
-                  <div>Data</div>
-                  <div>Opis</div>
-                  <div className="text-right">Ilość przedmiotów</div>
-                  <div className="text-right">Łączna kwota</div>
-                  <div className="text-center">Detale</div>
+                  <div>Date</div>
+                  <div>Description</div>
+                  <div className="text-right">Items Amount</div>
+                  <div className="text-right">Total Price</div>
+                  <div className="text-center">Details</div>
                 </div>
                 <div className="divide-y divide-gray-200">
                   {[...history]
@@ -194,7 +194,7 @@ const ClientDetail = () => {
                   onClick={() => setTransactionsShown((prev) => prev + 25)}
                   className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
                 >
-                  Pokaż więcej
+                  Show More
                 </button>
               )}
             </>

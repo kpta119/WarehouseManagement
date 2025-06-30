@@ -58,10 +58,10 @@ const CategoryForm = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (isEdit && !cat) {
-    return <p className="text-red-500">Nie znaleziono kategorii.</p>;
+    return <p className="text-red-500">Category not found.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
@@ -69,20 +69,20 @@ const CategoryForm = () => {
         to="/categories"
         className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
-        <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii
+        <FaChevronLeft className="inline mr-2" /> Return to Categories
       </Link>
       <h1 className="text-2xl font-semibold mb-4">
-        {isEdit ? "Edytuj Kategorię" : "Nowa Kategoria"}
+        {isEdit ? "Edit Category" : "New Category"}
       </h1>
       {formStatus === "failed" && (
         <p className="text-red-500 mb-4">
-          Błąd: {error || "Nie udało się zapisać kategorii."}
+          Error: {error || "Nie udało się zapisać kategorii."}
         </p>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
-            Nazwa
+            Name
           </label>
           <input
             id="name"
@@ -95,7 +95,7 @@ const CategoryForm = () => {
         </div>
         <div>
           <label htmlFor="description" className="block text-sm font-medium">
-            Opis
+            Description
           </label>
           <textarea
             id="description"
@@ -113,9 +113,9 @@ const CategoryForm = () => {
           {formStatus === "loading" ? (
             <Spinner color="white" />
           ) : isEdit ? (
-            "Zapisz"
+            "Save"
           ) : (
-            "Utwórz"
+            "Create"
           )}
         </button>
       </form>

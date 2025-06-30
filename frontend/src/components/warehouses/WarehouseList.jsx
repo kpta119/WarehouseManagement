@@ -153,7 +153,7 @@ const WarehouseList = () => {
     }
   });
   const handleDelete = (id) => {
-    if (window.confirm("Czy na pewno chcesz usunąć ten magazyn?")) {
+    if (window.confirm("Are you sure you want to delete this warehouse?")) {
       dispatch(deleteWarehouse(id));
     }
   };
@@ -163,8 +163,8 @@ const WarehouseList = () => {
         inputs={[
           {
             type: "text",
-            label: "Nazwa",
-            placeholder: "Szukaj magazynu...",
+            label: "Name",
+            placeholder: "Search for Warehouse...",
             value: searchTerm,
             setValue: setSearchTerm,
           },
@@ -180,80 +180,80 @@ const WarehouseList = () => {
           },
           {
             type: "number",
-            label: "Pojemność (min)",
-            placeholder: "Wybierz pojemność...",
+            label: "Capacity (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minCapacity,
             setValue: setMinCapacity,
           },
           {
             type: "number",
-            label: "Pojemność (max)",
-            placeholder: "Wybierz pojemność...",
+            label: "Capacity (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxCapacity,
             setValue: setMaxCapacity,
           },
           {
             type: "number",
-            label: "Zajęte (min)",
-            placeholder: "Wybierz zajętość...",
+            label: "Occupied (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minOccupied,
             setValue: setMinOccupied,
           },
           {
             type: "number",
-            label: "Zajęte (max)",
-            placeholder: "Wybierz zajętość...",
+            label: "Occupied (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxOccupied,
             setValue: setMaxOccupied,
           },
           {
             type: "number",
-            label: "Pracownicy (min)",
-            placeholder: "Wybierz pracowników...",
+            label: "Employees (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minEmployees,
             setValue: setMinEmployees,
           },
           {
             type: "number",
-            label: "Pracownicy (max)",
-            placeholder: "Wybierz pracowników...",
+            label: "Employees (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxEmployees,
             setValue: setMaxEmployees,
           },
           {
             type: "number",
-            label: "Produkty (min)",
-            placeholder: "Wybierz produkty...",
+            label: "Products (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minProducts,
             setValue: setMinProducts,
           },
           {
             type: "number",
-            label: "Produkty (max)",
-            placeholder: "Wybierz produkty...",
+            label: "Products (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxProducts,
             setValue: setMaxProducts,
           },
           {
             type: "number",
-            label: "Transakcje (min)",
-            placeholder: "Wybierz transakcje...",
+            label: "Transactions (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minTransactions,
             setValue: setMinTransactions,
           },
           {
             type: "number",
-            label: "Transakcje (max)",
-            placeholder: "Wybierz transakcje...",
+            label: "Transactions (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxTransactions,
             setValue: setMaxTransactions,
@@ -263,42 +263,42 @@ const WarehouseList = () => {
           sortOption,
           setSortOption,
           options: [
-            { value: "name", label: "Nazwa (od A do Z)" },
-            { value: "name-reverse", label: "Nazwa (od Z do A)" },
-            { value: "capacity", label: "Pojemność (rosnąco)" },
-            { value: "capacity-reverse", label: "Pojemność (malejąco)" },
-            { value: "occupied", label: "Zajęte (rosnąco)" },
-            { value: "occupied-reverse", label: "Zajęte (malejąco)" },
-            { value: "address", label: "Adres (od A do Z)" },
-            { value: "address-reverse", label: "Adres (od Z do A)" },
-            { value: "employees", label: "Pracownicy (rosnąco)" },
-            { value: "employees-reverse", label: "Pracownicy (malejąco)" },
-            { value: "products", label: "Produkty (rosnąco)" },
-            { value: "products-reverse", label: "Produkty (malejąco)" },
-            { value: "transactions", label: "Transakcje (rosnąco)" },
-            { value: "transactions-reverse", label: "Transakcje (malejąco)" },
+            { value: "name", label: "Name (from A to Z)" },
+            { value: "name-reverse", label: "Name (from Z to A)" },
+            { value: "capacity", label: "Capacity (asc)" },
+            { value: "capacity-reverse", label: "Capacity (desc)" },
+            { value: "occupied", label: "Occupied (asc)" },
+            { value: "occupied-reverse", label: "Occupied (desc)" },
+            { value: "address", label: "Address (from A to Z)" },
+            { value: "address-reverse", label: "Address (from Z to A)" },
+            { value: "employees", label: "Employees (asc)" },
+            { value: "employees-reverse", label: "Employees (desc)" },
+            { value: "products", label: "Products (asc)" },
+            { value: "products-reverse", label: "Products (desc)" },
+            { value: "transactions", label: "Transactions (asc)" },
+            { value: "transactions-reverse", label: "Transactions (desc)" },
           ],
         }}
       />
       {status === "loading" || status === "idle" ? (
         <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Błąd: {error}</p>
+        <p className="text-red-500">Error: {error}</p>
       ) : filtered.length === 0 ? (
-        <p className="text-red-500">Nie znaleziono magazynu</p>
+        <p className="text-red-500">Warehouse not found.</p>
       ) : (
         <>
-          {error && <p className="text-red-500">Błąd: {error}</p>}
+          {error && <p className="text-red-500">Error: {error}</p>}
           <ItemsList
             pagination={{ page, setPage, totalPages }}
             labels={[
-              { name: "Nazwa", type: "Link" },
-              { name: "Adres", type: "Text" },
-              { name: "Pojemność", type: "Number", className: "text-right" },
-              { name: "Zajęte", type: "Number", className: "text-right" },
-              { name: "Pracownicy", type: "Number", className: "text-right" },
-              { name: "Produkty", type: "Number", className: "text-right" },
-              { name: "Transakcje", type: "Number", className: "text-right" },
+              { name: "Name", type: "Link" },
+              { name: "Address", type: "Text" },
+              { name: "Capacity", type: "Number", className: "text-right" },
+              { name: "Occupied", type: "Number", className: "text-right" },
+              { name: "Employees", type: "Number", className: "text-right" },
+              { name: "Products", type: "Number", className: "text-right" },
+              { name: "Transactions", type: "Number", className: "text-right" },
             ]}
             data={filtered.map((item) => ({
               id: item.warehouseId,

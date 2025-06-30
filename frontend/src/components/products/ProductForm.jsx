@@ -73,10 +73,10 @@ const ProductForm = () => {
     return <Spinner />;
   }
   if (prodStatus === "failed") {
-    return <p className="text-red-500">Błąd: {prodError}</p>;
+    return <p className="text-red-500">Error: {prodError}</p>;
   }
   if (isEdit && !product) {
-    return <p className="text-red-500">Nie znaleziono produktu.</p>;
+    return <p className="text-red-500">Product not found.</p>;
   }
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
@@ -84,18 +84,18 @@ const ProductForm = () => {
         to="/products"
         className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
-        <FaChevronLeft className="inline mr-2" /> Powrót do Produktów
+        <FaChevronLeft className="inline mr-2" /> Return to Products
       </Link>
       <h1 className="text-2xl font-semibold mb-4">
-        {isEdit ? "Edytuj Produkt" : "Nowy Produkt"}
+        {isEdit ? "Edit Product" : "New Product"}
       </h1>
       {formStatus === "failed" && (
-        <p className="text-red-500 mb-4">Błąd: {prodError}</p>
+        <p className="text-red-500 mb-4">Error: {prodError}</p>
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
-            Nazwa
+            Name
           </label>
           <input
             id="name"
@@ -108,7 +108,7 @@ const ProductForm = () => {
         </div>
         <div>
           <label htmlFor="description" className="block text-sm font-medium">
-            Opis
+            Description
           </label>
           <textarea
             id="description"
@@ -122,7 +122,7 @@ const ProductForm = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="unitPrice" className="block text-sm font-medium">
-              Cena jednostkowa
+              Unit Price
             </label>
             <input
               id="unitPrice"
@@ -137,7 +137,7 @@ const ProductForm = () => {
           </div>
           <div>
             <label htmlFor="unitSize" className="block text-sm font-medium">
-              Rozmiar jednostkowy
+              Unit Size
             </label>
             <input
               id="unitSize"
@@ -153,7 +153,7 @@ const ProductForm = () => {
         </div>
         <div>
           <label htmlFor="categoryId" className="block text-sm font-medium">
-            Kategoria
+            Category
           </label>
           <div className="relative">
             <select
@@ -164,7 +164,7 @@ const ProductForm = () => {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               required
             >
-              <option value="">Wybierz kategorię</option>
+              <option value="">Choose Category</option>
               {categories.map((cat) => (
                 <option key={cat.categoryId} value={cat.categoryId}>
                   {cat.name}
@@ -181,9 +181,9 @@ const ProductForm = () => {
           {formStatus === "loading" ? (
             <Spinner color="white" />
           ) : isEdit ? (
-            "Aktualizuj Produkt"
+            "Update Product"
           ) : (
-            "Stwórz Produkt"
+            "Create Product"
           )}
         </button>
       </form>

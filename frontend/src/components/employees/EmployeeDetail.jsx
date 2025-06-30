@@ -42,10 +42,10 @@ const EmployeeDetail = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (!employee) {
-    return <p className="text-red-500">Nie znaleziono pracownika.</p>;
+    return <p className="text-red-500">Employee not found.</p>;
   }
   const {
     name,
@@ -88,8 +88,7 @@ const EmployeeDetail = () => {
             to="/employees"
             className="text-gray-600 hover:text-pink-500 transition duration-200"
           >
-            <FaChevronLeft className="inline-block mr-2" /> Powrót do
-            Pracowników
+            <FaChevronLeft className="inline-block mr-2" /> Return to Employees
           </Link>
         </div>
         <h1 className="text-3xl font-semibold text-gray-800">
@@ -97,7 +96,7 @@ const EmployeeDetail = () => {
         </h1>
         <div className="bg-white py-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <h2 className="text-lg font-semibold mb-2">Stanowisko</h2>
+            <h2 className="text-lg font-semibold mb-2">Position</h2>
             <p className="text-gray-800">{position}</p>
           </div>
           <div>
@@ -105,11 +104,11 @@ const EmployeeDetail = () => {
             <p className="text-gray-800">{email}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Nr. telefonu</h2>
+            <h2 className="text-lg font-semibold mb-2">Phone No.</h2>
             <p className="text-gray-800">{phoneNumber}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Ilość przedmiotów</h2>
+            <h2 className="text-lg font-semibold mb-2">Items Amount</h2>
             <p className="text-gray-800">
               {numberFormatter(
                 history.reduce((acc, tx) => acc + tx.totalItems, 0)
@@ -117,7 +116,7 @@ const EmployeeDetail = () => {
             </p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Łączna wartość</h2>
+            <h2 className="text-lg font-semibold mb-2">Total Value</h2>
             <p className="text-gray-800">
               {currencyFormatter(
                 history.reduce((acc, tx) => acc + tx.totalPrice, 0)
@@ -125,7 +124,7 @@ const EmployeeDetail = () => {
             </p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Magazyn</h2>
+            <h2 className="text-lg font-semibold mb-2">Warehouse</h2>
             <Link
               to={`/warehouses/${warehouseId}`}
               className="text-pink-600 hover:underline"
@@ -139,7 +138,7 @@ const EmployeeDetail = () => {
             <div className="space-y-8 flex gap-4">
               <div className="w-1/2">
                 <h3 className="text-xl font-semibold mb-2 text-center">
-                  Zaksięgowane pieniądze na miesiąc
+                  Booked Money per Month
                 </h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart
@@ -158,7 +157,7 @@ const EmployeeDetail = () => {
                     <Line
                       type="monotone"
                       dataKey="totalPrice"
-                      name="Łączna kwota"
+                      name="Total Price"
                       stroke="#3B82F6"
                       strokeWidth={2}
                     />
@@ -167,7 +166,7 @@ const EmployeeDetail = () => {
               </div>
               <div className="w-1/2">
                 <h3 className="text-xl font-semibold mb-2 text-center">
-                  Ilość przedmiotów na miesiąc
+                  Items Amount per Month
                 </h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={monthlyData}>
@@ -176,7 +175,7 @@ const EmployeeDetail = () => {
                     <BarTooltip formatter={(v) => numberFormatter(v)} />
                     <Bar
                       dataKey="totalItems"
-                      name="Sztuk w miesiącu"
+                      name="Amount in Month"
                       fill="#10B981"
                     />
                   </BarChart>
@@ -187,7 +186,7 @@ const EmployeeDetail = () => {
           {pieData.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold mb-2 text-center">
-                Udział typów transakcji
+                Distribution of Transaction Types
               </h3>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -214,19 +213,19 @@ const EmployeeDetail = () => {
               </ResponsiveContainer>
             </div>
           )}
-          <h2 className="text-2xl font-semibold mb-4">Historia Transakcji</h2>
+          <h2 className="text-2xl font-semibold mb-4">Transaction History</h2>
           {history.length === 0 ? (
-            <p className="text-red-500">Brak historii transakcji.</p>
+            <p className="text-red-500">No transaction history.</p>
           ) : (
             <>
               <div className="bg-white rounded-lg shadow overflow-auto">
                 <div className="grid grid-cols-6 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 tracking-wide">
-                  <div>Data</div>
-                  <div>Typ</div>
-                  <div>Opis</div>
-                  <div className="text-right">Ilość przedmiotów</div>
-                  <div className="text-right">Łączna kwota</div>
-                  <div className="text-center">Szczegóły</div>
+                  <div>Date</div>
+                  <div>Type</div>
+                  <div>Description</div>
+                  <div className="text-right">Items Amount</div>
+                  <div className="text-right">Total Price</div>
+                  <div className="text-center">Details</div>
                 </div>
                 <div className="divide-y divide-gray-200">
                   {[...history]
@@ -268,7 +267,7 @@ const EmployeeDetail = () => {
                   onClick={() => setTransactionsShown((prev) => prev + 25)}
                   className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block"
                 >
-                  Pokaż więcej
+                  Show More
                 </button>
               )}
             </>

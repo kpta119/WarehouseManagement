@@ -44,7 +44,7 @@ const ItemsList = ({
                 {label.name}
               </div>
             ))}
-          <div className="text-center">Akcje</div>
+          <div className="text-center">Actions</div>
         </div>
         <div className="divide-y divide-gray-200">
           {data.map((item) => (

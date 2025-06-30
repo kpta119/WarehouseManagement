@@ -38,10 +38,10 @@ const ProductDetail = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (!product) {
-    return <p className="text-red-500">Nie znaleziono produktu.</p>;
+    return <p className="text-red-500">Product not found.</p>;
   }
   const {
     name,
@@ -80,19 +80,19 @@ const ProductDetail = () => {
           to="/products"
           className="text-gray-600 hover:text-pink-500 transition duration-200"
         >
-          <FaChevronLeft className="inline mr-2" /> Powrót do Produktów
+          <FaChevronLeft className="inline mr-2" /> Return to Products
         </Link>
         <Link
           to={`/products/${id}/edit`}
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition duration-200"
         >
-          <FaEdit className="mr-2" /> Edytuj Produkt
+          <FaEdit className="mr-2" /> Edit Product
         </Link>
       </div>
       <h1 className="text-3xl font-semibold text-gray-800">{name}</h1>
       <p className="text-gray-700 whitespace-pre-line">{description}</p>
       <p>
-        <strong>Kategoria: </strong>
+        <strong>Category: </strong>
         <Link
           className="hover:underline text-pink-500"
           to={`/categories/${categoryId}`}
@@ -101,20 +101,20 @@ const ProductDetail = () => {
         </Link>
       </p>
       <p>
-        <strong>Jednostkowa Cena: </strong>
+        <strong>Unit Price: </strong>
         {currencyFormatter(unitPrice)}
       </p>
       <p>
-        <strong>Jednostkowy Rozmiar: </strong>
+        <strong>Unit Size: </strong>
         {numberFormatter(unitSize)}
       </p>
       {inventory.length > 0 && (
         <div className="flex gap-4 w-full">
           <div className="w-1/2">
-            <h2 className="text-xl font-semibold mb-2">Zasoby na Magazyn</h2>
+            <h2 className="text-xl font-semibold mb-2">Supply per Warehouse</h2>
             <div className="grid grid-cols-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
-              <div>Magazyn</div>
-              <div className="text-right">Ilość</div>
+              <div>Warehouse</div>
+              <div className="text-right">Amount</div>
             </div>
             <div className="divide-y divide-gray-200">
               {inventory.map(({ warehouseId, warehouseName, quantity }) => (
@@ -137,7 +137,9 @@ const ProductDetail = () => {
           </div>
           {inventoryData.length > 0 && (
             <div className="w-1/2">
-              <h2 className="text-xl font-semibold mb-2">Zapas na magazyn</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                Supply per Warehouse
+              </h2>
               <ResponsiveContainer
                 width="100%"
                 height={(Object.keys(inventory).length + 1) * 40}
@@ -146,7 +148,7 @@ const ProductDetail = () => {
                   <XAxis dataKey="warehouseId" tick={{ fill: "#6B7280" }} />
                   <YAxis tick={{ fill: "#6B7280" }} />
                   <BarTooltip />
-                  <Bar dataKey="quantity" name="Ilość sztuk" fill="#3B82F6" />
+                  <Bar dataKey="quantity" name="Quantity" fill="#3B82F6" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -157,7 +159,7 @@ const ProductDetail = () => {
         {transactionData.length > 0 && (
           <div>
             <h2 className="text-xl font-semibold mb-2">
-              Wolumen transakcji w czasie
+              Volume of Transactions Over Time
             </h2>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={transactionData}>
@@ -175,7 +177,7 @@ const ProductDetail = () => {
                 <Line
                   type="monotone"
                   dataKey="quantity"
-                  name="Ilość sztuk"
+                  name="Quantity"
                   stroke="#10B981"
                   strokeWidth={2}
                 />
@@ -184,7 +186,7 @@ const ProductDetail = () => {
           </div>
         )}
         <div>
-          <h2 className="text-xl font-semibold mb-2">Historia ceny produktu</h2>
+          <h2 className="text-xl font-semibold mb-2">Product Price History</h2>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={histogramData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -201,7 +203,7 @@ const ProductDetail = () => {
               <Line
                 type="monotone"
                 dataKey="price"
-                name="Cena jednostkowa"
+                name="Unit Price"
                 stroke="#10B981"
                 strokeWidth={2}
               />
@@ -210,18 +212,18 @@ const ProductDetail = () => {
         </div>
       </div>
       {transactions.length === 0 ? (
-        <p className="text-red-500">Brak transakcji.</p>
+        <p className="text-red-500">No transactions.</p>
       ) : (
         <div>
-          <h2 className="text-xl font-semibold mb-2">Ostatnie Transakcje</h2>
+          <h2 className="text-xl font-semibold mb-2">Recent Transactions</h2>
           <div className="grid grid-cols-7 bg-gray-50 text-xs font-medium text-gray-500 uppercase p-2 rounded-t-lg">
-            <div>Data</div>
-            <div>Przez pracownika</div>
-            <div>Typ</div>
-            <div className="text-right">Ilość</div>
-            <div className="text-right">Cena (szt.)</div>
-            <div className="text-right">Łącznie</div>
-            <div className="text-center">Detale</div>
+            <div>Date</div>
+            <div>By Employee</div>
+            <div>Type</div>
+            <div className="text-right">Amount</div>
+            <div className="text-right">Unit Price</div>
+            <div className="text-right">Total</div>
+            <div className="text-center">Details</div>
           </div>
           <div className="divide-y divide-gray-200">
             {[...transactions]
@@ -270,7 +272,7 @@ const ProductDetail = () => {
               onClick={() => setTransactionsShown((prev) => prev + 25)}
               className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block duration-200"
             >
-              Pokaż więcej
+              Show More
             </button>
           )}
         </div>

@@ -25,10 +25,10 @@ const TransactionDetail = () => {
     return <Spinner />;
   }
   if (status === "failed") {
-    return <p className="text-red-500">Błąd: {error}</p>;
+    return <p className="text-red-500">Error: {error}</p>;
   }
   if (!tx) {
-    return <p className="text-red-500">Nie znaleziono transakcji.</p>;
+    return <p className="text-red-500">Transaction not found.</p>;
   }
   const {
     transactionId,
@@ -53,27 +53,27 @@ const TransactionDetail = () => {
         to="/transactions"
         className="text-gray-600 hover:text-pink-500 transition duration-200"
       >
-        <FaChevronLeft className="inline-block mr-2" /> Powrót do Transakcji
+        <FaChevronLeft className="inline-block mr-2" /> Return to Transactions
       </Link>
       <h1 className="text-3xl font-semibold mt-4">
-        Transakcja #{transactionId}
+        Transaction #{transactionId}
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <strong>Data:</strong> {dateFormatter(date)}
+          <strong>Date:</strong> {dateFormatter(date)}
         </div>
         <div>
-          <strong>Typ:</strong>{" "}
+          <strong>Type:</strong>{" "}
           {type
             .toLowerCase()
             .replace(/_/g, " ")
             .replace(/\b\w/g, (c) => c.toUpperCase())}
         </div>
         <div>
-          <strong>Opis:</strong> {description}
+          <strong>Description:</strong> {description}
         </div>
         <div>
-          <strong>Wykonana przez:</strong>{" "}
+          <strong>Made by:</strong>{" "}
           <Link
             to={`/employees/${employeeId}`}
             className="text-pink-600 hover:underline"
@@ -83,7 +83,7 @@ const TransactionDetail = () => {
         </div>
         {supplierId && (
           <div>
-            <strong>Dostawca:</strong>{" "}
+            <strong>Supplier:</strong>{" "}
             <Link
               to={`/suppliers/${supplierId}`}
               className="text-pink-600 hover:underline"
@@ -94,7 +94,7 @@ const TransactionDetail = () => {
         )}
         {clientId && (
           <div>
-            <strong>Klient:</strong>{" "}
+            <strong>Client:</strong>{" "}
             <Link
               to={`/clients/${clientId}`}
               className="text-pink-600 hover:underline"
@@ -105,7 +105,7 @@ const TransactionDetail = () => {
         )}
         {fromWarehouseId && (
           <div>
-            <strong>Z magazynu:</strong>{" "}
+            <strong>From Warehouse:</strong>{" "}
             <Link
               to={`/warehouses/${fromWarehouseId}`}
               className="text-pink-600 hover:underline"
@@ -116,7 +116,7 @@ const TransactionDetail = () => {
         )}
         {toWarehouseId && (
           <div>
-            <strong>Do magazynu:</strong>{" "}
+            <strong>To Warehouse:</strong>{" "}
             <Link
               to={`/warehouses/${toWarehouseId}`}
               className="text-pink-600 hover:underline"
@@ -127,16 +127,16 @@ const TransactionDetail = () => {
         )}
       </div>
       {products.length === 0 ? (
-        <p className="text-red-500">Brak produktów</p>
+        <p className="text-red-500">No Products</p>
       ) : (
         <section>
-          <h2 className="text-xl font-semibold mb-4">Produkty</h2>
+          <h2 className="text-xl font-semibold mb-4">Products</h2>
           <div className="bg-gray-50 grid grid-cols-5 p-2 text-xs uppercase font-medium text-gray-500 rounded-t-lg">
-            <div>Produkt</div>
-            <div className="text-right">Ilość</div>
-            <div className="text-right">Cena jednostkowa</div>
-            <div className="text-right">Kategoria</div>
-            <div className="text-right">Łącznie</div>
+            <div>Product</div>
+            <div className="text-right">Amount</div>
+            <div className="text-right">Unit Price</div>
+            <div className="text-right">Category</div>
+            <div className="text-right">Total</div>
           </div>
           <div className="divide-y divide-gray-200">
             {products.map((p) => (

@@ -15,7 +15,7 @@ const RegionList = ({ selectedRegion, onSelect }) => {
     <p className="text-red-500">Error: {error}</p>
   ) : (
     <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-xl font-semibold mb-4">Regiony</h2>
+      <h2 className="text-xl font-semibold mb-4">Regions</h2>
       <ul className="space-y-2">
         {regions.map((r) => (
           <li

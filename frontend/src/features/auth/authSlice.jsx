@@ -14,7 +14,7 @@ const authSlice = createSlice({
         localStorage.setItem("loggedIn", "true");
       } else {
         state.loggedIn = false;
-        state.error = "Nieprawidłowa nazwa lub hasło";
+        state.error = "Incorrect username or password";
         localStorage.removeItem("loggedIn");
       }
     },

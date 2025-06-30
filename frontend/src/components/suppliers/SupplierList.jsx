@@ -85,8 +85,8 @@ const SupplierList = () => {
         inputs={[
           {
             type: "text",
-            label: "Nazwa",
-            placeholder: "Szukaj klientów...",
+            label: "Name",
+            placeholder: "Search for clients...",
             value: searchTerm,
             setValue: setSearchTerm,
           },
@@ -102,16 +102,16 @@ const SupplierList = () => {
           },
           {
             type: "number",
-            label: "Transakcje (min)",
-            placeholder: "Wybierz transakcje...",
+            label: "Transactions (min)",
+            placeholder: "Choose amount...",
             isMinus: true,
             value: minTransactions,
             setValue: setMinTransactions,
           },
           {
             type: "number",
-            label: "Transakcje (max)",
-            placeholder: "Wybierz transakcje...",
+            label: "Transactions (max)",
+            placeholder: "Choose amount...",
             isMinus: false,
             value: maxTransactions,
             setValue: setMaxTransactions,
@@ -121,18 +121,18 @@ const SupplierList = () => {
           sortOption,
           setSortOption,
           options: [
-            { value: "name", label: "Nazwa (od A do Z)" },
-            { value: "name-reverse", label: "Nazwa (od Z do A)" },
-            { value: "email", label: "E-mail (od A do Z)" },
-            { value: "email-reverse", label: "E-mail (od Z do A)" },
-            { value: "phone", label: "Nr. telefonu (rosnąco)" },
-            { value: "phone-reverse", label: "Nr. telefonu (malejąco)" },
-            { value: "address", label: "Adres (od A do Z)" },
-            { value: "address-reverse", label: "Adres (od Z do A)" },
-            { value: "transactions", label: "Liczba transakcji (rosnąco)" },
+            { value: "name", label: "Name (from A to Z)" },
+            { value: "name-reverse", label: "Name (from Z to A)" },
+            { value: "email", label: "E-mail (from A to Z)" },
+            { value: "email-reverse", label: "E-mail (from Z to A)" },
+            { value: "phone", label: "Phone No. (asc)" },
+            { value: "phone-reverse", label: "Phone No. (desc)" },
+            { value: "address", label: "Address (from A to Z)" },
+            { value: "address-reverse", label: "Address (from Z to A)" },
+            { value: "transactions", label: "Transactions (asc)" },
             {
               value: "transactions-reverse",
-              label: "Liczba transakcji (malejąco)",
+              label: "Transactions (desc)",
             },
           ],
         }}
@@ -140,18 +140,18 @@ const SupplierList = () => {
       {status === "loading" || status === "idle" ? (
         <Spinner />
       ) : status === "failed" ? (
-        <p className="text-red-500">Błąd: {error}</p>
+        <p className="text-red-500">Error: {error}</p>
       ) : filtered.length === 0 ? (
-        <p className="text-red-500">Nie znaleziono dostawcy</p>
+        <p className="text-red-500">Supplier not found.</p>
       ) : (
         <ItemsList
           pagination={{ page, setPage, totalPages }}
           labels={[
-            { name: "Nazwa", type: "Link" },
+            { name: "Name", type: "Link" },
             { name: "E-mail", type: "Text-Long" },
-            { name: "Nr. telefonu", type: "Text" },
-            { name: "Adres", type: "Text" },
-            { name: "Transakcje", type: "Number" },
+            { name: "Phone No.", type: "Text" },
+            { name: "Address", type: "Text" },
+            { name: "Transactions", type: "Number" },
           ]}
           data={filtered.map((item) => ({
             id: item.supplierId,

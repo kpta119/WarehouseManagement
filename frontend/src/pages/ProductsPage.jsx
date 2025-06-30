@@ -9,14 +9,14 @@ const ProductsPage = () => {
         <div className="flex items-center space-x-2">
           <FaBoxOpen className="text-pink-500 w-6 h-6" />
           <h1 className="text-2xl font-semibold text-gray-800">
-            Lista produktów
+            Products List
           </h1>
         </div>
         <Link
           to="/products/new"
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition"
         >
-          <FaPlus className="mr-2" /> Nowy Produkt
+          <FaPlus className="mr-2" /> New Product
         </Link>
       </div>
       <ProductList />

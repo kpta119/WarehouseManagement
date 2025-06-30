@@ -94,15 +94,15 @@ const TransferPage = () => {
         <div className="flex items-center w-1/2 space-x-2">
           <FaExchangeAlt className="text-pink-500 w-6 h-6" />
           <h1 className="text-2xl font-semibold text-gray-800">
-            Przeniesienie towaru
+            Goods Transfer
           </h1>
         </div>
         {status === "failed" && (
-          <p className="text-red-500 ml-4">Błąd: {error}</p>
+          <p className="text-red-500 ml-4">Error: {error}</p>
         )}
         {status === "succeeded" && (
           <p className="text-green-600 ml-4">
-            Przeniesienie zakończone sukcesem! ID transakcji:{" "}
+            Successfuly transferred! Transaction ID:{" "}
             <Link
               to={`/transactions/${transaction?.transactionId}`}
               className="text-pink-600 hover:underline"
@@ -118,7 +118,9 @@ const TransferPage = () => {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Z magazynu</label>
+            <label className="block text-sm font-medium mb-1">
+              From Warehouse
+            </label>
             <div className="relative">
               <select
                 required
@@ -128,7 +130,7 @@ const TransferPage = () => {
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz magazyn</option>
+                <option value="">Choose Warehouse</option>
                 {warehouses.map((w) => (
                   <option key={w.warehouseId} value={w.warehouseId}>
                     {w.name}
@@ -140,7 +142,7 @@ const TransferPage = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
-              Do magazynu
+              To Warehouse
             </label>
             <div className="relative">
               <select
@@ -151,7 +153,7 @@ const TransferPage = () => {
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz magazyn</option>
+                <option value="">To Warehouse</option>
                 {warehouses.map((w) => (
                   <option key={w.warehouseId} value={w.warehouseId}>
                     {w.name}
@@ -162,7 +164,7 @@ const TransferPage = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Pracownik</label>
+            <label className="block text-sm font-medium mb-1">Employee</label>
             <div className="relative">
               <select
                 required
@@ -172,7 +174,7 @@ const TransferPage = () => {
                 }
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
               >
-                <option value="">Wybierz pracownika</option>
+                <option value="">Choose Employee</option>
                 {employees.map((e) => (
                   <option key={e.employeeId} value={e.employeeId}>
                     {e.name} {e.surname}
@@ -184,7 +186,9 @@ const TransferPage = () => {
           </div>
         </div>
         <div className="space-y-3">
-          <label className="text-sm font-medium">Produkty oraz ich ilość</label>
+          <label className="text-sm font-medium">
+            Products and their amounts
+          </label>
           {form.items.map((item, idx) => (
             <div key={idx} className="grid grid-cols-5 gap-2 items-end">
               <div className="col-span-2">
@@ -197,7 +201,7 @@ const TransferPage = () => {
                     }
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
                   >
-                    <option value="">Wybierz produkt</option>
+                    <option value="">Choose Product</option>
                     {products.map((p) => (
                       <option key={p.productId} value={p.productId}>
                         {p.name}
@@ -212,14 +216,14 @@ const TransferPage = () => {
                   type="number"
                   min="1"
                   required
-                  placeholder="Ilość"
+                  placeholder="Amount"
                   value={item.quantity}
                   onChange={(e) =>
                     handleItemChange(idx, "quantity", e.target.value)
                   }
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 focus:border-pink-500 transition-colors duration-300 appearance-none"
                 />
-              </div>{" "}
+              </div>
               <div className="text-gray-800 flex items-center justify-center h-full">
                 {products.find(
                   (product) => product.productId === +item.productId
@@ -247,12 +251,12 @@ const TransferPage = () => {
             onClick={handleAddRow}
             className="flex items-center text-pink-600 hover:text-pink-800 mt-4 transition duration-200"
           >
-            <FaPlus className="mr-1" /> Dodaj następny produkt
+            <FaPlus className="mr-1" /> Add another product
           </button>
         </div>
         <div className="pt-4 border-t">
           <h3 className="text-lg font-semibold mb-2">
-            Łącznie:{" "}
+            Total:{" "}
             <span className="text-pink-600">
               {currencyFormatter(
                 form.items.reduce((total, item) => {
@@ -274,7 +278,7 @@ const TransferPage = () => {
             {status === "loading" ? (
               <Spinner color="white" />
             ) : (
-              "Przenieś towar"
+              "Transfer Goods"
             )}
           </button>
         </div>

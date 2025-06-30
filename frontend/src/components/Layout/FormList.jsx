@@ -14,8 +14,8 @@ const FormList = ({ inputs, sorting }) => {
           ) =>
             type === "text" ? (
               <TextInput
-                label="Nazwa"
-                placeholder="Wyszukaj po nazwie..."
+                label={label}
+                placeholder={placeholder}
                 value={value}
                 setValue={setValue}
                 key={index}
@@ -55,11 +55,11 @@ const FormList = ({ inputs, sorting }) => {
         )}
       </div>
       <SelectInput
-        label="Sortowanie"
+        label="Sorting"
         value={sorting.sortOption}
         setValue={sorting.setSortOption}
       >
-        <option value="">Sortuj przez</option>
+        <option value="">Sort by</option>
         {sorting.options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

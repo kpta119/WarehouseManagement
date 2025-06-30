@@ -14,8 +14,7 @@ const DashboardPage = () => {
   }, [dispatch, selectedWarehouse]);
   if (status === "loading" || status === "idle") return <Spinner />;
   if (status === "failed") return <p className="text-red-500">{error}</p>;
-  if (!summary)
-    return <p className="text-red-500">Brak danych do wyświetlenia.</p>;
+  if (!summary) return <p className="text-red-500">No data to display.</p>;
   return (
     <div className="space-y-6">
       <SummaryTiles summary={summary} />

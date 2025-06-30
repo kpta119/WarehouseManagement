@@ -65,13 +65,13 @@ const SupplierForm = () => {
         to="/suppliers"
         className="flex items-center text-gray-600 hover:text-pink-500 mb-6 transition duration-200"
       >
-        <FaChevronLeft className="inline mr-2" /> Powrót do Dostawców
+        <FaChevronLeft className="inline mr-2" /> Return to Suppliers
       </Link>
       <h1 className="text-3xl font-semibold text-gray-800 mb-6">
-        Nowy Dostawca
+        New Supplier
       </h1>
       {formStatus === "failed" && (
-        <p className="text-red-500 mb-4">Błąd: {error}</p>
+        <p className="text-red-500 mb-4">Error: {error}</p>
       )}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -79,7 +79,7 @@ const SupplierForm = () => {
             htmlFor="name"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Nazwa
+            Name
           </label>
           <input
             type="text"
@@ -113,7 +113,7 @@ const SupplierForm = () => {
             htmlFor="phoneNumber"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Nr. telefonu
+            Phone No.
           </label>
           <input
             type="tel"
@@ -141,7 +141,7 @@ const SupplierForm = () => {
               required
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition appearance-none"
             >
-              <option value="">Wybierz region</option>
+              <option value="">Choose Region</option>
               {regions.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
@@ -156,7 +156,7 @@ const SupplierForm = () => {
             htmlFor="countryId"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Kraj
+            Country
           </label>
           <div className="relative">
             <select
@@ -168,7 +168,7 @@ const SupplierForm = () => {
               disabled={!form.regionId}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-pink-500 transition appearance-none"
             >
-              <option value="">Wybierz region, a potem kraj</option>
+              <option value="">Choose Region and then Country</option>
               {countries.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -183,7 +183,7 @@ const SupplierForm = () => {
             htmlFor="city"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Miasto
+            City
           </label>
           <input
             type="text"
@@ -200,7 +200,7 @@ const SupplierForm = () => {
             htmlFor="postalCode"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Kod pocztowy
+            Postal Code
           </label>
           <input
             type="text"
@@ -217,7 +217,7 @@ const SupplierForm = () => {
             htmlFor="street"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Ulica
+            Street
           </label>
           <input
             type="text"
@@ -234,7 +234,7 @@ const SupplierForm = () => {
             htmlFor="streetNumber"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Numer domu
+            Street Number
           </label>
           <input
             type="number"
@@ -253,7 +253,7 @@ const SupplierForm = () => {
           {formStatus === "loading" ? (
             <Spinner color="white" />
           ) : (
-            "Stwórz dostawcę"
+            "Create Supplier"
           )}
         </button>
       </form>

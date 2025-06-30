@@ -23,8 +23,9 @@ const CategoryDetail = () => {
   }, [dispatch, status]);
   const cat = categories.find((c) => String(c.categoryId) === String(id));
   if (status === "loading" || status === "idle") return <Spinner />;
-  if (status === "failed") return <p className="text-red-500">Błąd: {error}</p>;
-  if (!cat) return <p className="text-red-500">Nie znaleziono kategorii.</p>;
+  if (status === "failed")
+    return <p className="text-red-500">Error: {error}</p>;
+  if (!cat) return <p className="text-red-500">Category not found.</p>;
   return (
     <div className="space-y-6 max-w-lg mx-auto bg-white p-6 rounded-lg shadow">
       <div className="flex items-center justify-between">
@@ -32,27 +33,27 @@ const CategoryDetail = () => {
           to="/categories"
           className="text-gray-600 hover:text-pink-500 transition duration-200"
         >
-          <FaChevronLeft className="inline mr-2" /> Powrót do Kategorii
+          <FaChevronLeft className="inline mr-2" /> Return to Categories
         </Link>
         <Link
           to={`/categories/${cat.categoryId}/edit`}
           className="flex items-center bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition duration-200"
         >
-          <FaEdit className="mr-2" /> Edytuj Produkt
+          <FaEdit className="mr-2" /> Edit Category
         </Link>
       </div>
       <h1 className="text-3xl font-semibold text-gray-800">{cat.name}</h1>
       <p className="text-gray-700 whitespace-pre-line">
-        {cat.description || "Brak opisu."}
+        {cat.description || "No description."}
       </p>
       <section>
         <h2 className="text-2xl font-semibold mt-6 mb-4">
-          Produkty w tej kategorii
+          Products in this Category
         </h2>
         {prodStatus === "loading" ? (
           <Spinner />
         ) : products.length === 0 ? (
-          <p className="text-red-500">Brak produktów w tej kategorii.</p>
+          <p className="text-red-500">No products in this Category.</p>
         ) : (
           <>
             <ul className="divide-y divide-gray-200">
@@ -76,7 +77,7 @@ const CategoryDetail = () => {
                 onClick={() => setProductsShown((prev) => prev + 25)}
                 className="mt-4 bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition mx-auto block duration-200"
               >
-                Pokaż więcej
+                Show More
               </button>
             )}
           </>

@@ -8,7 +8,7 @@ const TransactionsPage = () => {
         <div className="flex items-center space-x-2">
           <FaClipboardList className="text-pink-500 w-6 h-6" />
           <h1 className="text-2xl font-semibold text-gray-800">
-            Lista transakcji
+            Transactions List
           </h1>
         </div>
       </div>
