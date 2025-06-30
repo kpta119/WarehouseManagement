@@ -1,18 +1,17 @@
 package com.example.warehouse.dtos.employeeDtos;
 
 import com.example.warehouse.dtos.addressDtos.AddressInfoDto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateEmployeeDto extends AddressInfoDto {
+public class CreateEmployeeDto {
     private Integer employeeId;
     @NotBlank(message = "Name cannot be empty")
     private String name;
@@ -23,4 +22,6 @@ public class CreateEmployeeDto extends AddressInfoDto {
     private String phoneNumber;
     private String position;
     private Integer warehouseId;
+    @Valid
+    private AddressInfoDto address;
 }

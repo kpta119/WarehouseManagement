@@ -47,7 +47,7 @@ public class EmployeeService {
     }
 
     public EmployeeDto createEmployee(CreateEmployeeDto employeeDto) {
-        Address savedAddress = addressService.createAddress(employeeDto);
+        Address savedAddress = addressService.createAddress(employeeDto.getAddress());
 
         Integer warehouseId = employeeDto.getWarehouseId();
         Optional<Warehouse> existingWarehouse = warehouseRepository.findById(warehouseId);
