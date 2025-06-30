@@ -19,14 +19,17 @@ public class HistoryServiceImpl implements HistoryService {
     }
 
     @Override
-    public List<TransactionWithProductsDto> getTransactionHistory(List<Transaction> transactions) {
+    public List<TransactionWithProductsDto> getTransactionsHistory(List<Transaction> transactions) {
         return transactions.stream()
-                .map(t -> {
-                    List<ProductInfoDto> products = getProductsFromTransactions(t.getProducts());
-                    int totalItems = products.stream().mapToInt(ProductInfoDto::getQuantity).sum();
-                    double totalPrice = products.stream().mapToDouble(p -> p.getUnitPrice() * p.getQuantity()).sum();
-                    return transactionMapper.mapToDto(t, products, totalItems, totalPrice);
-                }).toList();
+                .map(this::getTransactionHistory).toList();
+    }
+
+    @Override
+    public TransactionWithProductsDto getTransactionHistory(Transaction transaction) {
+        List<ProductInfoDto> products = getProductsFromTransactions(transaction.getProducts());
+        int totalItems = products.stream().mapToInt(ProductInfoDto::getQuantity).sum();
+        double totalPrice = products.stream().mapToDouble(p -> p.getUnitPrice() * p.getQuantity()).sum();
+        return transactionMapper.mapToDto(transaction, products, totalItems, totalPrice);
     }
 
     @Override

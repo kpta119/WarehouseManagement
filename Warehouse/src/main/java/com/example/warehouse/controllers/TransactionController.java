@@ -1,12 +1,7 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
-import com.example.warehouse.mappers.TransactionMapper;
-import com.example.warehouse.mappers.TransactionSummaryMapper;
 import com.example.warehouse.services.TransactionService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,20 +14,15 @@ import java.util.NoSuchElementException;
 @RequestMapping("api/transactions")
 public class TransactionController {
     private final TransactionService transactionService;
-    private final TransactionMapper transactionMapper;
-    private final TransactionSummaryMapper transactionSummaryMapper;
 
-    public TransactionController(TransactionMapper transactionMapper, TransactionService transactionService, TransactionSummaryMapper transactionSummaryMapper) {
-        this.transactionMapper = transactionMapper;
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
-        this.transactionSummaryMapper = transactionSummaryMapper;
     }
 
     @GetMapping("/{transactionId}")
     public ResponseEntity<?> getTransaction(@PathVariable Integer transactionId) {
         try {
-            Transaction transaction = transactionService.getTransactionById(transactionId);
-            return ResponseEntity.ok(transactionMapper.mapToDto(transaction));
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.getTransactionById(transactionId));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {
@@ -54,9 +44,7 @@ public class TransactionController {
             } else {
                 pageable = PageRequest.of(page, size);
             }
-            Page<Object[]> transactionsPage = transactionService.getAllTransactions(filters, pageable);
-            Page<TransactionSummaryDto> response = transactionsPage.map(transactionSummaryMapper::mapToDto);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(transactionService.getAllTransactions(filters, pageable));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found: " + e.getMessage());
         } catch (Exception e) {

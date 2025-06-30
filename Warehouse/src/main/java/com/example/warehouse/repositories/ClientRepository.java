@@ -6,15 +6,15 @@ import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ClientRepository extends CrudRepository<Client, Integer> {
+public interface ClientRepository extends JpaRepository<Client, Integer> {
 
     @Query("""
     SELECT new com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto(
@@ -40,7 +40,7 @@ public interface ClientRepository extends CrudRepository<Client, Integer> {
         "address.city.country",
         "transactions",
         "transactions.fromWarehouse",
-        "transactions.toWarehouse",
+        "transactions.client",
         "transactions.employee"
     })
     @Query("SELECT c FROM Client c WHERE c.id = :clientId")

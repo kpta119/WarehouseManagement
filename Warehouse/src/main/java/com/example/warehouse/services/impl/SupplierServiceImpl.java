@@ -66,7 +66,7 @@ public class SupplierServiceImpl implements SupplierService {
     public SupplierWithHistoryDto getSupplierWithHistory(Integer supplierId) {
         Supplier supplier = supplierRepository.findSupplierWithHistoryById(supplierId)
                 .orElseThrow(() -> new NoSuchElementException("Supplier not found"));
-        List<TransactionWithProductsDto> transactions = historyService.getTransactionHistory(supplier.getTransactions());
+        List<TransactionWithProductsDto> transactions = historyService.getTransactionsHistory(supplier.getTransactions());
         return businessEntityWithHistoryMapper.mapToDto(supplier, transactions);
     }
 }

@@ -68,7 +68,7 @@ public class ClientServiceImpl implements ClientService {
     public ClientWithHistoryDto getClientWithHistory(Integer clientId) {
         Client client = clientRepository.findClientWithHistoryById(clientId)
                 .orElseThrow(() -> new NoSuchElementException("Client not found"));
-        List<TransactionWithProductsDto> transactions = historyService.getTransactionHistory(client.getTransactions());
+        List<TransactionWithProductsDto> transactions = historyService.getTransactionsHistory(client.getTransactions());
         return businessEntityWithHistoryMapper.mapToDto(client, transactions);
     }
 }

@@ -10,7 +10,9 @@ import java.util.List;
 
 @Service
 public interface HistoryService {
-    List<TransactionWithProductsDto> getTransactionHistory(List<Transaction> transactions);
+    List<TransactionWithProductsDto> getTransactionsHistory(List<Transaction> transactions);
+
+    TransactionWithProductsDto getTransactionHistory(Transaction transaction);
 
     List<ProductInfoDto> getProductsFromTransactions(List<TransactionProduct> transactionProducts);
 }

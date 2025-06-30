@@ -2,14 +2,13 @@ package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
+import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TransactionRepository extends CrudRepository<Transaction, Integer>, JpaSpecificationExecutor<Transaction>, JpaRepository<Transaction, Integer> {
+public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     @Query("SELECT COUNT(t) FROM Transaction t WHERE " +
             "t.transactionType = :type AND " +
             "t.date BETWEEN :start AND :end AND " +
@@ -85,8 +84,10 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 
 
     @Query("""
-            SELECT t.id, t.date, t.description, t.transactionType, t.employee.name, t.employee.surname, fw.name, tw.name,
-                  c.name, s.name, SUM(tp.transactionPrice * tp.quantity) AS totalPrice, SUM(p.unitSize * tp.quantity) AS totalSize
+            SELECT new com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto(
+                 t.id, t.date, t.description, t.transactionType, concat(t.employee.name, " ", t.employee.surname), fw.name, tw.name,
+                 c.name, s.name, SUM(tp.transactionPrice * tp.quantity), SUM(p.unitSize * tp.quantity)
+                )
             FROM Transaction t
             LEFT JOIN t.client   c
             LEFT JOIN t.supplier s
@@ -106,5 +107,16 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
                AND (:#{#filters.maxTotalSize} IS NULL OR SUM(p.unitSize * tp.quantity) <= :#{#filters.maxTotalSize})
             ORDER BY t.date DESC
     """)
-    Page<Object[]> findAllWithFilters(@Param("filters") TransactionsSearchFilters filters, @Param("fromDate") Date fromDate, Pageable pageable);
+    Page<TransactionSummaryDto> findAllWithFilters(@Param("filters") TransactionsSearchFilters filters, @Param("fromDate") Date fromDate, Pageable pageable);
+
+    @EntityGraph(attributePaths = {
+            "fromWarehouse",
+            "toWarehouse",
+            "employee",
+            "client",
+            "employee",
+            "products.product",
+    })
+    @Query("SELECT t from Transaction t where t.id = :transactionId")
+    Optional<Transaction> findTransactionHistoryById(Integer transactionId);
 }
