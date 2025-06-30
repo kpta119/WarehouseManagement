@@ -1,8 +1,8 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Client;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto;
-import com.example.warehouse.domain.dto.filtersDto.ClientSearchFilters;
+import com.example.warehouse.dtos.clientAndSupplierDtos.ClientSummaryDto;
+import com.example.warehouse.dtos.filtersDto.ClientSearchFilters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface ClientRepository extends JpaRepository<Client, Integer> {
 
     @Query("""
-    SELECT new com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientSummaryDto(
+    SELECT new com.example.warehouse.dtos.clientAndSupplierDtos.ClientSummaryDto(
         c.id, c.name, c.email, c.phoneNumber, Concat(a.street, ' ', a.streetNumber, ' ' , ci.name, ', ', co.name), Count(t)
         )
     FROM Client c

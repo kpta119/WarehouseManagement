@@ -1,7 +1,7 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionDataBaseDto;
+import com.example.warehouse.dtos.transactionDtos.TransactionDataBaseDto;
 import org.springframework.stereotype.Component;
 
 @Component

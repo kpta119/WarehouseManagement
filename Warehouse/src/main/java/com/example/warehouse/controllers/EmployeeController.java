@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.employeeDtos.CreateEmployeeDto;
-import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
+import com.example.warehouse.dtos.employeeDtos.CreateEmployeeDto;
+import com.example.warehouse.dtos.filtersDto.EmployeeSearchFilter;
 import com.example.warehouse.services.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;

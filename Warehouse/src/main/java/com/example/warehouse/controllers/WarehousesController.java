@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
-import com.example.warehouse.domain.dto.warehouseDto.WarehouseModifyDto;
+import com.example.warehouse.dtos.filtersDto.WarehousesSearchFilters;
+import com.example.warehouse.dtos.warehouseDto.WarehouseModifyDto;
 import com.example.warehouse.services.WarehousesService;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;

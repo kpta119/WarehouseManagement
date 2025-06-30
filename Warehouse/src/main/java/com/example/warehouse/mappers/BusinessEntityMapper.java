@@ -3,8 +3,8 @@ package com.example.warehouse.mappers;
 import com.example.warehouse.domain.Address;
 import com.example.warehouse.domain.Client;
 import com.example.warehouse.domain.Supplier;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.ClientDto;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierDto;
+import com.example.warehouse.dtos.clientAndSupplierDtos.ClientDto;
+import com.example.warehouse.dtos.clientAndSupplierDtos.SupplierDto;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,7 +1,7 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Category;
-import com.example.warehouse.domain.dto.filtersDto.CategorySearchFilters;
+import com.example.warehouse.dtos.filtersDto.CategorySearchFilters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

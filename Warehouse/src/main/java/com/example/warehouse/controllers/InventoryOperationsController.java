@@ -1,8 +1,8 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.InventoryOperationsDtos.ReceiveDeliveryDto;
-import com.example.warehouse.domain.dto.InventoryOperationsDtos.SellToClientDto;
-import com.example.warehouse.domain.dto.InventoryOperationsDtos.TransferBetweenDto;
+import com.example.warehouse.dtos.InventoryOperationsDtos.ReceiveDeliveryDto;
+import com.example.warehouse.dtos.InventoryOperationsDtos.SellToClientDto;
+import com.example.warehouse.dtos.InventoryOperationsDtos.TransferBetweenDto;
 import com.example.warehouse.services.InventoryOperationsService;
 import com.example.warehouse.validation.OnCreate;
 import org.springframework.dao.NonTransientDataAccessException;

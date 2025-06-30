@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.BusinessEntityDto;
-import com.example.warehouse.domain.dto.filtersDto.SupplierSearchFilter;
+import com.example.warehouse.dtos.clientAndSupplierDtos.BusinessEntityDto;
+import com.example.warehouse.dtos.filtersDto.SupplierSearchFilter;
 import com.example.warehouse.services.SupplierService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;

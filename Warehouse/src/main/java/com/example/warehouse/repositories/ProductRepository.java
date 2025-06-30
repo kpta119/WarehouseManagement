@@ -1,8 +1,8 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
-import com.example.warehouse.domain.dto.productDtos.ProductsResponseDto;
+import com.example.warehouse.dtos.filtersDto.ProductSearchFilterDto;
+import com.example.warehouse.dtos.productDtos.ProductsResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("""
-                SELECT new com.example.warehouse.domain.dto.productDtos.ProductsResponseDto(
+                SELECT new com.example.warehouse.dtos.productDtos.ProductsResponseDto(
                             p.id,
                             p.name,
                             p.description,

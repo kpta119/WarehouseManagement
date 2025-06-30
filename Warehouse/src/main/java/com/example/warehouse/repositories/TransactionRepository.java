@@ -1,8 +1,8 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Transaction;
-import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
-import com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto;
+import com.example.warehouse.dtos.filtersDto.TransactionsSearchFilters;
+import com.example.warehouse.dtos.transactionDtos.TransactionSummaryDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -84,7 +84,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 
 
     @Query("""
-            SELECT new com.example.warehouse.domain.dto.transactionDtos.TransactionSummaryDto(
+            SELECT new com.example.warehouse.dtos.transactionDtos.TransactionSummaryDto(
                  t.id, t.date, t.description, t.transactionType, concat(t.employee.name, " ", t.employee.surname), fw.name, tw.name,
                  c.name, s.name, SUM(tp.transactionPrice * tp.quantity), SUM(p.unitSize * tp.quantity)
                 )

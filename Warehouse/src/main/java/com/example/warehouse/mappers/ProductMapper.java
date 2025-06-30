@@ -2,10 +2,10 @@ package com.example.warehouse.mappers;
 
 
 import com.example.warehouse.domain.Product;
-import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
-import com.example.warehouse.domain.dto.productDtos.ProductDetailsResponseDto;
-import com.example.warehouse.domain.dto.productDtos.ProductsInventoryDto;
-import com.example.warehouse.domain.dto.transactionDtos.ProductTransactionInfoDto;
+import com.example.warehouse.dtos.productDtos.ProductDataBaseDto;
+import com.example.warehouse.dtos.productDtos.ProductDetailsResponseDto;
+import com.example.warehouse.dtos.productDtos.ProductsInventoryDto;
+import com.example.warehouse.dtos.transactionDtos.ProductTransactionInfoDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

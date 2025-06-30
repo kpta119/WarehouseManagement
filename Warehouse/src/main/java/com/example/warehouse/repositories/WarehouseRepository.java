@@ -1,8 +1,8 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Warehouse;
-import com.example.warehouse.domain.dto.filtersDto.WarehousesSearchFilters;
-import com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllResponseDto;
+import com.example.warehouse.dtos.filtersDto.WarehousesSearchFilters;
+import com.example.warehouse.dtos.warehouseDto.WarehouseGetAllResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface WarehouseRepository extends JpaRepository<Warehouse, Integer> {
 
     @Query("""
-            SELECT new com.example.warehouse.domain.dto.warehouseDto.WarehouseGetAllResponseDto(
+            SELECT new com.example.warehouse.dtos.warehouseDto.WarehouseGetAllResponseDto(
                         w.id, w.name, w.capacity, w.occupiedCapacity, Concat(a.street, ' ', a.streetNumber, ' ' , c.name, ', ', co.name),
                         Count(distinct e.id), COALESCE(Sum(distinct pi.quantity), 0L), Count(distinct t.id)
                         )

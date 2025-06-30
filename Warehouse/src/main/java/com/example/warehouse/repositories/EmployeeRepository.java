@@ -1,8 +1,8 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Employee;
-import com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto;
-import com.example.warehouse.domain.dto.filtersDto.EmployeeSearchFilter;
+import com.example.warehouse.dtos.employeeDtos.EmployeeSummaryDto;
+import com.example.warehouse.dtos.filtersDto.EmployeeSearchFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     @Query("""
-            SELECT new com.example.warehouse.domain.dto.employeeDtos.EmployeeSummaryDto(
+            SELECT new com.example.warehouse.dtos.employeeDtos.EmployeeSummaryDto(
                 e.id, e.name, e.surname, e.email, e.phoneNumber, e.position, e.warehouse.name, COUNT(t)
                 )
             FROM Employee e

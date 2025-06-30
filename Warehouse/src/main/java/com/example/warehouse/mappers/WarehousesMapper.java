@@ -3,12 +3,12 @@ package com.example.warehouse.mappers;
 import com.example.warehouse.domain.Employee;
 import com.example.warehouse.domain.Transaction;
 import com.example.warehouse.domain.Warehouse;
-import com.example.warehouse.domain.dto.dateDtos.OccupancyDto;
-import com.example.warehouse.domain.dto.employeeDtos.EmployeeDto;
-import com.example.warehouse.domain.dto.transactionDtos.WarehouseTransactionInfoDto;
-import com.example.warehouse.domain.dto.warehouseDto.ProductInWarehouseDto;
-import com.example.warehouse.domain.dto.warehouseDto.WarehouseDataBaseDto;
-import com.example.warehouse.domain.dto.warehouseDto.WarehouseDetailsDto;
+import com.example.warehouse.dtos.dateDtos.OccupancyDto;
+import com.example.warehouse.dtos.employeeDtos.EmployeeDto;
+import com.example.warehouse.dtos.transactionDtos.WarehouseTransactionInfoDto;
+import com.example.warehouse.dtos.warehouseDto.ProductInWarehouseDto;
+import com.example.warehouse.dtos.warehouseDto.WarehouseDataBaseDto;
+import com.example.warehouse.dtos.warehouseDto.WarehouseDetailsDto;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;

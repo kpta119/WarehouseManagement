@@ -1,7 +1,7 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.categoryDtos.CategoryDto;
-import com.example.warehouse.domain.dto.filtersDto.CategorySearchFilters;
+import com.example.warehouse.dtos.categoryDtos.CategoryDto;
+import com.example.warehouse.dtos.filtersDto.CategorySearchFilters;
 import com.example.warehouse.services.CategoryService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;

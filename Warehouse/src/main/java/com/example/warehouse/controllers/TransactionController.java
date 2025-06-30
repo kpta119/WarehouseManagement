@@ -1,6 +1,6 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.filtersDto.TransactionsSearchFilters;
+import com.example.warehouse.dtos.filtersDto.TransactionsSearchFilters;
 import com.example.warehouse.services.TransactionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

@@ -1,8 +1,8 @@
 package com.example.warehouse.repositories;
 
 import com.example.warehouse.domain.Supplier;
-import com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto;
-import com.example.warehouse.domain.dto.filtersDto.SupplierSearchFilter;
+import com.example.warehouse.dtos.clientAndSupplierDtos.SupplierSummaryDto;
+import com.example.warehouse.dtos.filtersDto.SupplierSearchFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface SupplierRepository extends JpaRepository<Supplier, Integer> {
 
     @Query("""
-            SELECT new com.example.warehouse.domain.dto.clientAndSupplierDtos.SupplierSummaryDto(
+            SELECT new com.example.warehouse.dtos.clientAndSupplierDtos.SupplierSummaryDto(
                 s.id, s.name, s.email, s.phoneNumber, Concat(a.street, ' ', a.streetNumber, ' ' , ci.name, ', ', co.name), Count(t)
                 )
             FROM Supplier s

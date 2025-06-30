@@ -1,8 +1,8 @@
 package com.example.warehouse.controllers;
 
-import com.example.warehouse.domain.dto.dateDtos.Period;
-import com.example.warehouse.domain.dto.filtersDto.ProductSearchFilterDto;
-import com.example.warehouse.domain.dto.productDtos.ProductDataBaseDto;
+import com.example.warehouse.dtos.dateDtos.Period;
+import com.example.warehouse.dtos.filtersDto.ProductSearchFilterDto;
+import com.example.warehouse.dtos.productDtos.ProductDataBaseDto;
 import com.example.warehouse.services.ProductsService;
 import com.example.warehouse.validation.OnCreate;
 import com.example.warehouse.validation.OnUpdate;

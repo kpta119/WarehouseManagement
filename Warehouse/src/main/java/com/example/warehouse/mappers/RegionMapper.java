@@ -1,7 +1,7 @@
 package com.example.warehouse.mappers;
 
 import com.example.warehouse.domain.Region;
-import com.example.warehouse.domain.dto.addressDtos.RegionDto;
+import com.example.warehouse.dtos.addressDtos.RegionDto;
 import org.springframework.stereotype.Component;
 
 @Component

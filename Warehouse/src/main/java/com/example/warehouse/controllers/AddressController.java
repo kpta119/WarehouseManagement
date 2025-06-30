@@ -1,8 +1,8 @@
 package com.example.warehouse.controllers;
 
 import com.example.warehouse.domain.Address;
-import com.example.warehouse.domain.dto.addressDtos.AddressDto;
-import com.example.warehouse.domain.dto.addressDtos.AddressInfoDto;
+import com.example.warehouse.dtos.addressDtos.AddressDto;
+import com.example.warehouse.dtos.addressDtos.AddressInfoDto;
 import com.example.warehouse.mappers.AddressMapper;
 import com.example.warehouse.services.AddressService;
 import jakarta.validation.Valid;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import java.util.NoSuchElementException;
 
