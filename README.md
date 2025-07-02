@@ -34,7 +34,7 @@ I was responsible for the **backend implementation** using **Spring Boot**. My k
 ## Documentation
 There is also available detailed documentations:
 - [API documentation](https://github.com/kpta119/WarehouseManagement/blob/main/API-Documentation.pdf): description of all endpoint (query parameters, path parameters, response and request bodies, status codes)
-- [Database documentation](): precise desrciption of all tables in relational database
+- [Database documentation](https://github.com/kpta119/WarehouseManagement/blob/main/Database_Documentation.pdf): precise desrciption of all tables in relational database
 
 You can try the live version of the application here:  
 👉 [https://bd2test-adrianeqqs-projects.vercel.app/](https://bd2test-adrianeqqs-projects.vercel.app/) (login: admin, password: admin)  
