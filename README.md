@@ -47,12 +47,12 @@ You can try the live version of the application here:
 ---
 
 ### 📦  List of products
-![Procucts List Screenshot](screenshots/inventory.png)
+![Procucts List Screenshot](screenshots/products_list.png)
 
 ---
 
 ### 🚚 Transfers – Moving Goods Between Warehouses
-![Transfers Screenshot](screenshots/transfers.png)
+![Transfers Screenshot](screenshots/transfer.png)
 
 ---
 
@@ -62,8 +62,8 @@ You can try the live version of the application here:
 ---
 
 ### 🏢 Details of the warehouse
-![Warehouse Details1](screenshots/warehouse_1/png)  
-![Warehouse Details2](screenshots/warehouse_2/png)
+![Warehouse Details1](screenshots/warehouse_1.png)  
+![Warehouse Details2](screenshots/warehouse_2.png)
 
 ### 👨🏻‍💼 List of clients
-![Clients List Screenshot](screenshots/clients_list/png)
+![Clients List Screenshot](screenshots/clients_list.png)
